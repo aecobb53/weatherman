@@ -1,0 +1,136 @@
+import json
+import requests
+import datetime
+
+
+class WeatherButler:
+    """
+    WeatherButler handles API calls of the weather website. 
+    """
+
+    def __init__(self):
+
+        """Load configs"""
+        private_config_path = 'etc/weather_api_private.json'
+        public_config_path = 'etc/weather_api_public.json'
+        self.config = {}
+        
+        with open(private_config_path, 'r') as private_config:
+            private_conf = json.load(private_config)
+        self.config.update(private_conf)
+        with open(public_config_path, 'r') as public_config:
+            public_conf = json.load(public_config)
+        self.config.update(public_conf)
+
+        """Load key"""
+        key_path = 'etc/key.json'
+        with open(key_path) as keyfile:
+            self.key = json.load(keyfile)
+
+
+    def get_responce(self, url, key):
+        """
+        Get a responce... yep.
+        It also returns the request object and the json data.
+        """
+        request = requests.get(url, key)
+        return request, request.json()['list']
+
+
+    def format_request_city_id_list(self, url, city_id_list, key):
+        """
+        Format the url in the git_responce to look for the list of cities in the config. 
+        """
+        url += 'group?'
+        args = {'appid':key, 'id':','.join([str(i) for i in city_id_list]), 'units':'imperial'}
+        return url, args
+
+
+    def poll(self):
+        """
+        An easy module to handle all parts of grabbing the data. Its run and successful weather 
+        comes out... or an error... an error can happen too.
+        """
+        url, args = self.format_request_city_id_list(self.config['url'], self.config['locations'].values(), self.key['Weather_Key'])
+        self.request, data = self.get_responce(url, args)
+        report = []
+
+        # I am currently saving ALL responces so i can go back through and tweak the reports
+        with open('butler_data.txt', 'a') as bf:
+            for line in data:
+                bf.write(f"{line}\n")
+        
+        for weather in data:
+            entry = {}
+
+            try:
+                utc = datetime.datetime.now(tz=datetime.timezone.utc)
+                entry['time'] = utc
+                # entry['time'] = datetime.datetime.strftime(utc, '%Y-%m-%dT%H:%M:%SZ')
+                # entry['time'] = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%dT%H:%M:%SZ')
+            except KeyError:
+                entry['time'] = ''
+
+            try:
+                entry['city'] = weather['id']
+            except KeyError:
+                entry['city'] = None
+
+            try:
+                entry['name'] = weather['name']
+            except KeyError:
+                entry['name'] = None
+
+            try:
+                entry['sky_id'] = weather['weather'][0]['id']
+            except KeyError:
+                entry['sky_id'] = None
+
+            try:
+                entry['sky'] = weather['weather'][0]['main']
+            except KeyError:
+                entry['sky'] = None
+
+            try:
+                entry['sky_desc'] = weather['weather'][0]['description']
+            except KeyError:
+                entry['sky_desc'] = None
+
+            try:
+                entry['temp'] = weather['main']['temp']
+            except KeyError:
+                entry['temp'] = None
+
+            try:
+                entry['humidity'] = weather['main']['humidity']
+            except KeyError:
+                entry['humidity'] = None
+
+            try:
+                entry['wind'] = weather['wind']['speed']
+            except KeyError:
+                entry['wind'] = None
+
+            try:
+                entry['cover'] = weather['clouds']['all']
+            except KeyError:
+                entry['cover'] = None
+
+            try:
+                entry['rain'] = weather['precipitation']['all']
+            except KeyError:
+                entry['rain'] = None
+
+            try:
+                entry['snow'] = weather['snow']['all']
+            except KeyError:
+                entry['snow'] = None
+
+            report.append(entry)
+        return report
+
+
+"""
+dict.get("<key>", <default value>)
+returns the default value if the key does not exist
+"""
