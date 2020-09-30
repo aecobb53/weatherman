@@ -71,13 +71,13 @@ class WeatherMan:
         # Testing
         if os.environ.get('TESTING') == None:
             logger.update_file_level('DEBUG')
-            logger.update_file_level('INFO')
+            logger.update_consol_level('INFO')
             self.testing = False
             self.state['fh_logging'] = 'DEBUG'
             self.state['ch_logging'] = 'INFO'
         elif os.environ.get('TESTING') == 'True':
             logger.update_file_level('DEBUG')
-            logger.update_file_level('DEBUG')
+            logger.update_consol_level('DEBUG')
             self.testing = True
             self.db_name += '_behave'
             self.state['log_file'] = logger.update_file(self.name,log_suffix='test')
@@ -86,7 +86,7 @@ class WeatherMan:
             self.state['db_name'] += '_behave'
         else:
             logger.update_file_level('DEBUG')
-            logger.update_file_level('INFO')
+            logger.update_consol_level('INFO')
             # Eventually switche these two to INFO/WARNING or something like that
             self.testing = False
             self.state['fh_logging'] = 'DEBUG'
@@ -440,6 +440,19 @@ actually run
 """
 app = FastAPI()
 WM = WeatherMan()
+
+# # logit.warning(logit, logger)
+# logit.debug('test debug warning')
+# print(logit)
+# print(logger.state)
+# print(logger)
+# logger.update_file_level('INFO')
+# logger.update_consol_level('DEBUG')
+# logit = logger.return_logit()
+# print(logit)
+# print(logger.state)
+# # logit.warning(logit, logger)
+# logit.debug('tkuest debug warning')
 
 @app.get('/')
 def reat_root():

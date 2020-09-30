@@ -3,91 +3,91 @@ import datetime
 import os
 from logging.handlers import RotatingFileHandler
 
-class Logger:
 
-    # Setting for borgueing
-    # Look for better way to link all logger classes
-    logger = None
-    # debug, info, warning, error, critical
+
+class Borg:
+
+    _shared_state = {}
+    def __init__(self):
+        self.__dict__ = self._shared_state
+
+
+
+class Logger(Borg):
 
     def __init__(self, app_name, **kwargs):
-        if self.logger == None:
+        Borg.__init__(self)
+        # Easy way to keep track of what is currently set or not. 
+        self.state = {
+            'f_level':None,
+            'c_level':None,
+            'log_rolling':None,
+            'log_directory':None,
+            'log_prefix':None,
+            'log_suffix':None,
+
+            'app_name_in_file':None,
+            'date_in_file':None,
+            'time_in_file':None,
+            'utc_in_file':None,
+            'short_datetime':None
+        }
+
+        # Update teh state form the kwargs
+        self.set_state(kwargs)
+
+        # creating the logging object
+        self.logger = logging.getLogger(app_name)
+        self.logger.setLevel(logging.DEBUG)
+
+        # Create a filename from self.state
+        self.log_file = self.set_file(app_name)
+
+        # Creating handlers file and consol
+        self.fh = logging.FileHandler(self.log_file)
+        self.ch = logging.StreamHandler()
 
 
-            # Easy way to keep track of what is currently set or not. 
-            self.state = {
-                'f_level':None,
-                'c_level':None,
-                'log_rolling':None,
-                'log_directory':None,
-                'log_prefix':None,
-                'log_suffix':None,
+        """
+        Setting handler levels.
+        The default is file:DEBUG commandline:INFO
+        """
+        if self.state['f_level'] == None:
+            self._update_file_level('DEBUG')
+            self.state['f_level'] = 'DEBUG'
+        else:
+            self._update_file_level(self.state['f_level'])
 
-                'app_name_in_file':None,
-                'date_in_file':None,
-                'time_in_file':None,
-                'utc_in_file':None,
-                'short_datetime':None
-            }
+        # Set time to use
+        if self.state['c_level'] == None:
+            self._update_consol_level('INFO')
+            self.state['c_level'] = 'INFO'
+        else:
+            self._update_consol_level(self.state['c_level'])
 
-            # Update teh state form the kwargs
-            self.set_state(kwargs)
+        
 
-            # creating the logging object
-            self.logger = logging.getLogger(app_name)
-            self.logger.setLevel(logging.DEBUG)
-
-            # Create a filename from self.state
-            self.log_file = self.set_file(app_name)
-
-            # log_file = file_name
+        # create formatter and add it to the handlers
+        # Move into if statement based on kwargs?
+        self.formatter = logging.Formatter('%(asctime)s %(levelname)s %(module)s %(funcName)s - %(message)s', '%Y-%m-%dT%H:%M:%SZ')
 
 
-            # Creating handlers
-            self.fh = logging.FileHandler(self.log_file)
-            self.ch = logging.StreamHandler()
+        # create sublogger stuff
 
 
-            """
-            Setting handler levels.
-            The default is file:DEBUG commandline:INFO
-            """
-            if self.state['f_level'] == None:
-                self.update_file_level('DEBUG')
-                self.state['f_level'] = 'DEBUG'
-            else:
-                self.update_file_level(self.state['f_level'])
+        # Log rotating
+        # Move into if statement based on kwargs
+        #fh = logging.handlers.TimedRotatingFileHandler('logs/testlog.log', when='midnight',interval=1,backupCount=30)
 
-            # Set time to use
-            if self.state['c_level'] == None:
-                self.update_file_level('INFO')
-                self.state['c_level'] = 'INFO'
-            else:
-                self.update_terminal_level(self.state['c_level'])
-
-            
-
-            # create formatter and add it to the handlers
-            # Move into if statement based on kwargs?
-            self.formatter = logging.Formatter('%(asctime)s %(levelname)s %(module)s %(funcName)s - %(message)s', '%Y-%m-%dT%H:%M:%SZ')
+        
+        # Adds the formatter to the logging object
+        self.fh.setFormatter(self.formatter)
+        self.ch.setFormatter(self.formatter)
 
 
-            # create sublogger stuff
-
-
-            # Log rotating
-            # Move into if statement based on kwargs
-            #fh = logging.handlers.TimedRotatingFileHandler('logs/testlog.log', when='midnight',interval=1,backupCount=30)
-
-            
-            # Adds the formatter to the logging object
-            self.fh.setFormatter(self.formatter)
-            self.ch.setFormatter(self.formatter)
-
-
-            # Add the handlers to the logging object
-            self.logger.addHandler(self.fh)
-            self.logger.addHandler(self.ch)
+        # Add the handlers to the logging object
+        self.logger.addHandler(self.fh)
+        self.logger.addHandler(self.ch)
 
     def set_state(self, kwargs):
         # Set items from kwargs
@@ -230,7 +230,7 @@ class Logger:
         """
         return self.logger
 
-    def update_file_level(self, new_level):
+    def _update_file_level(self, new_level):
         """
         Log levels for log file:
         debug, info, warning, error, critical
@@ -255,7 +255,7 @@ class Logger:
             self.fh.setLevel(logging.CRITICAL)
             self.state['f_level'] = 'CRITICAL'
 
-    def update_terminal_level(self, new_level):
+    def _update_consol_level(self, new_level):
         """
         Log levels for command line:
         debug, info, warning, error, critical
@@ -280,6 +280,13 @@ class Logger:
             self.ch.setLevel(logging.CRITICAL)
             self.state['c_level'] = 'CRITICAL'
 
+    def update_file_level(self, new_level):
+        self._update_file_level(new_level)
+        self.logger.addHandler(self.fh)
+
+    def update_consol_level(self, new_level):
+        self._update_consol_level(new_level)
+        self.logger.addHandler(self.ch)
 
 
 
@@ -293,7 +300,7 @@ class Logger:
 #     log_directory='testlogs/')
 # logit = logger.return_logit()
 # logit.info('duplicate logging in both')
-# logger.update_file_level('DEBUG')
+# logger._update_file_level('DEBUG')
 # logit.info('duplicate logging in cmdline1')
 # logger.update_file('the_tester',log_suffix='testwo')
 # logit.info('duplicate logging in cmdline2')
