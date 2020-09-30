@@ -196,7 +196,11 @@ class SQLButler:
         to convert the tuple of data to a dict. 
         """
         line = list(tpl)
-        line[0] = datetime.datetime.strptime(line[0], '%Y-%m-%dT%H:%M:%SZ')
+        try:
+            line[0] = datetime.datetime.strptime(line[0], '%Y-%m-%dT%H:%M:%SZ')
+        except ValueError:
+            line[0] = datetime.datetime.strptime(line[0], '%Y-%m-%d %H:%M:%S')
+            
         dct = {k:v for k,v in zip(self.headers.keys(),line)}
         return dct
 

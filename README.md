@@ -291,10 +291,6 @@ Im still working on it but hopefully i can get it working.
 This was mostly added so i practice all the parts of an actual app. 
 I will put more into the behave readme mentioned after the table of contents. 
 
-`uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8300`
-
-To spin it up in terminal.
-
 ---
 
 You will know it has spun up when you see these lines if its printing to terminal. 
@@ -427,7 +423,7 @@ The boolean is explicit so `True/False` or `1/0`.
 `'False'` is considered a string and returns `True`. 
 
 | kwarg | What it does | input type |
-| --- | --- |
+| --- | --- | --- |
 | `f_level`          | Update the file logging level                | string |
 | `c_level`          | Update the commandline logging level         | string |
 | `log_rolling`      | Set log rotating (not working yet)           | string |
@@ -493,22 +489,17 @@ I am tweaking the codebase, and `logs/weatherman_dev_test.log` if I am running b
 
 ## TODO
 
-- ~Keep the docker container name the same name every time.~
-- ~Tweak container settings to see what they all do.~
-- ~spinup container headless and add documentation for execing back in.~
 - Build out more run.* arguments. 
-- ~more logging.~
-- logging module.
+- ~logging module.~
 - better error handling. 
 - verify the run scripts error silently and capture all returns so the cront does not get full. 
 - logging in the readme. 
 - reports in the readme. 
 - db structure in the readme. 
-- ~Use ENV to set logging.~
-- Second service to control polling?
-- ~spinup dev instances with different Docker or docker-compose files.~
+- ~Second service to control polling?~ no.
 - update Dockerfile or docker-compose itteration numbers. 
-- log rotating
+- log rotating.
+- Add to report the worst conditions of a storm. 
 
 ## Links
 

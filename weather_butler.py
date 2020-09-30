@@ -55,78 +55,79 @@ class WeatherButler:
         self.request, data = self.get_responce(url, args)
         report = []
 
-        # I am currently saving ALL responces so i can go back through and tweak the reports
-        with open('butler_data.txt', 'a') as bf:
-            for line in data:
-                bf.write(f"{line}\n")
+        # # I am currently saving ALL responces so i can go back through and tweak the reports
+        # with open('butler_data.txt', 'a') as bf:
+        #     for line in data:
+        #         bf.write(f"{line}\n")
         
         for weather in data:
-            entry = {}
+            for i in range(len(weather['weather'])):
+                entry = {}
 
-            try:
-                utc = datetime.datetime.now(tz=datetime.timezone.utc)
-                entry['time'] = utc
-                # entry['time'] = datetime.datetime.strftime(utc, '%Y-%m-%dT%H:%M:%SZ')
-                # entry['time'] = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%dT%H:%M:%SZ')
-            except KeyError:
-                entry['time'] = ''
+                try:
+                    utc = datetime.datetime.now(tz=datetime.timezone.utc)
+                    entry['time'] = utc
+                    # entry['time'] = datetime.datetime.strftime(utc, '%Y-%m-%dT%H:%M:%SZ')
+                    # entry['time'] = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%dT%H:%M:%SZ')
+                except KeyError:
+                    entry['time'] = ''
 
-            try:
-                entry['city'] = weather['id']
-            except KeyError:
-                entry['city'] = None
+                try:
+                    entry['city'] = weather['id']
+                except KeyError:
+                    entry['city'] = None
 
-            try:
-                entry['name'] = weather['name']
-            except KeyError:
-                entry['name'] = None
+                try:
+                    entry['name'] = weather['name']
+                except KeyError:
+                    entry['name'] = None
 
-            try:
-                entry['sky_id'] = weather['weather'][0]['id']
-            except KeyError:
-                entry['sky_id'] = None
+                try:
+                    entry['sky_id'] = weather['weather'][i]['id']
+                except KeyError:
+                    entry['sky_id'] = None
 
-            try:
-                entry['sky'] = weather['weather'][0]['main']
-            except KeyError:
-                entry['sky'] = None
+                try:
+                    entry['sky'] = weather['weather'][i]['main']
+                except KeyError:
+                    entry['sky'] = None
 
-            try:
-                entry['sky_desc'] = weather['weather'][0]['description']
-            except KeyError:
-                entry['sky_desc'] = None
+                try:
+                    entry['sky_desc'] = weather['weather'][i]['description']
+                except KeyError:
+                    entry['sky_desc'] = None
 
-            try:
-                entry['temp'] = weather['main']['temp']
-            except KeyError:
-                entry['temp'] = None
+                try:
+                    entry['temp'] = weather['main']['temp']
+                except KeyError:
+                    entry['temp'] = None
 
-            try:
-                entry['humidity'] = weather['main']['humidity']
-            except KeyError:
-                entry['humidity'] = None
+                try:
+                    entry['humidity'] = weather['main']['humidity']
+                except KeyError:
+                    entry['humidity'] = None
 
-            try:
-                entry['wind'] = weather['wind']['speed']
-            except KeyError:
-                entry['wind'] = None
+                try:
+                    entry['wind'] = weather['wind']['speed']
+                except KeyError:
+                    entry['wind'] = None
 
-            try:
-                entry['cover'] = weather['clouds']['all']
-            except KeyError:
-                entry['cover'] = None
+                try:
+                    entry['cover'] = weather['clouds']['all']
+                except KeyError:
+                    entry['cover'] = None
 
-            try:
-                entry['rain'] = weather['precipitation']['all']
-            except KeyError:
-                entry['rain'] = None
+                try:
+                    entry['rain'] = weather['precipitation']['all']
+                except KeyError:
+                    entry['rain'] = None
 
-            try:
-                entry['snow'] = weather['snow']['all']
-            except KeyError:
-                entry['snow'] = None
+                try:
+                    entry['snow'] = weather['snow']['all']
+                except KeyError:
+                    entry['snow'] = None
 
-            report.append(entry)
+                report.append(entry)
         return report
 
 

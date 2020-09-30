@@ -33,6 +33,7 @@ services:
     image: weather-dev:latest
     command: behave
     volumes:
+      # - /usr/src
       - .:/usr/src
     ports:
       - 8200:8000

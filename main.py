@@ -10,7 +10,7 @@ import weather_butler
 
 # Logging
 import logger
-logger = logger.Logger('weatherman', app_name_in_file=True)
+logger = logger.Logger('weatherman', app_name_in_file=True, log_suffix='startup')
 logit = logger.return_logit()
 default_log_file = logger.log_file
 
@@ -124,10 +124,10 @@ class WeatherMan:
             self.state['in_docker'] = True
             logit.info("Starting in Docker")
         else:
-            self.state['log_file'] = logger.update_file(self.name+'txt')
+            self.state['log_file'] = logger.update_file(self.name+'csv')
             import txt_butler
-            self.db = txt_butler.TxtButler(self.db_name)
-            self.state['db_name'] += '.txt'
+            self.db = csv_butler.CSVButler(self.db_name)
+            self.state['db_name'] += '.csv'
             self.working_directory = os.getcwd() + '/'
             self.state['working_directory'] = self.working_directory
             self.state['in_docker'] = False
