@@ -45,20 +45,8 @@ class WeatherButler:
         args = {'appid':key, 'id':','.join([str(i) for i in city_id_list]), 'units':'imperial'}
         return url, args
 
-
-    def poll(self):
-        """
-        An easy module to handle all parts of grabbing the data. Its run and successful weather 
-        comes out... or an error... an error can happen too.
-        """
-        url, args = self.format_request_city_id_list(self.config['url'], self.config['locations'].values(), self.key['Weather_Key'])
-        self.request, data = self.get_responce(url, args)
+    def format_response(self, data):
         report = []
-
-        # # I am currently saving ALL responces so i can go back through and tweak the reports
-        # with open('butler_data.txt', 'a') as bf:
-        #     for line in data:
-        #         bf.write(f"{line}\n")
         
         for weather in data:
             for i in range(len(weather['weather'])):
@@ -67,8 +55,6 @@ class WeatherButler:
                 try:
                     utc = datetime.datetime.now(tz=datetime.timezone.utc)
                     entry['time'] = utc
-                    # entry['time'] = datetime.datetime.strftime(utc, '%Y-%m-%dT%H:%M:%SZ')
-                    # entry['time'] = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%dT%H:%M:%SZ')
                 except KeyError:
                     entry['time'] = ''
 
@@ -128,6 +114,17 @@ class WeatherButler:
                     entry['snow'] = None
 
                 report.append(entry)
+        return report
+
+
+    def poll(self):
+        """
+        An easy module to handle all parts of grabbing the data. Its run and successful weather 
+        comes out... or an error... an error can happen too.
+        """
+        url, args = self.format_request_city_id_list(self.config['url'], self.config['locations'].values(), self.key['Weather_Key'])
+        self.request, data = self.get_responce(url, args)
+        report  = self.format_response(data)
         return report
 
 

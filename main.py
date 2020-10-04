@@ -376,8 +376,10 @@ class WeatherMan:
             json_report[name] = []
             for storm in storms:
                 storm_durration = str(storm[-1]['time'] - storm[0]['time'])
-                storm[0]['time'] = datetime.datetime.strftime(storm[0]['time'], '%Y-%m-%dT%H:%M:%SZ')
-                storm[-1]['time'] = datetime.datetime.strftime(storm[-1]['time'], '%Y-%m-%dT%H:%M:%SZ')
+                new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
+                new_end = storm[-1]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
+                storm[0]['time'] = new_start
+                storm[-1]['time'] = new_end
                 entry = {
                     'storm_start':storm[0]['time'],
                     'storm_end':storm[-1]['time'],
@@ -440,19 +442,6 @@ actually run
 """
 app = FastAPI()
 WM = WeatherMan()
-
-# # logit.warning(logit, logger)
-# logit.debug('test debug warning')
-# print(logit)
-# print(logger.state)
-# print(logger)
-# logger.update_file_level('INFO')
-# logger.update_consol_level('DEBUG')
-# logit = logger.return_logit()
-# print(logit)
-# print(logger.state)
-# # logit.warning(logit, logger)
-# logit.debug('tkuest debug warning')
 
 @app.get('/')
 def reat_root():

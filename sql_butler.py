@@ -62,7 +62,8 @@ class SQLButler:
         insert_data = []
         try:
             # insert_data.append(datetime.datetime.strftime(data['time'], '%Y-%m-%dT%H:%M:%SZ'))
-            insert_data.append(data['time'])
+            # insert_data.append(data['time'])
+            insert_data.append(data['time'].strftime('%Y-%m-%dT%H:%M:%SZ'))
         except:
             insert_data.append('')
 
@@ -196,11 +197,12 @@ class SQLButler:
         to convert the tuple of data to a dict. 
         """
         line = list(tpl)
+        print(line)
         try:
             line[0] = datetime.datetime.strptime(line[0], '%Y-%m-%dT%H:%M:%SZ')
         except ValueError:
-            line[0] = datetime.datetime.strptime(line[0], '%Y-%m-%d %H:%M:%S')
-            
+            # HERE purge the bad data eventually
+            line[0] = datetime.datetime.strptime(line[0], '%Y-%m-%d %H:%M:%S.%f+00:00')
         dct = {k:v for k,v in zip(self.headers.keys(),line)}
         return dct
 
