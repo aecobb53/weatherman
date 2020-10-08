@@ -18,6 +18,7 @@ Scenario: Adding multiple weather reports to database
 Does the database take a list of weather and return the list?
 
     Given I create an empty sql_database
+    Given I start with a new url from example_weather_api_private.json and example_urls.json
     When I load the example response data in good_weather_response_data.json
     When I try to write the data to the database
     When I try to get all data from the database

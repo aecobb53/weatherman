@@ -55,7 +55,7 @@ def after_all(context):
 #     print('after')
 
 def before_scenario(context, scenario):
-    print(scenario)
+    # print(scenario)
     if 'DEBUG' in scenario.tags:
         logger.update_consol_level('DEBUG')
     if 'INFO' in scenario.tags:
@@ -64,6 +64,12 @@ def before_scenario(context, scenario):
         logger.update_consol_level('WARNING')
     if 'database' in scenario.tags:
         database_cleanup()
+    if 'owma' in scenario.tags:
+        pass
+    if 'on' in scenario.tags:
+        context.run = True
+    if 'off' in scenario.tags:
+        context.run = False
 
 def after_scenario(context, scenario):
     logger.update_consol_level('WARNING')

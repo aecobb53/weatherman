@@ -8,11 +8,14 @@ class WeatherButler:
     WeatherButler handles API calls of the weather website. 
     """
 
-    def __init__(self):
+    def __init__(self, private_config_path, public_config_path):
 
         """Load configs"""
-        private_config_path = 'etc/weather_api_private.json'
-        public_config_path = 'etc/weather_api_public.json'
+        # print(private_config_path)
+        # if private_config_path == None:
+        #     private_config_path = 'etc/weather_api_private.json'
+        # print(private_config_path)
+        # public_config_path = 'etc/weather_api_public.json'
         self.config = {}
         
         with open(private_config_path, 'r') as private_config:
@@ -28,12 +31,12 @@ class WeatherButler:
             self.key = json.load(keyfile)
 
 
-    def get_responce(self, url, key):
+    def get_responce(self, url, args):
         """
         Get a responce... yep.
         It also returns the request object and the json data.
         """
-        request = requests.get(url, key)
+        request = requests.get(url, args)
         return request, request.json()['list']
 
 

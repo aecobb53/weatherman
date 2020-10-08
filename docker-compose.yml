@@ -31,6 +31,8 @@ services:
   test:
     build: .
     image: weather-dev:latest
+    # command: behave --tags=owma
+    # command: behave -n "Generating a poll url"
     command: behave
     volumes:
       # - /usr/src

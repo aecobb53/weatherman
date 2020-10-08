@@ -43,9 +43,11 @@ class WeatherMan:
 
     def __init__(self):
         self.name = 'weatherman'
-        self.config_path = 'etc/weather_api_private.json'
+        # self.private_config_path = 'features/support/example_weather_api_private.json'
+        self.private_config_path = 'etc/weather_api_private.json'
+        self.public_config_path = 'etc/weather_api_public.json'
         self.db_name='db/weatherman' # The type will be appended in the db
-        self.weather_butler = weather_butler.WeatherButler()
+        self.weather_butler = weather_butler.WeatherButler(self.private_config_path, self.public_config_path)
 
         self.state = {
             'working_directory':None,
@@ -57,7 +59,8 @@ class WeatherMan:
             'db_name':self.db_name,
         }
 
-        with open(self.config_path) as configfile:
+
+        with open(self.private_config_path) as configfile:
             self.config = json.load(configfile)
         self.state['cities'] = self.config['locations']
 
@@ -80,6 +83,7 @@ class WeatherMan:
             logger.update_consol_level('DEBUG')
             self.testing = True
             self.db_name += '_behave'
+            self.state['log_file'] = logger.update_file(self.name,log_suffix=None)
             self.state['log_file'] = logger.update_file(self.name,log_suffix='test')
             self.state['fh_logging'] = 'DEBUG'
             self.state['ch_logging'] = 'DEBUG'
@@ -102,7 +106,7 @@ class WeatherMan:
             # self.state['log_file'] = logger.update_file(self.name, app_name_in_file=True)
         elif os.environ.get('ENVIRONMENT') == 'dev':
             self.environment = 'dev'
-            self.state['log_file'] = logger.update_file(self.name,log_prefix='dev')
+            self.state['log_file'] = logger.update_file(self.name,log_prefix='dev',log_suffix=None)
             self.db_name += '_dev'
             self.state['db_name'] += '_dev'
         elif os.environ.get('ENVIRONMENT') == 'test':
