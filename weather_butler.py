@@ -31,9 +31,9 @@ class WeatherButler:
             self.key = json.load(keyfile)
 
 
-    def get_responce(self, url, args):
+    def get_response(self, url, args):
         """
-        Get a responce... yep.
+        Get a response... yep.
         It also returns the request object and the json data.
         """
         request = requests.get(url, args)
@@ -42,7 +42,7 @@ class WeatherButler:
 
     def format_request_city_id_list(self, url, city_id_list, key):
         """
-        Format the url in the git_responce to look for the list of cities in the config. 
+        Format the url in the git_response to look for the list of cities in the config. 
         """
         url += 'group?'
         args = {'appid':key, 'id':','.join([str(i) for i in city_id_list]), 'units':'imperial'}
@@ -126,7 +126,7 @@ class WeatherButler:
         comes out... or an error... an error can happen too.
         """
         url, args = self.format_request_city_id_list(self.config['url'], self.config['locations'].values(), self.key['Weather_Key'])
-        self.request, data = self.get_responce(url, args)
+        self.request, data = self.get_response(url, args)
         report  = self.format_response(data)
         return report
 

@@ -185,7 +185,7 @@ def weather_bulter_response(context):
     except:
         context.run = True
     if context.run == True:
-        context.request, context.request_list = context.WB.get_responce(context.url, context.args)
+        context.request, context.request_list = context.WB.get_response(context.url, context.args)
         if context.request.status_code != 200:
             logit.error(f'The api return a wrong code of {context.request.status_code}')
             raise ValueError(f'An eronius code was returned {context.request.status_code}')
