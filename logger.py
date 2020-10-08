@@ -90,7 +90,10 @@ class Logger(Borg):
         self.logger.addHandler(self.ch)
 
     def set_state(self, kwargs):
-        # Set items from kwargs
+        """
+        Set items from kwargs. 
+        If you need to un-set somethign set it equal to None
+        """
         for k,v in kwargs.items():
             """set to values"""
             if k == 'f_level':

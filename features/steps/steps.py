@@ -104,3 +104,4 @@ def compare_to_json_data(context, json_file):
                 raise ValueError('The examplefile and the database do not match')
     logit.info(f"The comparison matches")
 
+features/

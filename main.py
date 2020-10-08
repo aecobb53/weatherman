@@ -98,15 +98,16 @@ class WeatherMan:
         # Environment
         if os.environ.get('ENVIRONMENT') == 'prod':
             self.environment = 'prod'
+            self.state['log_file'] = logger.update_file(self.name, app_name_in_file=True, log_suffix=None)
+            # self.state['log_file'] = logger.update_file(self.name, app_name_in_file=True)
         elif os.environ.get('ENVIRONMENT') == 'dev':
             self.environment = 'dev'
-            self.db_name += '_dev'
             self.state['log_file'] = logger.update_file(self.name,log_prefix='dev')
+            self.db_name += '_dev'
             self.state['db_name'] += '_dev'
         elif os.environ.get('ENVIRONMENT') == 'test':
             self.environment = 'test'
             self.db_name += '_test'
-            self.state['log_file'] = logger.update_file(self.name,log_prefix='dev')
             self.state['db_name'] += '_test'
         else:
             self.environment = 'prod'
