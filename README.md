@@ -490,13 +490,11 @@ I am tweaking the codebase, and `logs/weatherman_dev_test.log` if I am running b
 ## TODO
 
 - Build out more run.* arguments. 
-- ~logging module.~
 - better error handling. 
 - verify the run scripts error silently and capture all returns so the cront does not get full. 
 - logging in the readme. 
 - reports in the readme. 
 - db structure in the readme. 
-- ~Second service to control polling?~ no.
 - update Dockerfile or docker-compose itteration numbers. 
 - log rotating.
 - Add to report the worst conditions of a storm. 
