@@ -1,0 +1,58 @@
+[
+    {
+        "time": "2020-10-09T17:30:21Z", 
+        "city": 2643741, 
+        "name": "City of London", 
+        "sky_id": 802, 
+        "sky": "Clouds", 
+        "sky_desc": "scattered clouds", 
+        "temp": 54.9, 
+        "humidity": 71, 
+        "wind": 3.36, 
+        "cover": 40, 
+        "rain": 0.0, 
+        "snow": 0.0
+    },
+    {
+        "time": "2020-10-09T17:30:21Z", 
+        "city": 5128581, 
+        "name": "New York", 
+        "sky_id": 800, 
+        "sky": "Clear", 
+        "sky_desc": "clear sky", 
+        "temp": 63.21, 
+        "humidity": 39, 
+        "wind": 12.75, 
+        "cover": 1, 
+        "rain": 0.0, 
+        "snow": 0.0
+    },
+    {
+        "time": "2020-10-09T17:30:21Z", 
+        "city": 5419384, 
+        "name": "Denver", 
+        "sky_id": 801, 
+        "sky": "Clouds", 
+        "sky_desc": "few clouds", 
+        "temp": 82.04, 
+        "humidity": 8, 
+        "wind": 6.93, 
+        "cover": 20, 
+        "rain": 0.0, 
+        "snow": 0.0
+    },
+    {
+        "time": "2020-10-09T17:30:21Z", 
+        "city": 5809844, 
+        "name": "Seattle", 
+        "sky_id": 803, 
+        "sky": "Clouds", 
+        "sky_desc": "broken clouds", 
+        "temp": 62.98, 
+        "humidity": 67, 
+        "wind": 10.29, 
+        "cover": 75, 
+        "rain": 0.0, 
+        "snow": 0.0
+    }
+]
