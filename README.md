@@ -8,11 +8,11 @@ Then use this weather data to determine if images for the ICAs were lost due to 
 It currently runs in a SQL or csv database and Docker or terminal configurations. 
 I highly reccomend running it in Docker as SQL but i kept the other forms mostly up to date just in case. 
 
-> Release:  0.3.0-alpha
+> Release:  0.4.0-beta
 
-> POC:  Andrew Cobb
+> Point of contact:  Andrew
 
-> Last modified:  2020-09-26
+> Last modified:  2020-10-09
 
 ## Table of Contents
 
@@ -174,7 +174,6 @@ I plan to increase to every 5 minutes.
 ## What you need
 
 All configurations will need the repo downloaded locally, and an "openweathermap.org" API key. 
-I may eventually create an OSE key. 
 To set up a key add the folowing to a file in the repo called `key.ignore`. 
 
 ```json
@@ -258,15 +257,11 @@ The name of the docker container is `weather:latest` or `weather-dev:latest` dep
 Different run commands to run out of the git repo (descriptions underneith):
 
 
-`docker-compose up weather`
+`docker-compose up [-d] [--build] weather`
 
 The super basic run docker. 
-However this will spin it up in terminal.
-
-
-`docker-compose up -d weather`
-
-Run the container headless. 
+By default this will spin it up in terminal. 
+If you want it headless use the `-d` and if you want the image rebuilt run `--build`. 
 
 
 `docker logs <container id> [--follow]`
@@ -274,31 +269,17 @@ Run the container headless.
 Print recent logges or tail the logs
 
 
-`docker-compose up weather --build`
-
-If the up commands arent working use the --build argument. 
-
-
-`docker-compose up dev`
+`docker-compose up [--build] dev`
 
 If you want to spin up the dev instance run the above command. 
 Note that the port for the dev instance is `8100` not `8000`.
 
-`docker-compose up --build test`
+
+`docker-compose up [--build] test`
 
 I added this for unit/feature testing. 
-Im still working on it but hopefully i can get it working. 
-This was mostly added so i practice all the parts of an actual app. 
-I will put more into the behave readme mentioned after the table of contents. 
-
----
-
-You will know it has spun up when you see these lines if its printing to terminal. 
-
-```txt
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-```
+I have some of the feature testing working but still need to finish and start the unit testing. 
+there is more info in the behave readme mentioned after the table of contents. 
 
 ##### Dockerfile
 
@@ -316,19 +297,13 @@ ENVs set:
 - IS_IN_DOCKER: The main.py reads this variable to determin if its in Docker or not. 
 - TESTING: Used to set logging on app startup. 
 
-Dockerfile:
+Notable Dockerfile events:
 
 ```Dockerfile
 FROM python:3
-
-WORKDIR /usr/src
-COPY . .
-
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV IS_IN_DOCKER=True
-
-RUN pip install --no-cache-dir -r requirements.txt
 ```
 
 ##### docker-compose.yml
@@ -348,19 +323,13 @@ All internal ports are set to 8000 but the external ports will be `8000` or prod
 `--reset` in uvicorn sets uvicorn to stop/start if any file in the directory updates. 
 This is SUPER useful for developing but not for a stable product. 
 
-docker-compose.xml file:
+Notable docker-compose.xml events:
 
 ```Docker
 version: '3'
-
 services:
-
   weather:
-    build: .
-    image: weather:latest
     command: uvicorn main:app --workers 1 --host 0.0.0.0 --port 8000
-    volumes:
-      - .:/usr/src
     ports:
         - 8000:8000
     environment:
@@ -368,15 +337,19 @@ services:
       - TESTING=False
 
   dev:
-    build: .
-    image: weather-dev:latest
     command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8000
-    volumes:
-      - .:/usr/src
     ports:
         - 8100:8000
     environment:
       - ENVIRONMENT=dev
+      - TESTING=True
+  
+  test:
+    command: behave
+    ports:
+      - 8200:8000
+    environment:
+      - ENVIRONMENT=test
       - TESTING=True
 ```
 
@@ -384,14 +357,13 @@ services:
 
 Right now using Docker will use SQL and not will use txt... i dont have a great way to switch 
 between the two. 
-But it would be possible to add.
 
 ## Terminal
 
-If you must not use Docker then you can use uvicorn to spin up the service in terminal. 
+You can use uvicorn to spin up the service in terminal. 
 Make sure you are in the repo and run the folowing command. 
 
-`uvicorn main:app --reload --host 0.0.0.0 --port 8000` You dont need the `--reload`. 
+`uvicorn main:app [--reload] --host 0.0.0.0 --port 8000`. 
 
 You will know it has spun up when you see these lines
 
@@ -410,7 +382,7 @@ Docker spins up SQL very easily and python comes with sql installed by default s
 
 ## CSV
 
-I added it for testing and if we ever need it. 
+I added it for testing and if people wanted it.  
 
 ## Logging
 
@@ -476,6 +448,7 @@ Because of the difference between logit and logger you can update waht the logge
 If you need to update the log level you can run `logger.update_file_level('DEBUG')`. 
 Logger expects `debug`, `info`, `warning`, `error`, `critical` (case insensitive). 
 You can also update the filename at any time with `logger.update_file('<app_name>', <kwargs>)`. 
+When you update the file it appends a list so set it to `None` if you want it to unset something. 
 Example Use cases are updateing the logger based on env variables as I have or switch the log levels 
 and file names if you receive an error and want to capture more data about it. 
 Currently if behave testing is being run I update the suffix to 'test' and all log levels to debug. 
@@ -485,7 +458,7 @@ If the script is spun up outside of docker "text" is added to the scriptname.
 ---
 
 In a nutshell weatherman logs to `logs/weatherman.log` if we are in prod, `logs/weatherman_dev.log` if 
-I am tweaking the codebase, and `logs/weatherman_dev_test.log` if I am running behave testing. 
+tweaking in dev, and `logs/weatherman_dev_test.log` if running behave testing. 
 
 ## TODO
 
@@ -503,7 +476,7 @@ I am tweaking the codebase, and `logs/weatherman_dev_test.log` if I am running b
 
 - [prod api](http://0.0.0.0:8000/state)
 - [dev api](http://0.0.0.0:8100/state)
-- [test api](http://0.0.0.0:8100state)
+- [test api](http://0.0.0.0:8200/state)
 
 
 - [SQL help](https://www.sqlite.org/lang_expr.html#cosub)
