@@ -1,0 +1,16 @@
+[
+    {
+        "time": "2020-09-30T22:53:29Z", 
+        "city": 2643741, 
+        "name": "City of London", 
+        "sky_id": 800, 
+        "sky": "Clear", 
+        "sky_desc": "clear sky", 
+        "temp": 59.2, 
+        "humidity": 17, 
+        "wind": 5.82, 
+        "cover": 4, 
+        "rain": 0.0, 
+        "snow": 0.0
+    }
+]

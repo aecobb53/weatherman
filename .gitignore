@@ -2,8 +2,8 @@
 db/*
 etc/weather_api_private.json
 etc/key.json
-features/support/*
 out/*
+logs/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
