@@ -8,11 +8,11 @@ Then use this weather data to determine if images for the ICAs were lost due to 
 It currently runs in a SQL or csv database and Docker or terminal configurations. 
 I highly reccomend running it in Docker as SQL but i kept the other forms mostly up to date just in case. 
 
-> Release:  0.4.0-beta
+> Release:  0.5.0-beta
 
 > Point of contact:  Andrew
 
-> Last modified:  2020-10-09
+> Last modified:  2020-10-20
 
 ## Table of Contents
 
@@ -272,7 +272,7 @@ Print recent logges or tail the logs
 `docker-compose up [--build] dev`
 
 If you want to spin up the dev instance run the above command. 
-Note that the port for the dev instance is `8100` not `8000`.
+Note that the port for the dev instance is `8010` not `8000`.
 
 
 `docker-compose up [--build] test`
@@ -319,7 +319,7 @@ For ENVIRONMENT prod is intended to be stable weather gathering.
 dev changes the name of the log file to `dev_weatherman.log`. 
 For TESTING True sets all log levels to DEBUG while False sets the logfile to DEBUG and commandline to INFO. 
 I plan to set the command line to INFO/WARNING enventually but for testing it works well. 
-All internal ports are set to 8000 but the external ports will be `8000` or prod and `8100` for dev. 
+All internal ports are set to 8000 but the external ports will be `8000` or prod and `8010` for dev. 
 `--reset` in uvicorn sets uvicorn to stop/start if any file in the directory updates. 
 This is SUPER useful for developing but not for a stable product. 
 
@@ -339,7 +339,7 @@ services:
   dev:
     command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8000
     ports:
-        - 8100:8000
+        - 8010:8000
     environment:
       - ENVIRONMENT=dev
       - TESTING=True
@@ -347,7 +347,7 @@ services:
   test:
     command: behave
     ports:
-      - 8200:8000
+      - 8020:8000
     environment:
       - ENVIRONMENT=test
       - TESTING=True
@@ -471,12 +471,14 @@ tweaking in dev, and `logs/weatherman_dev_test.log` if running behave testing.
 - update Dockerfile or docker-compose itteration numbers. 
 - log rotating.
 - Add to report the worst conditions of a storm. 
+- Date search from the database
+- Condensed sql db
 
 ## Links
 
 - [prod api](http://0.0.0.0:8000/state)
-- [dev api](http://0.0.0.0:8100/state)
-- [test api](http://0.0.0.0:8200/state)
+- [dev api](http://0.0.0.0:8010/state)
+- [test api](http://0.0.0.0:8020/state)
 
 
 - [SQL help](https://www.sqlite.org/lang_expr.html#cosub)
