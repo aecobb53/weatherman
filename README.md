@@ -473,6 +473,7 @@ tweaking in dev, and `logs/weatherman_dev_test.log` if running behave testing.
 - Add to report the worst conditions of a storm. 
 - Date search from the database
 - Condensed sql db
+- Set import versions in the requirements file
 
 ## Links
 
