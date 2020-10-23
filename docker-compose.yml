@@ -23,7 +23,7 @@ services:
     volumes:
       - .:/usr/src
     ports:
-      - 8100:8000
+      - 8010:8000
     environment:
       - ENVIRONMENT=dev
       - TESTING=False
@@ -38,8 +38,19 @@ services:
       # - /usr/src
       - .:/usr/src
     ports:
-      - 8200:8000
+      - 8020:8000
     environment:
       - ENVIRONMENT=test
       - TESTING=True
 
+  unit-test:
+    build: .
+    image: weather-unit-test:latest
+    command: pytest
+    volumes:
+      - .:/usr/src
+    ports:
+      - 8020:8000
+    environment:
+      - ENVIRONMENT=test
+      - TESTING=True
