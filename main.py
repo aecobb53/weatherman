@@ -130,7 +130,7 @@ class WeatherMan:
             logit.info("Starting in Docker")
         else:
             self.state['log_file'] = logger.update_file(self.name+'csv')
-            import txt_butler
+            import csv_butler
             self.db = csv_butler.CSVButler(self.db_name)
             self.state['db_name'] += '.csv'
             self.working_directory = os.getcwd() + '/'
@@ -468,7 +468,8 @@ def reat_root():
         '/snow_report':'File of snow data',
         '/wind_report':'File of wind data',
     }
-    return info
+    return "request type /location /http/1.1"
+    # return info
 
 @app.get('/state')
 def return_args():

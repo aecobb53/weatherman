@@ -10,6 +10,8 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV IS_IN_DOCKER=True
 
+EXPOSE 8000
+
 # # install system dependencies
 # RUN apt-get update \
 #   && apt-get -y install netcat gcc \
