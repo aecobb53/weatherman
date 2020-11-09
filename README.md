@@ -472,6 +472,8 @@ tweaking in dev, and `logs/weatherman_dev_test.log` if running behave testing.
 - log rotating.
 - Add to report the worst conditions of a storm. 
 - Add CICD daily testing. pull changes, run tests, send results. 
+- Change all backends to be `async`
+- Eventually set the main app logging to file only
 
 ## Links
 

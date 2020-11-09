@@ -5,6 +5,7 @@ import json
 import os
 
 from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 
 import weather_butler
 
@@ -448,6 +449,25 @@ actually run
 app = FastAPI()
 WM = WeatherMan()
 
+# origins = [
+#     "http://localhost.tiangolo.com",
+#     "https://localhost.tiangolo.com",
+#     "http://localhost",
+#     "http://localhost:8080",
+#     "http://localhost:8000",
+#     "http://127.0.0.1:8000",
+# ]
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get('/')
 def reat_root():
     logit.debug('home endpoint hit')
@@ -468,8 +488,9 @@ def reat_root():
         '/snow_report':'File of snow data',
         '/wind_report':'File of wind data',
     }
-    return "request type /location /http/1.1"
-    # return info
+    # return "request type /location /http/1.1"
+    return info
+    # return {"Hello":"World!"}
 
 @app.get('/state')
 def return_args():

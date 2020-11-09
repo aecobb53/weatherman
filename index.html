@@ -5,7 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/styles.css">
     <title>Weatherman</title>
-    <script src="jsscript.js" defer></script>
+    <!-- <script src="poll.js" async></script> -->
+    <!-- <script src="jsscript.js" defer></script> -->
+    <!-- <script>
+      window.addEventListener("load", function () {
+        fetch("http://127.0.0.1:8010").then(function (response) {
+              console.log("Content type:", response.headers.get('Content-Type'));
+
+              console.log("Redirected: ", response.redirected);
+              console.log("Status:", response.status);
+              console.log("Status text:", response.statusText);
+              console.log("Response type:", response.type);
+              console.log("Response URL:", response.url);
+
+              if (response.status == 200) {
+                  return response.text();
+              }
+          }).then(function (returnedData) {
+              console.log("Returned data:", returnedData);
+          }).catch(function (error) {
+              console.log("Error:", error);
+          })
+      });
+      console.log("it ran")
+    </script> -->
   </head>
   <body>
     <main>
@@ -35,10 +58,13 @@
         <!-- ***********************  Parameters  *********************** -->
         <!-- ***********************  Display  *********************** -->
     </main>
+    <!-- <script src="poll.js" async></script> -->
+    <!-- <script src="poll.js"></script> -->
+
     <script>
+
       window.addEventListener("load", function () {
-          // Perform a regular GET operation
-          fetch("https://localhost:8000/").then(function (response) {
+        fetch("http://127.0.0.1:8010").then(function (response) {
               console.log("Content type:", response.headers.get('Content-Type'));
 
               console.log("Redirected: ", response.redirected);
@@ -55,22 +81,8 @@
           }).catch(function (error) {
               console.log("Error:", error);
           })
-
-          // perform a POST function with data in the body
-          // fetch("https://httpbin.org/post", {
-          //     method: 'post',
-          //     body: 'foo=bar',
-          //     headers: {
-          //         "x-Custom-Header": "my-custom-value"
-          //     }
-          // }).then(function (response) {
-          //     return response.text();
-          // }).then(function (returnedData) {
-          //     console.log("Returned data:", returnedData);
-          // }).catch(function (error) {
-          //     console.log('Request failed', error);
-          // });
       });
+      console.log("it ran")
     </script>
   </body>
 </html>
