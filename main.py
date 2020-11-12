@@ -534,6 +534,12 @@ def poll_data():
     WM.manage_polling()
     return {'Success':True}
 
+@app.get('/dump')
+def data_dump(request: Request):
+    logit.debug('Sending dump')
+    dump = WM.bad_weather_dump()
+    return templates.TemplateResponse("dump.html", {"request": request})
+
 @app.get('/full_dump')
 def full_data_dump():
     logit.debug('Gathering full dump')
