@@ -5,32 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/styles.css">
     <title>Weatherman</title>
-    <!-- <script src="poll.js" async></script> -->
+    <!-- <script src="javascript/poll.js" async></script> -->
     <!-- <script src="jsscript.js" defer></script> -->
-    <!-- <script>
-      window.addEventListener("load", function () {
-        fetch("http://127.0.0.1:8010").then(function (response) {
-              console.log("Content type:", response.headers.get('Content-Type'));
-
-              console.log("Redirected: ", response.redirected);
-              console.log("Status:", response.status);
-              console.log("Status text:", response.statusText);
-              console.log("Response type:", response.type);
-              console.log("Response URL:", response.url);
-
-              if (response.status == 200) {
-                  return response.text();
-              }
-          }).then(function (returnedData) {
-              console.log("Returned data:", returnedData);
-          }).catch(function (error) {
-              console.log("Error:", error);
-          })
-      });
-      console.log("it ran")
-    </script> -->
-  </head>
+    <script src="javascript/poll.js" async></script>
+</head>
   <body>
+    <!-- <script src="javascript/poll.js" async></script> -->
     <main>
         <!-- ***********************  Header  *********************** -->
         <header class="clearfix">
@@ -58,11 +38,7 @@
         <!-- ***********************  Parameters  *********************** -->
         <!-- ***********************  Display  *********************** -->
     </main>
-    <!-- <script src="poll.js" async></script> -->
-    <!-- <script src="poll.js"></script> -->
-
-    <script>
-
+    <!-- <script>
       window.addEventListener("load", function () {
         fetch("http://127.0.0.1:8010").then(function (response) {
               console.log("Content type:", response.headers.get('Content-Type'));
@@ -83,6 +59,33 @@
           })
       });
       console.log("it ran")
-    </script>
+    </script> -->
   </body>
+  <!-- <script src="javascript/poll.js" async></script> -->
+
+  <!-- <script>
+    window.addEventListener("load", function () {
+      fetch("http://127.0.0.1:8010").then(function (response) {
+            console.log("Content type:", response.headers.get('Content-Type'));
+
+            console.log("Redirected: ", response.redirected);
+            console.log("Status:", response.status);
+            console.log("Status text:", response.statusText);
+            console.log("Response type:", response.type);
+            console.log("Response URL:", response.url);
+            console.log(typeof response.status)
+
+            if (response.status == 200) {
+                console.log("good response")
+                return response.json();
+            }
+
+        }).then(function (returnedData) {
+            console.log("Returned data:", returnedData);
+        }).catch(function (error) {
+            console.log("Error:", error);
+        })
+    });
+    console.log("it ran")
+  </script> -->
 </html>
