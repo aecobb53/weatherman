@@ -4,8 +4,12 @@ import time
 import json
 import os
 
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, Request, Form
+from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from starlette.responses import PlainTextResponse, RedirectResponse
 
 import weather_butler
 
@@ -448,6 +452,8 @@ actually run
 """
 app = FastAPI()
 WM = WeatherMan()
+templates = Jinja2Templates(directory="templates/")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # origins = [
 #     "http://localhost.tiangolo.com",
@@ -469,7 +475,7 @@ app.add_middleware(
 )
 
 @app.get('/')
-def reat_root():
+def reat_root(request: Request):
     logit.debug('home endpoint hit')
     info = {
         '/':'list of extentions',
@@ -488,14 +494,39 @@ def reat_root():
         '/snow_report':'File of snow data',
         '/wind_report':'File of wind data',
     }
-    # return "request type /location /http/1.1"
-    return info
-    # return {"Hello":"World!"}
+
+    new_l = [i+' : '+j for i,j in info.items()]
+    return templates.TemplateResponse("main.html", {"request": request, 'list':new_l})
+
+
+
+@app.get("/items/{id}", response_class=HTMLResponse)
+async def read_item(request: Request, id: str):
+    return templates.TemplateResponse("item.html", {"request": request, "id": id})
+
+@app.get("/about-weatherman", response_class=HTMLResponse)
+async def about_weatherman(request: Request):
+    return templates.TemplateResponse("about_weatherman.html", {"request": request})
+
 
 @app.get('/state')
-def return_args():
+def return_args(request: Request):
     logit.debug('state endpoint hit')
-    return WM.state
+    state_list = []
+    for i,j in WM.state.items():
+        if i == 'cities':
+            state_list.append(i + ':')
+            for x,y in j.items():
+                state_list.append('    ' + x + ' : ' + str(y))
+        elif i == 'fh_logging':
+            state_list.append('file_logging' + ' : ' + j)
+        elif i == 'ch_logging':
+            state_list.append('consol_logging' + ' : ' + j)
+        else:
+            state_list.append(i + ' : ' + str(j))
+        logit.info(f"{i} : {j}")
+    return templates.TemplateResponse("state.html", {"request": request, 'list':state_list})
+    # return WM.state
 
 @app.get('/poll')
 def poll_data():
