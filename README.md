@@ -8,11 +8,11 @@ Then use this weather data to determine if images for the ICAs were lost due to 
 It currently runs in a SQL or csv database and Docker or terminal configurations. 
 I highly reccomend running it in Docker as SQL but i kept the other forms mostly up to date just in case. 
 
-> Release:  0.5.0-beta
+> Release:  0.6.0-beta
 
 > Point of contact:  Andrew
 
-> Last modified:  2020-10-20
+> Last modified:  2020-11-13
 
 
 ## Table of Contents
@@ -477,6 +477,13 @@ tweaking in dev, and `logs/weatherman_dev_test.log` if running behave testing.
 - Add CICD daily testing. pull changes, run tests, send results. 
 - Change all backends to be `async`
 - Eventually set the main app logging to file only
+- Shorten up main README and add it to an extended README
+  - README - Basics of the app and where to go for more information
+  - Testing - Details on testing how to perform, what to expect
+  - OWA - Details about the weather service
+  - Env - Docker, SQL, 
+  - Frontend - html, css, if i write an actual frontend which is very tempting
+  - Other - Catchall
 
 ## Links
 
