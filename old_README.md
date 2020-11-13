@@ -127,48 +127,6 @@ Poll data from Open Weather Map based on the list of cities
 
 ---
 
-### Open Weather Map api
-
-I am using the Free calls:
-
-```
-60 calls/minute
-1,000,000 calls/month
-Curent Weather
-Minute Forecast 1 hour*
-Hourly Forecast 2 days*
-Daily Forecast 7 days*
-Government Weather alerts*
-Historical weather 5 days*
-Basic weather maps
-Weather triggers
-Weather widgets
-Uptime 95%
-
-* - 1,000 API calls per day by using One Call API
-** - 2,000 API calls per day by using One Call API
-```
-
-Note: I read somewhere the polling type i am using maxes out at 20. 
-I cant find where that was again so maybe that changed. 
-It appears i can call for current weather up to 60/min or 1M/month. 
-If that is the case i can poll up to 22 cities every minute. 
-Currently i only get 11 cities data every 15 minutes. 
-I plan to increase to every 5 minutes.
-
-
-| calls/attempt          | 10        | 11      | 20      | 23        |
-| ----------------------:| ---------:| -------:| -------:| ---------:|
-| calls/min              | 10        | 11      | 20      | 23        |
-| calls/hour             | 600       | 660     | 1,200   | 1,380     |
-| calls/day              | 14,400    | 15,840  | 28,800  | 33,120    |
-| calls/week             | 100,800   | 110,880 | 201,600 | 231,840   |
-| calls/month            | 446,400   | 491,040 | 892,800 | 1,026,720 |
-| calls every 5  minutes | 89,280    | 98,208  | 178,560 | 205,344   |
-| calls every 10 minutes | 44,640    | 49,104  | 89,280  | 102,672   |
-| calls every 15 minutes | 29,760    | 32,736  | 59,520  | 68,448    |
-| calls every 30 minutes | 14,880    | 16,368  | 29,760  | 34,224    |
-| calls every 60 minutes | 7,440     | 8,184   | 14,880  | 17,112    |
 
 ## What you need
 
@@ -198,49 +156,4 @@ Config:
 
 
 
-
-## TODO
-
-- better error handling. 
-- verify the run scripts error silently and capture all returns so the cront does not get full. 
-- logging in the readme. 
-- reports in the readme. 
-- db structure in the readme. 
-- update Dockerfile or docker-compose itteration numbers. 
-- log rotating.
-- Add to report the worst conditions of a storm. 
-- Date search from the database
-- Condensed sql db
-- Set import versions in the requirements file
-- Add CICD daily testing. pull changes, run tests, send results. 
-- Change all backends to be `async`
-- Eventually set the main app logging to file only
-- Shorten up main README and add it to an extended README
-  - README - Basics of the app and where to go for more information
-  - Testing - Details on testing how to perform, what to expect
-  - OWA - Details about the weather service
-  - Env - Docker, SQL, 
-  - Frontend - html, css, if i write an actual frontend which is very tempting
-  - Other - Catchall
-- Transition off a crontab
-- Add intervul detail to the json dump?
-- lock requirements.txt versions
-- mo config
-- update log levels of master to the intended levels. 
-
-## Links
-
-- [prod api](http://0.0.0.0:8000/state)
-- [dev api](http://0.0.0.0:8010/state)
-- [test api](http://0.0.0.0:8020/state)
-
-
-- [SQL help](https://www.sqlite.org/lang_expr.html#cosub)
-- [Open Weather Map (OWM)](https://openweathermap.org)
-- [Open Weather Map Api](https://openweathermap.org/current#format). 
-  This is the link to the main OWM api info. 
-- [OWM weather conditions](https://openweathermap.org/weather-conditions). 
-  This is where the weather codes, icons, and brief descriptions are. 
-- [OWM FAQ](https://openweathermap.org/faq)
-- [OWM Pricing](https://openweathermap.org/price)
   
