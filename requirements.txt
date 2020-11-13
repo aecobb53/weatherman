@@ -3,3 +3,5 @@ fastapi
 uvicorn
 gunicorn
 behave
+jinja2
+aiofiles

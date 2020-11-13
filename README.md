@@ -462,7 +462,7 @@ tweaking in dev, and `logs/weatherman_dev_test.log` if running behave testing.
 
 ## TODO
 
-- Build out more run.* arguments. 
+- ~~Build out more run.* arguments.~~
 - better error handling. 
 - verify the run scripts error silently and capture all returns so the cront does not get full. 
 - logging in the readme. 
@@ -471,6 +471,9 @@ tweaking in dev, and `logs/weatherman_dev_test.log` if running behave testing.
 - update Dockerfile or docker-compose itteration numbers. 
 - log rotating.
 - Add to report the worst conditions of a storm. 
+- Add CICD daily testing. pull changes, run tests, send results. 
+- Change all backends to be `async`
+- Eventually set the main app logging to file only
 
 ## Links
 

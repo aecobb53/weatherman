@@ -1,0 +1,31 @@
+.state {
+    margin: 20px;
+    background-color: #85bda6;
+    color: #2f4b26;
+}
+.state-header {
+    font-size: 32px;
+    margin: 0;
+    padding: 25px 25px 10px;
+    text-decoration: underline;
+}
+.state-list {
+    list-style-type: none;
+    margin: 0 0;
+    padding: 0 0;
+    left: 50px;
+    font-size: 18px;
+    background-color: #62A381;
+}
+.state-list > div:nth-of-type(2n) {
+    background-color: #85bda6;
+}
+.state-list li {
+    padding: 10px 50px;
+}
+/* .state-list li {
+    margin: 10px 50px;
+} */
+/* .state-list li {
+    margin: 5px;
+} */
