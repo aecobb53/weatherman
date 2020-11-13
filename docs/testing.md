@@ -1,8 +1,29 @@
-# Weatherman Behave Testing
+# Weatherman Testing
 
-## Table of Contents
+## Table of contents
 
-## Running
+Backend
+- [Functional](#functional)
+  - [Running](#running)
+  - [Features](#features)
+  - [Steps](#steps)
+- [Unit](#unit)
+  - [Running](#running)
+  - [Tests](#tests)
+
+Frontend
+- [uhhh...](#uhhh)
+
+## Functional
+
+The functional tests are run with Behave. 
+They have two main parts, the [features](/features) and the [steps](/features/steps). 
+The features are supposed to be somewhat human readable to know what the test is doing. 
+The steps take the features and run the backend code to test it. 
+
+[Back to top](#table-of-contents)
+
+### Running
 
 In Docker:
 
@@ -21,7 +42,7 @@ Sadly i havnt found a good way to pass arguments to the behave testing so i upda
 While it seems to be fine if the line number is anywhere in the scenario, its easiest if you try to 
 get the line where the scenario starts. 
 
-## Features
+### Features
 
 There are different before and after setup/teardown events for each Feature and Scenario. 
 They are run from the `environment.py` file in steps. 
@@ -76,4 +97,34 @@ For each database scenario I delete the testing databases.
 
 > Still need negative tests
 
-## Steps
+### Steps
+
+
+## Unit
+
+I use pytest to run the unit tests. 
+I started writing them but did not finish. 
+There is still alot to do. 
+
+[Back to top](#table-of-contents)
+
+### Running
+
+`docker-compose run unit-test sh`
+
+in sh terminal `pytest` or `pytest -k <name>`
+
+### Tests
+
+## uhhh
+
+I dont know how to run frontend tests. 
+I will get to it eventually. 
+
+[Back to top](#table-of-contents)
+
+
+
+
+
+
