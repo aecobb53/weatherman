@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Weatherman about{% endblock %}
+{% block main %}
+
+<html>
+    <head>
+        <link rel="stylesheet" href="static/about.css">
+    </head>
+    <body>
+        <section>
+            <h2>About Weatherman</h2>
+            <p class="short-explanation">
+                Historic weather data is surprisingly hard to come by. 
+                Thus the Weather man was born. 
+                (His backstory is is REALLY lame). 
+                Really what you need to know is it would be nice to have a way to capture weather data. 
+                Then use this weather data to determine if images for the ICAs were lost due to weather or not. 
+                It currently runs in a SQL or csv database and Docker or terminal configurations. 
+                I highly reccomend running it in Docker as SQL but i kept the other forms mostly up to date just in case. 
+            </p>
+            <p>
+                For more information go to the 
+                <a href="https://github.com/aecobb53/weatherman">GitHub</a>
+                . 
+            </p>
+        </section>
+    </body>
+</html>
+
+{% endblock %}

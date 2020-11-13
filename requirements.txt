@@ -3,6 +3,8 @@ fastapi
 uvicorn
 gunicorn
 behave
+jinja2
+aiofiles
 coverage==4.5.2
 pytest==5.2.0
 pytest-cov==2.6.1

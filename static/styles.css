@@ -1,0 +1,96 @@
+/* pallet
+2f4b26 Hunter Green
+3e885b Sea Green
+85bda6 Eton Blue
+bedcfe Beau Blue
+c0d7bb Cambridge Blue
+
+
+001524 - rich black
+15616D - ming
+FFECD1 - blanched almond
+510D0A - rosewood
+DC602E - flame */
+
+/* Global Styles */
+html {
+    box-sizing: border-box;
+    background-color: #000000;
+    /* background-color: #2f4b26; */
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+body {
+    color: #FFFFFF;
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    line-height: 1.25;
+}
+a {
+    color: #c0d7bb;
+}
+a:hover {
+    text-decoration: none;
+}
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+h1 {
+    color: #ffffff;
+    margin: 3px;
+    padding: 3px;
+    font-size: 40px;
+    float: left;
+}
+
+/* Navigation Bar */
+header {
+    background-color: #3e885b;
+}
+.navigation-bar {
+    color: #3e885b;
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    float: right;
+    display: inline-block;
+    font-size: 22px;
+}
+.navigation-bar a {
+    margin-left: 5px;
+}
+
+/* Menu */
+.main-menu {
+    display: flex;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    justify-content: center;
+    background-color: #2f4b26;
+}
+.main-menu a {
+    padding: 10px;
+    margin: 0 20px;
+    font-size: 24px;
+    text-decoration: none;
+    border: 2px solid #bedcfe;
+    display: inline-block;
+    background-color: #85bda6;
+    color: black;
+    border-radius: 10%;
+}
+.main-menu a:hover {
+    background-color: #bedcfe;
+}
+.main-menu a:active {
+    padding: 6px;
+    background-color: #ffffff;
+    border: 6px solid #000000;
+}
+

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Weatherman repoprts{% endblock %}
+{% block main %}
+
+<html>
+    <head>
+        <link rel="stylesheet" href="static/dump.css">
+    </head>
+    <body>
+        <section>
+            <form action="" class="selectors">
+                <div class="ranges">
+                    <div><label class="selector-indicator" for="code">Weather range</label></div>
+                    <div>
+                        <input type="checkbox" id="vehicle1" name="vehicle1" value="2xx" checked>
+                        <label class="selector-indicator" for="code">2## Thunderstorm</label>
+                        <input type="checkbox" id="vehicle1" name="vehicle1" value="3xx" checked>
+                        <label class="selector-indicator" for="code">3## Drizzle</label>
+                        <input type="checkbox" id="vehicle1" name="vehicle1" value="5xx" checked>
+                        <label class="selector-indicator" for="code">5## Rain</label>
+                        <input type="checkbox" id="vehicle1" name="vehicle1" value="6xx" checked>
+                        <label class="selector-indicator" for="code">6## Snow</label>
+                    </div>
+
+                    <div>
+                        <input type="button" id="vehicle1" name="vehicle1" value="All" checked>
+                    </div>
+
+                    <div>
+                        <input type="checkbox" id="vehicle1" name="vehicle1" value="7xx" checked>
+                        <label class="selector-indicator" for="code">7## Atmosphere</label>
+                        <input type="checkbox" id="vehicle1" name="vehicle1" value="8xx" checked>
+                        <label class="selector-indicator" for="code">8## Clouds</label>
+                        <input type="checkbox" id="vehicle1" name="vehicle1" value="800" checked>
+                        <label class="selector-indicator" for="code">800 Clear</label>
+                    </div>
+                </div>
+
+                <div class="exact-search">
+                    <div>
+                        <label class="selector-indicator" for="code">Exact list</label>
+                    </div>
+                    <input type="text" name="exact_list" placeholder="600-610, 700-800, 500">
+                </div>
+
+                <div class="time">
+                    <label class="selector-indicator" for="url">Time range start</label>
+                    <!-- <input type="date" name="start-date" pattern="regexsearch" placeholder="YYYY-MM" value="text"> -->
+                    <input 
+                    type="datetime" 
+                    name="start-time" 
+                    pattern="^\d{4}[-/]\d\d?[-/]\d\d?[T ]?(\d{2}[:-]\d{2}[:-]\d{2}.\d*|\d{2}[:-]\d{2}[:-]\d{2}|\d{2}[:-]\d{2}|\d{2})?Z?$" 
+                    placeholder="YYYY-MM-DDTHH:MM:SSZ">
+                    <label class="selector-indicator" for="url">Time range end</label>
+                    <!-- <input type="date" name="start-date" pattern="regexsearch" placeholder="YYYY-MM" value="text"> -->
+                    <input 
+                    type="datetime" 
+                    name="start-time" 
+                    pattern="^\d{4}[-/]\d\d?[-/]\d\d?[T ]?(\d{2}[:-]\d{2}[:-]\d{2}.\d*|\d{2}[:-]\d{2}[:-]\d{2}|\d{2}[:-]\d{2}|\d{2})?Z?$" 
+                    placeholder="YYYY-MM-DDTHH:MM:SSZ">
+                </div>
+
+                <div class="search">
+                    <input type="submit" value="Get data" autofocus>
+                </div>
+                <!-- <div class="time">
+                    <label class="selector-indicator" for="url">Time range Start</label>
+                    <input type="url" name="url" value="" required>
+                </div>
+
+                <div class="time">
+                    <label class="selector-indicator" for="url">Time range End</label>
+                    <input type="url" name="url" value="" required>
+                </div>
+
+                <div class="ranges">
+                </div>
+
+                <label class="selector-indicator" for="code">Weather range</label>
+                <input type="text" name="code" value="" required>
+                <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike" checked>
+                <div class="submit">
+                    <input type="submit" value="Get data">
+                </div> -->
+            </form>
+        </section>
+    
+    </body>
+</html>
+
+{% endblock %}

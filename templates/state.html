@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Weatherman state{% endblock %}
+{% block main %}
+
+<html>
+    <head>
+        <link rel="stylesheet" href="static/state.css">
+    </head>
+    <body>
+        <div class="state">
+            <h2 class="state-header">State of the current instance</h2>
+            <section class="state-list">
+                {% for item in list %}
+                <div>
+                    <li>{{ item }}</li>
+                </div>
+                {% endfor %}
+            </section>
+            <p class="state-header"> </p>
+        </div>        
+    </body>
+</html>
+
+{% endblock %}
