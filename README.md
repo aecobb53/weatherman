@@ -15,6 +15,10 @@ The reports currently show the start and end of the storm but I want to add inte
 
 > Last modified:  2020-11-13
 
+<!-- 
+Currently its in a Beta phase. People can use it and it gathers weather data fine, it just needs some hand holding in the setup process. I am also still building out major systems so its not perfectly on its own yet. 
+ -->
+
 ## Table of contents
 
 - [How to use](#how-to-use)
@@ -39,13 +43,14 @@ Try it out and let me know.
 
 1. Install Docker. 
 2. Clone this repo. 
-3. To spin up the server you need to use `docker-compose up -d weather`. 
+3. Update config files. ADD HOW TO DO THAT HERE
+4. To spin up the server you need to use `docker-compose up -d weather`. 
   - For the first time I recommend using `docker-compose up --build weather`. Thisway you can see the output and see errors easier. 
   - `--build` will build a new image every time. Unless the code changed this is useless. 
   - `-d` spins up the server as a headless instance. It is set to reload if it is stopped. 
   - If you need to get a readout after it was started headless run `docker logs <container id>`. 
   - If you need to follow the output run `docker logs <container id> --follow`. 
-4. Now that it is spun up and working you can verify the frontend by going to `localhost:8000`. 
+5. Now that it is spun up and working you can verify the frontend by going to `localhost:8000`. 
 
 You will know the backend is spun up if you see these two lines
 ```
@@ -71,12 +76,12 @@ Poll data on click will instantly grab data from OWM.
 There is a lot more information than this README so I added it to the other documents. 
 It was mostly for myself but I figured if im writing it down for myself I might as well provide it to everybody. 
 
-- [API](/docs/api.md)
-- [Frontend](/docs/frontend.md)
-- [Backend](/docs/backend.md)
-- [Testing](/docs/testing.md)
-- [Open Weather Map API](/docs/open_weather_map_api.md)
-- [Catchall](/docs/catchall.md)
+- [API](docs/api.md)
+- [Frontend](docs/frontend.md)
+- [Backend](docs/backend.md)
+- [Testing](docs/testing.md)
+- [Open Weather Map API](docs/open_weather_map_api.md)
+- [Catchall](docs/catchall.md)
 
 ## Contact me
 
