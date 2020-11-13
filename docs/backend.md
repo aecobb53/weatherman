@@ -86,7 +86,7 @@ Dont run these with `-d` in the docker-compose arguments because the output is i
 
 Notable docker-compose.xml events:
 
-The [docker-compose.yml](docker-compose.yml)
+The [docker-compose.yml](/docker-compose.yml)
 
 ## SQLite
 
