@@ -16,6 +16,7 @@ EXPOSE 8000
 # RUN apt-get update \
 #   && apt-get -y install netcat gcc \
 #   && apt-get clean
+RUN pip install --upgrade pip
 
 # install requirements file
 RUN pip install --no-cache-dir -r requirements.txt

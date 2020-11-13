@@ -45,3 +45,14 @@ services:
       - ENVIRONMENT=test
       - TESTING=True
 
+  unit-test:
+    build: .
+    image: weather-unit-test:latest
+    command: pytest
+    volumes:
+      - .:/usr/src
+    ports:
+      - 8020:8000
+    environment:
+      - ENVIRONMENT=test
+      - TESTING=True

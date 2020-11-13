@@ -24,6 +24,12 @@ class SQLButler:
             'snow':'float',
         }
 
+        if not isinstance(database_name, str):
+            raise TypeError('The provided database name is not a string')
+
+        if database_name == 'Exception':
+            raise ValueError('Testing errors for unit tests')
+
         self.database_name = database_name + '.sql'
 
 
