@@ -34,6 +34,7 @@
 - lock requirements.txt versions
 - mo config
 - update log levels of master to the intended levels. 
+- Create a setup script that grabs the list of potential locations for a user to select places. 
 
 ## Links
 
