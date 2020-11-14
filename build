@@ -141,10 +141,6 @@ about () {
     "
 }
 
-
-# idiomatic parameter and option handling in sh
-# while test $# -gt 0
-# do
 case "$1" in
     # Setup
     setup)
