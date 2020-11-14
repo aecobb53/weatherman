@@ -8,7 +8,7 @@ class WeatherButler:
     WeatherButler handles API calls of the weather website. 
     """
 
-    def __init__(self, private_config_path, public_config_path):
+    def __init__(self, private_config_path, owma_url):
 
         """Load configs"""
         # print(private_config_path)
@@ -21,8 +21,9 @@ class WeatherButler:
         with open(private_config_path, 'r') as private_config:
             private_conf = json.load(private_config)
         self.config.update(private_conf)
-        with open(public_config_path, 'r') as public_config:
-            public_conf = json.load(public_config)
+        # with open(public_config_path, 'r') as public_config:
+        #     public_conf = json.load(public_config)
+        public_conf = {'url':owma_url}
         self.config.update(public_conf)
 
         """Load key"""

@@ -22,19 +22,20 @@
 - Add CICD daily testing. pull changes, run tests, send results. 
 - Change all backends to be `async`
 - Eventually set the main app logging to file only
-- Shorten up main README and add it to an extended README
-  - README - Basics of the app and where to go for more information
-  - Testing - Details on testing how to perform, what to expect
-  - OWA - Details about the weather service
-  - Env - Docker, SQL, 
-  - Frontend - html, css, if i write an actual frontend which is very tempting
-  - Other - Catchall
+- ~~Shorten up main README and add it to an extended README~~
+  - ~~README - Basics of the app and where to go for more information~~
+  - ~~Testing - Details on testing how to perform, what to expect~~
+  - ~~OWA - Details about the weather service~~
+  - ~~Env - Docker, SQL, ~~
+  - ~~Frontend - html, css, if i write an actual frontend which is very tempting~~
+  - ~~Other - Catchall~~
 - Transition off a crontab
-- Add intervul detail to the json dump?
+- ~~Add intervul detail to the json dump?~~ no.
 - lock requirements.txt versions
 - mo config
 - update log levels of master to the intended levels. 
 - Create a setup script that grabs the list of potential locations for a user to select places. 
+- Transition the jsons in etc/ to yml
 
 ## Links
 

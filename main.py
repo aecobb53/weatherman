@@ -3,6 +3,7 @@ import datetime
 import time
 import json
 import os
+import yaml
 
 from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
@@ -47,26 +48,29 @@ class WeatherMan:
 
 
     def __init__(self):
-        self.name = 'weatherman'
-        # self.private_config_path = 'features/support/example_weather_api_private.json'
-        self.private_config_path = 'etc/weather_api_private.json'
-        self.public_config_path = 'etc/weather_api_public.json'
-        self.db_name='db/weatherman' # The type will be appended in the db
-        self.weather_butler = weather_butler.WeatherButler(self.private_config_path, self.public_config_path)
 
-        self.state = {
-            'working_directory':None,
-            'in_docker':None,
-            'env':None,
-            'testing':None,
-            'reports':None,
-            'log_file':default_log_file,
-            'db_name':self.db_name,
-        }
+        self.master_config = 'etc/weatherman.yml'
+        with open(self.master_config) as ycf:
+            self.config = yaml.load(ycf, Loader=yaml.FullLoader)
+
+        logit.info(f"lines of the config")
+        logit.info(f"{json.dumps(self.config, indent=4)}")
+
+        self.name = self.config['name']
+        self.private_config_path = self.config['private_config_path']
+        self.public_config_path = 'etc/weather_api_public.json'
+        self.db_name = self.config['db_name'] # The type will be appended in the db
+        self.weather_butler = weather_butler.WeatherButler(
+            self.config['private_config_path'],
+            self.config['owma_url']
+        )
+
+        self.state = self.config['starting_state']
 
 
         with open(self.private_config_path) as configfile:
-            self.config = json.load(configfile)
+            self.config.update(json.load(configfile))
+            # self.config = json.load(configfile)
         self.state['cities'] = self.config['locations']
 
         """
@@ -75,77 +79,38 @@ class WeatherMan:
         SQL on my VDI at first and in case this ever needs to be bruit forced down the road.
         """
 
-
-        # Testing
-        if os.environ.get('TESTING') == None:
-            logger.update_file_level('DEBUG')
-            logger.update_consol_level('INFO')
-            self.testing = False
-            self.state['fh_logging'] = 'DEBUG'
-            self.state['ch_logging'] = 'INFO'
-        elif os.environ.get('TESTING') == 'True':
-            logger.update_file_level('DEBUG')
-            logger.update_consol_level('DEBUG')
-            self.testing = True
-            self.db_name += '_behave'
-            self.state['log_file'] = logger.update_file(self.name,log_suffix=None)
-            self.state['log_file'] = logger.update_file(self.name,log_suffix='test')
-            self.state['fh_logging'] = 'DEBUG'
-            self.state['ch_logging'] = 'DEBUG'
-            self.state['db_name'] += '_behave'
-        else:
-            logger.update_file_level('DEBUG')
-            logger.update_consol_level('WARNING')
-            # Eventually switche these two to INFO/WARNING or something like that
-            self.testing = False
-            self.state['fh_logging'] = 'DEBUG'
-            self.state['ch_logging'] = 'WARNING'
-        logit.info(f"logging levels set to fh:{self.state['fh_logging']} ch:{self.state['ch_logging']} testing:{self.testing}")
-        self.state['testing'] = self.testing
-
-
-        # Environment
+        # Setup
+        import sql_butler
         if os.environ.get('ENVIRONMENT') == 'prod':
-            self.environment = 'prod'
-            self.state['log_file'] = logger.update_file(self.name, app_name_in_file=True, log_suffix=None)
-            # self.state['log_file'] = logger.update_file(self.name, app_name_in_file=True)
+            environment = 'prod'
         elif os.environ.get('ENVIRONMENT') == 'dev':
-            self.environment = 'dev'
-            self.state['log_file'] = logger.update_file(self.name,log_prefix='dev',log_suffix=None)
-            self.db_name += '_dev'
-            self.state['db_name'] += '_dev'
+            environment = 'dev'
         elif os.environ.get('ENVIRONMENT') == 'test':
-            self.environment = 'test'
-            self.db_name += '_test'
-            self.state['db_name'] += '_test'
+            environment = 'test'
         else:
-            self.environment = 'prod'
-        logit.info(f"logging environment set to {self.environment}")
-        self.state['env'] = self.environment
+            raise TypeError('The environment is not recognized. App closing')
 
-        # Sets Docker params
-        if os.environ.get('IS_IN_DOCKER'):
-            import sql_butler
-            self.db = sql_butler.SQLButler(self.db_name)
-            self.db.create_database()
-            self.state['db_name'] += '.sql'
-            self.working_directory = '/usr/src/'
-            self.state['working_directory'] = self.working_directory
-            self.state['in_docker'] = True
-            logit.info("Starting in Docker")
-        else:
-            self.state['log_file'] = logger.update_file(self.name+'csv')
-            import csv_butler
-            self.db = csv_butler.CSVButler(self.db_name)
-            self.state['db_name'] += '.csv'
-            self.working_directory = os.getcwd() + '/'
-            self.state['working_directory'] = self.working_directory
-            self.state['in_docker'] = False
-            logit.info("Starting outside of Docker")
+        logger.update_file_level(self.config['environments'][environment]['file_handler_level'])
+        logger.update_consol_level(self.config['environments'][environment]['consol_handler_level'])
+        self.environment = environment
+        self.testing = self.config['environments'][environment]['testing_flag']
+        self.working_directory = self.config['environments'][environment]['docker_working_dir']
+        self.db_name += self.config['environments'][environment]['db_addition']
+        self.db = sql_butler.SQLButler(self.db_name)
+        self.db.create_database()
 
-        self.reports_dir = self.working_directory + 'out/'
-        self.state['reports'] = self.reports_dir
+        self.state['env'] = environment
+        self.state['testing'] = self.config['environments'][environment]['testing_flag']
+        self.state['db_name'] += self.config['environments'][environment]['db_addition']
+        self.state['fh_logging'] = self.config['environments'][environment]['file_handler_level']
+        self.state['ch_logging'] = self.config['environments'][environment]['consol_handler_level']
+        self.state['log_file'] = logger.update_file(self.name, app_name_in_file=True, log_suffix=None)
+        self.state['db_name'] += '.sql'
+        self.state['working_directory'] = self.config['environments'][environment]['docker_working_dir']
+        self.state['in_docker'] = True
 
+        logit.info(f"Starting in {environment}")
+        logit.info(f"logging levels set to fh:{self.state['fh_logging']} ch:{self.state['ch_logging']} testing:{self.testing}")
         logit.debug(f'State: {self.state}')
 
 
@@ -209,14 +174,14 @@ class WeatherMan:
         10:00:00 not 10:23:45.
         """
         if new_minutes != 0 and new_seconds == 0:
-            later = later.replace(second=0)
+            later = later.replace(second=self.config['time_increment']['replace_seconds'])
         if new_hours != 0 and new_minutes == 0 and new_seconds == 0:
-            later = later.replace(minute=0)
+            later = later.replace(minute=self.config['time_increment']['replace_minutes'])
 
         if new_hours == 0:
             pass
         else:
-            inch = datetime.timedelta(hours=1)
+            inch = datetime.timedelta(hours=self.config['time_increment']['hours'])
             later = later + inch
             while later.hour not in [i for i in range(24) if i % new_hours == 0]:
                 later = later + inch
@@ -224,7 +189,7 @@ class WeatherMan:
         if new_minutes == 0:
             pass
         else:
-            incm = datetime.timedelta(minutes=1)
+            incm = datetime.timedelta(minutes=self.config['time_increment']['minutes'])
             later = later + incm
             while later.minute not in [i for i in range(60) if i % new_minutes == 0]:
                 later = later + incm
@@ -232,7 +197,7 @@ class WeatherMan:
         if new_seconds == 0:
             pass
         else:
-            incs = datetime.timedelta(seconds=1)
+            incs = datetime.timedelta(seconds=self.config['time_increment']['seconds'])
             later = later + incs
             while later.second not in [i for i in range(60) if i % new_seconds == 0]:
                 later = later + incs
@@ -253,9 +218,13 @@ class WeatherMan:
         it is currently not used.
         """
 
-        timer = self.next_time(0,0,0)
-        timer_intervul = 15
-        timer_delta = int(timer_intervul * .75)
+        timer = self.next_time(
+            self.config['timer']['default_hours'],
+            self.config['timer']['default_minutes'],
+            self.config['timer']['default_seconds']
+        )
+        timer_intervul = self.config['timer']['intervul']
+        timer_delta = int(timer_intervul * self.config['timer']['intervul_multiplier'])
         logit.debug(f"Starting run loop with intervuls of {timer_intervul} and {timer_delta}")
         while True:
             logit.info(datetime.datetime.now())
@@ -264,9 +233,9 @@ class WeatherMan:
                 minortimer = timer - datetime.timedelta(minutes=timer_delta)
                 self.manage_polling()
             if datetime.datetime.now() > minortimer:
-                sleeptime = 60
+                sleeptime = self.config['timer']['sleep']
             else:
-                sleeptime = minortimer * 60
+                sleeptime = minortimer * self.config['timer']['sleep']
             time.sleep(sleeptime)
 
 
