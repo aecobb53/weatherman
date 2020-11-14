@@ -95,11 +95,11 @@ class WeatherMan:
             self.state['db_name'] += '_behave'
         else:
             logger.update_file_level('DEBUG')
-            logger.update_consol_level('INFO')
+            logger.update_consol_level('WARNING')
             # Eventually switche these two to INFO/WARNING or something like that
             self.testing = False
             self.state['fh_logging'] = 'DEBUG'
-            self.state['ch_logging'] = 'INFO'
+            self.state['ch_logging'] = 'WARNING'
         logit.info(f"logging levels set to fh:{self.state['fh_logging']} ch:{self.state['ch_logging']} testing:{self.testing}")
         self.state['testing'] = self.testing
 

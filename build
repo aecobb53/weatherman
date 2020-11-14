@@ -88,6 +88,23 @@ dev () {
     docker-compose up dev
 }
 
+stop () {
+    # Stop weatherman containers
+
+    echo "Stopping all weatherman containers"
+
+    docker ps --filter name=weatherman* -aq | xargs docker stop
+}
+
+clense () {
+    # Find all containers that have weatherman* in the name and stop/rm them. 
+
+    echo "About to stop/rm all weatherman containers. If one is running in terminal this cmd will wait"
+
+    docker ps --filter name=weatherman* -aq | xargs docker stop | xargs docker rm
+}
+
+
 unit () {
     # Run the unit tests. 
     # This includes flake and lenting
@@ -109,16 +126,18 @@ tests () {
 about () {
     echo "
     This is a makeshift Makefile
-    setup       - Set up dir and files (run if its a new cloan)
-    clean       - Move log files to the logs/archive directory
-    run         - Run the container
-    dev         - Run a dev instance
-    clean-run   - Clean then run
-    clean-dev   - Clean then dev
-    unit        - Unit tests
-    functional  - Functional tests
-    tests       - Unit then Functional
-    help        - Uhhh speaking...
+    setup               - Set up dir and files (run if its a new cloan)
+    clean               - Move log files to the logs/archive directory
+    run                 - Run the container
+    dev                 - Run a dev instance
+    clean-run           - Clean then run
+    clean-dev           - Clean then dev
+    stop                - Stop weatherman containers
+    clense-containers   - Stop/rm weatherman containers
+    unit                - Unit tests
+    functional          - Functional tests
+    tests               - Unit then Functional
+    help                - Uhhh speaking...
     "
 }
 
@@ -150,6 +169,14 @@ case "$1" in
     clean-dev)
         clean
         dev
+        ;;
+
+    # Stopping
+    stop)
+        stop
+        ;;
+    clense-containers)
+        clense
         ;;
 
     # Testing

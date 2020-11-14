@@ -19,9 +19,7 @@ services:
   dev:
     build: .
     image: weather-dev:latest
-    # command: uvicorn main:app --reload --workers 1 --port 8000
     command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8000
-    # command: uvicorn main:app --reload --workers 1 --host 127.0.0.1 --port 8000
     volumes:
       - .:/usr/src
     ports:
@@ -33,11 +31,8 @@ services:
   test:
     build: .
     image: weather-dev:latest
-    # command: behave --tags=owma
-    # command: behave -n "Generating a poll url"
     command: behave
     volumes:
-      # - /usr/src
       - .:/usr/src
     ports:
       - 8020:8000
@@ -52,7 +47,7 @@ services:
     volumes:
       - .:/usr/src
     ports:
-      - 8020:8000
+      - 8030:8000
     environment:
       - ENVIRONMENT=test
       - TESTING=True
