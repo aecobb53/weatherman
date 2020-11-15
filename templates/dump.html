@@ -4,10 +4,12 @@
 
 <html>
     <head>
+        <!-- <link rel="stylesheet" href="static/base.css"> -->
         <link rel="stylesheet" href="static/dump.css">
+        <!-- <link rel="stylesheet" href="static/state.css"> -->
     </head>
     <body>
-        <section>
+        <div>
             <form action="" class="selectors">
                 <div class="ranges">
                     <div><label class="selector-indicator" for="code">Weather range</label></div>
@@ -83,8 +85,29 @@
                     <input type="submit" value="Get data">
                 </div> -->
             </form>
-        </section>
-    
+        </div>
+        <div class="dump-data">
+            <h2 class="dump-header">Dumped data</h2>
+            <section class="dump-list">
+                <p class="dump-table-header">name</p>
+                <p class="dump-table-header">sky</p>
+                <p class="dump-table-header">sky_id</p>
+                <p class="dump-table-header">sky_desc</p>
+                <p class="dump-table-header">temp</p>
+                <p class="dump-table-header">wind</p>
+                <p class="dump-table-header">time</p>
+                {% for dict_item in list %}
+                    {% for key, value in dict_item.items() %}
+                        <!-- <h1>Key: {{key}}</h1>
+                        <h2>Value: {{value}}</h2> -->
+                        <div>
+                            <p>{{value}}</p>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </section>
+            <p class="dump-header"> </p>
+        </div>  
     </body>
 </html>
 

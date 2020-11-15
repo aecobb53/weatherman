@@ -54,7 +54,8 @@ class WeatherMan:
             self.config = yaml.load(ycf, Loader=yaml.FullLoader)
 
         logit.info(f"lines of the config")
-        logit.info(f"{json.dumps(self.config, indent=4)}")
+        logit.info(f"Yml config {json.dumps(self.config)}")
+        # logit.info(f"{json.dumps(self.config, indent=4)}")
 
         self.name = self.config['name']
         self.private_config_path = self.config['private_config_path']
@@ -511,8 +512,19 @@ def poll_data():
 @app.get('/dump')
 def data_dump(request: Request):
     logit.debug('Sending dump')
-    dump = WM.bad_weather_dump()
-    return templates.TemplateResponse("dump.html", {"request": request})
+    dump_list = []
+    for weatherdata in WM.bad_weather_dump():
+        new_dct = {i:None for i in WM.config['dump_webpage_list']}
+        dct = dict(weatherdata)
+        for i,j in dct.items():
+            if i == 'time':
+                dct[i] = datetime.datetime.strftime(j, WM.config['datetime_str'])
+            if i in WM.config['dump_webpage_list']:
+                new_dct[i] = j
+        dump_list.append(new_dct)
+    # logit.debug(f"dump list{dump_list}")
+    return templates.TemplateResponse("dump.html", {"request": request, 'list':dump_list})
+    # return templates.TemplateResponse("dump.html", {"request": request})
 
 @app.get('/full_dump')
 def full_data_dump():

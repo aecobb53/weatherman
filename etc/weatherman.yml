@@ -62,3 +62,12 @@ timer:
     intervul: 15
     intervul_multiplier: .75
     sleep: 60
+datetime_str: '%Y-%m-%dT%H:%M:%SZ'
+dump_webpage_list: 
+    - name
+    - sky
+    - sky_id
+    - sky_desc
+    - temp
+    - wind
+    - time
