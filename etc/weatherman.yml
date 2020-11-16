@@ -63,6 +63,7 @@ timer:
     intervul_multiplier: .75
     sleep: 60
 datetime_str: '%Y-%m-%dT%H:%M:%SZ'
+earliest_datetime: '2000-01-01'
 valid_datetimes:
     full: '%Y-%m-%dT%H:%M:%S.%f'
     norm: '%Y-%m-%dT%H:%M:%S'

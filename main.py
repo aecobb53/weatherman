@@ -260,6 +260,15 @@ class WeatherMan:
     dump cases.
     """
 
+    def weather_dump(self, parameters):
+        """
+        Bad weather dump grabs any weather between 200 and 899. 800+ is generally good
+        weather (800 being "clear").
+        """
+        data = self.db.query_database(parameters)
+        logit.debug(f'weather dump based on parameters {parameters}')
+        return data
+
 
     def bad_weather_dump(self):
         """
@@ -526,13 +535,14 @@ def data_dump(request: Request):
                 new_dct[i] = j
         dump_list.append(new_dct)
     # logit.debug(f"dump list{dump_list}")
-    return templates.TemplateResponse("dump.html", {"request": request, 'list':dump_list})
+    return templates.TemplateResponse("empty_dump.html", {"request": request, 'list':dump_list})
     # return templates.TemplateResponse("dump.html", {"request": request})
 
 @app.get('/dump/search/')
 # async def read_items(q: Optional[List[str]] = Query(None)):
 # async def read_items(q: Optional[str] = Query(None)):
 async def read_items(
+    request: Request,
     thunderstorm=False,
     drizzle=False,
     rain=False,
@@ -555,19 +565,77 @@ async def read_items(
     logit.info(f"start_time: {start_time}")
     logit.info(f"end_time: {end_time}")
 
-    try:
-        logit.info(f"validating exact_list {validator.is_exact_list(exact_list)}")
-    except ValueError:
-        pass
+    if thunderstorm:
+        for num in WM.config['accepted_owma_codes']['thunderstorm']:
+            exact_list += f",{str(num)}"
+
+    if drizzle:
+        for num in WM.config['accepted_owma_codes']['drizzle']:
+            exact_list += f",{str(num)}"
+
+    if rain:
+        for num in WM.config['accepted_owma_codes']['rain']:
+            exact_list += f",{str(num)}"
+
+    if snow:
+        for num in WM.config['accepted_owma_codes']['snow']:
+            exact_list += f",{str(num)}"
+
+    if atmosphere:
+        for num in WM.config['accepted_owma_codes']['atmosphere']:
+            exact_list += f",{str(num)}"
+
+    if clouds:
+        for num in WM.config['accepted_owma_codes']['clouds']:
+            exact_list += f",{str(num)}"
+
+    if clear:
+        for num in WM.config['accepted_owma_codes']['clear']:
+            exact_list += f",{str(num)}"
+
 
     try:
-        logit.info(f"validating start_time {validator.is_datetime(start_time)}")
+        logit.debug(f"validating exact_list")
+        exact_list = validator.is_exact_list(exact_list)
     except ValueError:
-        pass
+        exact_list = None
+
     try:
-        logit.info(f"validating start_time {validator.is_datetime(end_time)}")
+        logit.debug(f"validating start_time")
+        start_time = validator.is_datetime(start_time)
     except ValueError:
-        pass
+        start_time = None
+        # start_time = datetime.datetime.strptime(
+        #     WM.config['earliest_datetime'],
+        #     WM.config['valid_datetimes']['day']
+        # )
+    try:
+        logit.debug(f"validating wnd_time")
+        end_time = validator.is_datetime(end_time)
+    except ValueError:
+        end_time = None
+        # end_time = datetime.datetime.now(tz=datetime.timezone.utc) + datetime.timedelta(days=1)
+
+    parameters = {
+        'exact_list': exact_list,
+        'start_time': start_time,
+        'end_time': end_time,
+    }
+    # logit.debug(f'Sending query with parameters {parameters}')
+    dump_list = []
+    for weatherdata in WM.weather_dump(parameters):
+        new_dct = {i:None for i in WM.config['dump_webpage_list']}
+        dct = dict(weatherdata)
+        for i,j in dct.items():
+            if i == 'time':
+                dct[i] = datetime.datetime.strftime(j, WM.config['datetime_str'])
+            if i in WM.config['dump_webpage_list']:
+                new_dct[i] = j
+        dump_list.append(new_dct)
+    # logit.debug(f"dump list{dump_list}")
+    return templates.TemplateResponse("dump.html", {"request": request, 'list':dump_list})
+    # return templates.TemplateResponse("dump.html", {"request": request})
+    
     
     # query_items = {"q": q}
     # return {query_items}

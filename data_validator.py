@@ -14,6 +14,8 @@ class DataValidator:
         datetime_obj = None
         zulu = False
         local = False
+        if datetime_str == '':
+            return datetime_obj
 
         # If its a zulu o local time, strip and set the flag. 
         # I plan to use this eventually.
@@ -25,6 +27,9 @@ class DataValidator:
         if datetime_str.upper().endswith('L'):
             local = True
             datetime_str = datetime_str[:-1]
+        # if len(datetime_str) > 11:
+        #     if datetime_str[10] == ' ':
+        #         datetime_str = datetime_str[:10] + 'T' + datetime_str[11:]
 
         try:
             datetime_obj = datetime.strptime(datetime_str, self.config['valid_datetimes']['full'])
@@ -59,13 +64,16 @@ class DataValidator:
         number_list = []
         for bracket in self.config['accepted_owma_codes'].values():
             number_list += bracket
+        exact_str = ''.join([c for c in exact_str if c != ' '])
         comma_list = exact_str.split(',')
         for item in comma_list:
+            if item == '':
+                continue
             difflist = item.split('-')
             difflist = [int(i) for i in difflist]
             if len(difflist) == 1:
                 if difflist[0] in number_list:
-                    exact_list.append(difflist[0])
+                    exact_list.append(int(difflist[0]))
             else:
                 start = min(difflist)
                 end = max(difflist)
