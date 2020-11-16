@@ -123,6 +123,7 @@ class WeatherMan:
 
         # Data holders
         self.dump_list = []
+        self.last_poll = None
 
 
     def poll_weather(self):
@@ -132,6 +133,7 @@ class WeatherMan:
         data = self.weather_butler.poll()
         logit.debug(f"request: {self.weather_butler.request}")
         logit.debug(f"request: {self.weather_butler.request.json()}")
+        self.last_poll = datetime.datetime.now(tz=datetime.timezone.utc)
         return data
 
 
@@ -530,10 +532,14 @@ def return_args(request: Request):
     # return WM.state
 
 @app.get('/poll')
-def poll_data():
+def poll_data(request: Request):
     logit.debug('About to poll data')
     WM.manage_polling()
-    return {'Success':True}
+    timestamp = datetime.datetime.strftime(WM.last_poll, WM.config['datetime_str'])
+    return templates.TemplateResponse("poll.html", {"request": request, "last_poll":timestamp})
+    # return {'Success':True}
+    # response = RedirectResponse(url='/')
+    # return response
 
 @app.get('/dump')
 def data_dump(request: Request):
