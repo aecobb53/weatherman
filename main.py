@@ -121,6 +121,9 @@ class WeatherMan:
         logit.info(f"logging levels set to fh:{self.state['fh_logging']} ch:{self.state['ch_logging']} testing:{self.testing}")
         logit.debug(f'State: {self.state}')
 
+        # Data holders
+        self.dump_list = []
+
 
     def poll_weather(self):
         """
@@ -265,9 +268,20 @@ class WeatherMan:
         Bad weather dump grabs any weather between 200 and 899. 800+ is generally good
         weather (800 being "clear").
         """
-        data = self.db.query_database(parameters)
         logit.debug(f'weather dump based on parameters {parameters}')
-        return data
+        data = self.db.query_database(parameters)
+        self.dump_list = []
+        for weatherdata in data:
+            new_dct = {i:None for i in self.config['dump_webpage_list']}
+            dct = dict(weatherdata)
+            for i,j in dct.items():
+                if i == 'time':
+                    dct[i] = datetime.datetime.strftime(j, self.config['datetime_str'])
+                if i in self.config['dump_webpage_list']:
+                    new_dct[i] = j
+            self.dump_list.append(new_dct)
+        return self.dump_list
+        # return data
 
 
     def bad_weather_dump(self):
@@ -524,18 +538,19 @@ def poll_data():
 @app.get('/dump')
 def data_dump(request: Request):
     logit.debug('Sending dump')
-    dump_list = []
-    for weatherdata in WM.bad_weather_dump():
-        new_dct = {i:None for i in WM.config['dump_webpage_list']}
-        dct = dict(weatherdata)
-        for i,j in dct.items():
-            if i == 'time':
-                dct[i] = datetime.datetime.strftime(j, WM.config['datetime_str'])
-            if i in WM.config['dump_webpage_list']:
-                new_dct[i] = j
-        dump_list.append(new_dct)
+    # dump_list = []
+    # for weatherdata in WM.bad_weather_dump():
+    #     new_dct = {i:None for i in WM.config['dump_webpage_list']}
+    #     dct = dict(weatherdata)
+    #     for i,j in dct.items():
+    #         if i == 'time':
+    #             dct[i] = datetime.datetime.strftime(j, WM.config['datetime_str'])
+    #         if i in WM.config['dump_webpage_list']:
+    #             new_dct[i] = j
+    #     dump_list.append(new_dct)
     # logit.debug(f"dump list{dump_list}")
-    return templates.TemplateResponse("empty_dump.html", {"request": request, 'list':dump_list})
+    print(len(WM.dump_list))
+    return templates.TemplateResponse("dump.html", {"request": request, 'list':WM.dump_list})
     # return templates.TemplateResponse("dump.html", {"request": request})
 
 @app.get('/dump/search/')
@@ -554,16 +569,16 @@ async def read_items(
     start_time=None,
     end_time=None):
 
-    logit.info(f"thunderstorm: {thunderstorm}")
-    logit.info(f"drizzle: {drizzle}")
-    logit.info(f"rain: {rain}")
-    logit.info(f"snow: {snow}")
-    logit.info(f"atmosphere: {atmosphere}")
-    logit.info(f"clouds: {clouds}")
-    logit.info(f"clear: {clear}")
-    logit.info(f"exact_list: {exact_list}")
-    logit.info(f"start_time: {start_time}")
-    logit.info(f"end_time: {end_time}")
+    logit.debug(f"thunderstorm: {thunderstorm}")
+    logit.debug(f"drizzle: {drizzle}")
+    logit.debug(f"rain: {rain}")
+    logit.debug(f"snow: {snow}")
+    logit.debug(f"atmosphere: {atmosphere}")
+    logit.debug(f"clouds: {clouds}")
+    logit.debug(f"clear: {clear}")
+    logit.debug(f"exact_list: {exact_list}")
+    logit.debug(f"start_time: {start_time}")
+    logit.debug(f"end_time: {end_time}")
 
     if thunderstorm:
         for num in WM.config['accepted_owma_codes']['thunderstorm']:
@@ -621,20 +636,22 @@ async def read_items(
         'start_time': start_time,
         'end_time': end_time,
     }
+    WM.weather_dump(parameters)
     # logit.debug(f'Sending query with parameters {parameters}')
-    dump_list = []
-    for weatherdata in WM.weather_dump(parameters):
-        new_dct = {i:None for i in WM.config['dump_webpage_list']}
-        dct = dict(weatherdata)
-        for i,j in dct.items():
-            if i == 'time':
-                dct[i] = datetime.datetime.strftime(j, WM.config['datetime_str'])
-            if i in WM.config['dump_webpage_list']:
-                new_dct[i] = j
-        dump_list.append(new_dct)
-    # logit.debug(f"dump list{dump_list}")
-    return templates.TemplateResponse("dump.html", {"request": request, 'list':dump_list})
-    # return templates.TemplateResponse("dump.html", {"request": request})
+    # dump_list = []
+    # for weatherdata in WM.weather_dump(parameters):
+    #     new_dct = {i:None for i in WM.config['dump_webpage_list']}
+    #     dct = dict(weatherdata)
+    #     for i,j in dct.items():
+    #         if i == 'time':
+    #             dct[i] = datetime.datetime.strftime(j, WM.config['datetime_str'])
+    #         if i in WM.config['dump_webpage_list']:
+    #             new_dct[i] = j
+    #     dump_list.append(new_dct)
+    # return templates.TemplateResponse("dump.html", {"request": request, 'list':dump_list})
+    response = RedirectResponse(url='/dump')
+    return response
+    # data_dump(Request, dump_list)
     
     
     # query_items = {"q": q}
