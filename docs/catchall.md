@@ -36,6 +36,10 @@
 - update log levels of master to the intended levels. 
 - Create a setup script that grabs the list of potential locations for a user to select places. 
 - Transition the jsons in etc/ to yml
+- From main web page rout to an intermediate dump return
+- Remove json from the dump header
+- Update City name in the dup data to the identifier in the private json
+- When poll data is called, dont change html page
 
 ## Links
 
