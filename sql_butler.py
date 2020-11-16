@@ -203,7 +203,6 @@ class SQLButler:
         to convert the tuple of data to a dict. 
         """
         line = list(tpl)
-        print(line)
         try:
             line[0] = datetime.datetime.strptime(line[0], '%Y-%m-%dT%H:%M:%SZ')
         except ValueError:
@@ -223,6 +222,27 @@ class SQLButler:
         for line_t in lstt:
             lstd.append(self.tuple_to_dict(line_t))
         return lstd
+
+
+    def query_database(self, parameters):
+        dump = []
+        refined = []
+        self.c = self.create_database()
+        self.c.execute("""SELECT * FROM weather""")
+        data = self.c.fetchall()
+        dump = self.list_tuple_to_list_dict(data)
+        for entry in dump:
+            if parameters['start_time'] != None:
+                if entry['time'] < parameters['start_time']:
+                    continue
+            if parameters['end_time'] != None:
+                if entry['time'] > parameters['end_time']:
+                    continue
+            if parameters['exact_list'] != None:
+                if entry['sky_id'] not in parameters['exact_list']:
+                    continue
+            refined.append(entry)
+        return refined
 
 
     def get_all_data(self):

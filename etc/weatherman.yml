@@ -62,3 +62,82 @@ timer:
     intervul: 15
     intervul_multiplier: .75
     sleep: 60
+datetime_str: '%Y-%m-%dT%H:%M:%SZ'
+earliest_datetime: '2000-01-01'
+valid_datetimes:
+    full: '%Y-%m-%dT%H:%M:%S.%f'
+    norm: '%Y-%m-%dT%H:%M:%S'
+    min: '%Y-%m-%dT%H:%M'
+    hour: '%Y-%m-%dT%H'
+    day: '%Y-%m-%d'
+dump_webpage_list: 
+    - name
+    - sky
+    - sky_id
+    - sky_desc
+    - temp
+    - wind
+    - time
+accepted_owma_codes:
+    thunderstorm:
+        - 200
+        - 201
+        - 202
+        - 210
+        - 211
+        - 212
+        - 221
+        - 230
+        - 231
+        - 232
+    drizzle:
+        - 300
+        - 301
+        - 305
+        - 310
+        - 311
+        - 312
+        - 313
+        - 314
+        - 321
+    rain:
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 511
+        - 520
+        - 521
+        - 522
+        - 531
+    snow:
+        - 600
+        - 601
+        - 602
+        - 611
+        - 612
+        - 613
+        - 615
+        - 616
+        - 620
+        - 621
+        - 622
+    atmosphere:
+        - 701
+        - 711
+        - 721
+        - 731
+        - 741
+        - 751
+        - 761
+        - 761
+        - 771
+        - 781
+    clouds:
+        - 801
+        - 802
+        - 803
+        - 804
+    clear:
+        - 800

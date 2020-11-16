@@ -5,14 +5,16 @@ import json
 import os
 import yaml
 
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Form, Query
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import PlainTextResponse, RedirectResponse
+from typing import Optional, List
 
 import weather_butler
+import data_validator
 
 # Logging
 import logger
@@ -54,7 +56,8 @@ class WeatherMan:
             self.config = yaml.load(ycf, Loader=yaml.FullLoader)
 
         logit.info(f"lines of the config")
-        logit.info(f"{json.dumps(self.config, indent=4)}")
+        logit.info(f"Yml config {json.dumps(self.config)}")
+        # logit.info(f"{json.dumps(self.config, indent=4)}")
 
         self.name = self.config['name']
         self.private_config_path = self.config['private_config_path']
@@ -117,6 +120,9 @@ class WeatherMan:
         logit.info(f"Starting in {environment}")
         logit.info(f"logging levels set to fh:{self.state['fh_logging']} ch:{self.state['ch_logging']} testing:{self.testing}")
         logit.debug(f'State: {self.state}')
+
+        # Data holders
+        self.dump_list = []
 
 
     def poll_weather(self):
@@ -257,6 +263,26 @@ class WeatherMan:
     dump cases.
     """
 
+    def weather_dump(self, parameters):
+        """
+        Bad weather dump grabs any weather between 200 and 899. 800+ is generally good
+        weather (800 being "clear").
+        """
+        logit.debug(f'weather dump based on parameters {parameters}')
+        data = self.db.query_database(parameters)
+        self.dump_list = []
+        for weatherdata in data:
+            new_dct = {i:None for i in self.config['dump_webpage_list']}
+            dct = dict(weatherdata)
+            for i,j in dct.items():
+                if i == 'time':
+                    dct[i] = datetime.datetime.strftime(j, self.config['datetime_str'])
+                if i in self.config['dump_webpage_list']:
+                    new_dct[i] = j
+            self.dump_list.append(new_dct)
+        return self.dump_list
+        # return data
+
 
     def bad_weather_dump(self):
         """
@@ -267,52 +293,52 @@ class WeatherMan:
         logit.debug('Created bad weather dump')
         return data
 
-    def ica_dump(self):
-        """
-        ICA dump takes the bad weather dump and refines it for weather that could cause
-        bad signal. The reason its so general is to grab the full scope of a storm if it rolls in.
-        """
-        data = self.bad_weather_dump()
-        dump = []
-        for line in data:
-            if line['sky_id'] >= 200 and line['sky_id'] < 300 or \
-            line['sky_id'] >= 310 and line['sky_id'] < 400 or \
-            line['sky_id'] >= 500 and line['sky_id'] < 600 or \
-            line['sky_id'] >= 601 and line['sky_id'] < 700 or \
-            line['sky_id'] in [731, 751, 762, 771, 781]:
-                dump.append(line)
-        logit.debug('Created ica weather dump')
-        return dump
+    # def ica_dump(self):
+    #     """
+    #     ICA dump takes the bad weather dump and refines it for weather that could cause
+    #     bad signal. The reason its so general is to grab the full scope of a storm if it rolls in.
+    #     """
+    #     data = self.bad_weather_dump()
+    #     dump = []
+    #     for line in data:
+    #         if line['sky_id'] >= 200 and line['sky_id'] < 300 or \
+    #         line['sky_id'] >= 310 and line['sky_id'] < 400 or \
+    #         line['sky_id'] >= 500 and line['sky_id'] < 600 or \
+    #         line['sky_id'] >= 601 and line['sky_id'] < 700 or \
+    #         line['sky_id'] in [731, 751, 762, 771, 781]:
+    #             dump.append(line)
+    #     logit.debug('Created ica weather dump')
+    #     return dump
 
-    def rain_dump(self):
-        """Rain"""
-        data = self.bad_weather_dump()
-        dump = []
-        for line in data:
-            if line['sky_id'] >= 300 and line['sky_id'] < 600:
-                dump.append(line)
-        logit.debug('Created rain weather dump')
-        return dump
+    # def rain_dump(self):
+    #     """Rain"""
+    #     data = self.bad_weather_dump()
+    #     dump = []
+    #     for line in data:
+    #         if line['sky_id'] >= 300 and line['sky_id'] < 600:
+    #             dump.append(line)
+    #     logit.debug('Created rain weather dump')
+    #     return dump
 
-    def snow_dump(self):
-        """Snow"""
-        data = self.bad_weather_dump()
-        dump = []
-        for line in data:
-            if line['sky_id'] >= 600 and line['sky_id'] < 700:
-                dump.append(line)
-        logit.debug('Created snow weather dump')
-        return dump
+    # def snow_dump(self):
+    #     """Snow"""
+    #     data = self.bad_weather_dump()
+    #     dump = []
+    #     for line in data:
+    #         if line['sky_id'] >= 600 and line['sky_id'] < 700:
+    #             dump.append(line)
+    #     logit.debug('Created snow weather dump')
+    #     return dump
 
-    def wind_dump(self):
-        """wind"""
-        data = self.bad_weather_dump()
-        dump = []
-        for line in data:
-            if line['wind'] > 5:
-                dump.append(line)
-        logit.debug('Created wind weather dump')
-        return dump
+    # def wind_dump(self):
+    #     """wind"""
+    #     data = self.bad_weather_dump()
+    #     dump = []
+    #     for line in data:
+    #         if line['wind'] > 5:
+    #             dump.append(line)
+    #     logit.debug('Created wind weather dump')
+    #     return dump
 
     """
     End of the dump secion and start of the report secion
@@ -419,13 +445,13 @@ class WeatherMan:
 
 
 
-
 """
 Spin up the app using fastapp and uvicorn. See the docker-compose file for whats
 actually run
 """
 app = FastAPI()
 WM = WeatherMan()
+validator = data_validator.DataValidator()
 templates = Jinja2Templates(directory="templates/")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -476,6 +502,7 @@ def reat_root(request: Request):
 
 @app.get("/items/{id}", response_class=HTMLResponse)
 async def read_item(request: Request, id: str):
+    # This is here to remind myself how to pass data and to make things async
     return templates.TemplateResponse("item.html", {"request": request, "id": id})
 
 @app.get("/about-weatherman", response_class=HTMLResponse)
@@ -511,38 +538,157 @@ def poll_data():
 @app.get('/dump')
 def data_dump(request: Request):
     logit.debug('Sending dump')
-    dump = WM.bad_weather_dump()
-    return templates.TemplateResponse("dump.html", {"request": request})
+    # dump_list = []
+    # for weatherdata in WM.bad_weather_dump():
+    #     new_dct = {i:None for i in WM.config['dump_webpage_list']}
+    #     dct = dict(weatherdata)
+    #     for i,j in dct.items():
+    #         if i == 'time':
+    #             dct[i] = datetime.datetime.strftime(j, WM.config['datetime_str'])
+    #         if i in WM.config['dump_webpage_list']:
+    #             new_dct[i] = j
+    #     dump_list.append(new_dct)
+    # logit.debug(f"dump list{dump_list}")
+    print(len(WM.dump_list))
+    return templates.TemplateResponse("dump.html", {"request": request, 'list':WM.dump_list})
+    # return templates.TemplateResponse("dump.html", {"request": request})
 
-@app.get('/full_dump')
-def full_data_dump():
-    logit.debug('Gathering full dump')
-    dump = WM.bad_weather_dump()
-    return dump
+@app.get('/dump/search/')
+# async def read_items(q: Optional[List[str]] = Query(None)):
+# async def read_items(q: Optional[str] = Query(None)):
+async def read_items(
+    request: Request,
+    thunderstorm=False,
+    drizzle=False,
+    rain=False,
+    snow=False,
+    atmosphere=False,
+    clouds=False,
+    clear=False,
+    exact_list=None,
+    start_time=None,
+    end_time=None):
 
-@app.get('/ica_dump')
-def ica_dump():
-    logit.debug('Gathering ica dump')
-    dump = WM.ica_dump()
-    return dump
+    logit.debug(f"thunderstorm: {thunderstorm}")
+    logit.debug(f"drizzle: {drizzle}")
+    logit.debug(f"rain: {rain}")
+    logit.debug(f"snow: {snow}")
+    logit.debug(f"atmosphere: {atmosphere}")
+    logit.debug(f"clouds: {clouds}")
+    logit.debug(f"clear: {clear}")
+    logit.debug(f"exact_list: {exact_list}")
+    logit.debug(f"start_time: {start_time}")
+    logit.debug(f"end_time: {end_time}")
 
-@app.get('/rain_dump')
-def rain_dump():
-    logit.debug('Gathering rain dump')
-    dump = WM.rain_dump()
-    return dump
+    if thunderstorm:
+        for num in WM.config['accepted_owma_codes']['thunderstorm']:
+            exact_list += f",{str(num)}"
 
-@app.get('/snow_dump')
-def snow_dump():
-    logit.debug('Gathering snow dump')
-    dump = WM.snow_dump()
-    return dump
+    if drizzle:
+        for num in WM.config['accepted_owma_codes']['drizzle']:
+            exact_list += f",{str(num)}"
 
-@app.get('/wind_dump')
-def wind_dump():
-    logit.debug('Gathering wind dump')
-    dump = WM.wind_dump()
-    return dump
+    if rain:
+        for num in WM.config['accepted_owma_codes']['rain']:
+            exact_list += f",{str(num)}"
+
+    if snow:
+        for num in WM.config['accepted_owma_codes']['snow']:
+            exact_list += f",{str(num)}"
+
+    if atmosphere:
+        for num in WM.config['accepted_owma_codes']['atmosphere']:
+            exact_list += f",{str(num)}"
+
+    if clouds:
+        for num in WM.config['accepted_owma_codes']['clouds']:
+            exact_list += f",{str(num)}"
+
+    if clear:
+        for num in WM.config['accepted_owma_codes']['clear']:
+            exact_list += f",{str(num)}"
+
+
+    try:
+        logit.debug(f"validating exact_list")
+        exact_list = validator.is_exact_list(exact_list)
+    except ValueError:
+        exact_list = None
+
+    try:
+        logit.debug(f"validating start_time")
+        start_time = validator.is_datetime(start_time)
+    except ValueError:
+        start_time = None
+        # start_time = datetime.datetime.strptime(
+        #     WM.config['earliest_datetime'],
+        #     WM.config['valid_datetimes']['day']
+        # )
+    try:
+        logit.debug(f"validating wnd_time")
+        end_time = validator.is_datetime(end_time)
+    except ValueError:
+        end_time = None
+        # end_time = datetime.datetime.now(tz=datetime.timezone.utc) + datetime.timedelta(days=1)
+
+    parameters = {
+        'exact_list': exact_list,
+        'start_time': start_time,
+        'end_time': end_time,
+    }
+    WM.weather_dump(parameters)
+    # logit.debug(f'Sending query with parameters {parameters}')
+    # dump_list = []
+    # for weatherdata in WM.weather_dump(parameters):
+    #     new_dct = {i:None for i in WM.config['dump_webpage_list']}
+    #     dct = dict(weatherdata)
+    #     for i,j in dct.items():
+    #         if i == 'time':
+    #             dct[i] = datetime.datetime.strftime(j, WM.config['datetime_str'])
+    #         if i in WM.config['dump_webpage_list']:
+    #             new_dct[i] = j
+    #     dump_list.append(new_dct)
+    # return templates.TemplateResponse("dump.html", {"request": request, 'list':dump_list})
+    response = RedirectResponse(url='/dump')
+    return response
+    # data_dump(Request, dump_list)
+    
+    
+    # query_items = {"q": q}
+    # return {query_items}
+
+
+
+
+# @app.get('/full_dump')
+# def full_data_dump():
+#     logit.debug('Gathering full dump')
+#     dump = WM.bad_weather_dump()
+#     return dump
+
+# @app.get('/ica_dump')
+# def ica_dump():
+#     logit.debug('Gathering ica dump')
+#     dump = WM.ica_dump()
+#     return dump
+
+# @app.get('/rain_dump')
+# def rain_dump():
+#     logit.debug('Gathering rain dump')
+#     dump = WM.rain_dump()
+#     return dump
+
+# @app.get('/snow_dump')
+# def snow_dump():
+#     logit.debug('Gathering snow dump')
+#     dump = WM.snow_dump()
+#     return dump
+
+# @app.get('/wind_dump')
+# def wind_dump():
+#     logit.debug('Gathering wind dump')
+#     dump = WM.wind_dump()
+#     return dump
 
 """
 Reports

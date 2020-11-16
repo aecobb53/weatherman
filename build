@@ -11,6 +11,10 @@ setup () {
         echo "making db/ dir"
         mkdir db;fi
 
+    if [ ! -d db/archive ]; then
+        echo "making db/archive/ dir"
+        mkdir db;fi
+
     if [ ! -d out ]; then
         echo "making out/ dir"
         mkdir out; fi
