@@ -663,7 +663,19 @@ async def read_items(
     # query_items = {"q": q}
     # return {query_items}
 
+# @app.get('/bug_report_list/')
+# def data_dump(request: Request):
+#     logit.debug('Sending dump')
+#     results_list = [{'firstreprot':'remember to replace with results!'}]
+#     return templates.TemplateResponse("bug_report_list.html", {"request": request, 'list':results_list})
 
+# @app.get('/bug_report/')
+# async def read_items(request: Request):
+#     pass
+#     return templates.TemplateResponse("bug_report.html", {"request": request})
+    # return templates.TemplateResponse("bug_report.html", {"request": request})
+    # response = RedirectResponse(url='/bug_report_list')
+    # return response
 
 
 # @app.get('/full_dump')
