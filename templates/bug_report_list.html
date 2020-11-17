@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Weatherman data dump{% endblock %}
+{% block title %}Weatherman repoprts{% endblock %}
 {% block main %}
 
 <html>
@@ -12,19 +12,27 @@
         <div>
             <form action="/dump/search/" class="selectors">
                 <div class="ranges">
-                    <div><label class="selector-indicator" for="code">Weather range</label></div>
+                    <h2>Bug Report</h2>
+                    <p>
+                        Fill in as much info as you want, usually the more you add the more helpful it is. 
+                        Thanks!
+                    </p>
+                    <p>
+                        For a list of bug reports view them <a href="/bug_report_list">here</a>.
+                    </p>
+                    <div><label class="selector-indicator" for="code">Env</label></div>
                     <div>
-                        <input type="checkbox" name="thunderstorm" value="True" checked>
-                        <label class="selector-indicator" for="code">2## Thunderstorm</label>
+                        <input type="checkbox" name="prod" value="True">
+                        <label class="selector-indicator" for="code">prod</label>
 
-                        <input type="checkbox" name="drizzle" value="True" checked>
-                        <label class="selector-indicator" for="code">3## Drizzle</label>
+                        <input type="checkbox" name="dev" value="True">
+                        <label class="selector-indicator" for="code">dev</label>
 
-                        <input type="checkbox" name="rain" value="True" checked>
-                        <label class="selector-indicator" for="code">5## Rain</label>
+                        <input type="checkbox" name="test" value="True">
+                        <label class="selector-indicator" for="code">test</label>
 
-                        <input type="checkbox" name="snow" value="True" checked>
-                        <label class="selector-indicator" for="code">6## Snow</label>
+                        <input type="checkbox" name="unit_test" value="True">
+                        <label class="selector-indicator" for="code">unit-test</label>
                     </div>
 
                     <div>

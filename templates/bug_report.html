@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Weatherman bug report{% endblock %}
+{% block main %}
+
+<html>
+    <head>
+        <link rel="stylesheet" href="static/bug_report.css">
+    </head>
+    <body>
+        <div class="selectors">
+            <form action="/bug-report/entry/">
+                <div class="explanation">
+                    <h2>Submit bug report</h2>
+                    <p>
+                        Thank you for submitting a bug report. 
+                        While most options are optional, the more info the better. <br>
+                        
+                        For a list of bug reports go <a href="/bug-report-list">here</a>.<br>
+                    </p>
+                </div>
+                <div class="checkboxes">
+
+                    <div><label class="selector-indicator" for="code">Environment</label></div>
+                    <div>
+                        <input type="checkbox" name="prod" value="True">
+                        <label class="selector-indicator" for="code">prod</label>
+
+                        <input type="checkbox" name="dev" value="True">
+                        <label class="selector-indicator" for="code">dev</label>
+
+                        <input type="checkbox" name="test" value="True">
+                        <label class="selector-indicator" for="code">test</label>
+
+                        <input type="checkbox" name="unit_test" value="True">
+                        <label class="selector-indicator" for="code">unit-test</label>
+
+                        <input type="checkbox" name="website" value="True">
+                        <label class="selector-indicator" for="code">website</label>
+                    </div>
+
+                    <div><label class="selector-indicator" for="code">Tab</label></div>
+                    <div>
+                        <input type="checkbox" name="home" value="True">
+                        <label class="selector-indicator" for="code">Home</label>
+
+                        <input type="checkbox" name="reports" value="True">
+                        <label class="selector-indicator" for="code">Reports</label>
+
+                        <input type="checkbox" name="dump" value="True">
+                        <label class="selector-indicator" for="code">Dump</label>
+
+                        <input type="checkbox" name="realtime" value="True">
+                        <label class="selector-indicator" for="code">Realtime</label>
+
+                        <input type="checkbox" name="state" value="True">
+                        <label class="selector-indicator" for="code">State</label>
+
+                        <input type="checkbox" name="poll" value="True">
+                        <label class="selector-indicator" for="code">Poll</label>
+
+                        <input type="checkbox" name="about" value="True">
+                        <label class="selector-indicator" for="code">About</label>
+
+                        <input type="checkbox" name="report" value="True">
+                        <label class="selector-indicator" for="code">Report</label>
+
+                    </div>
+                </div>
+
+                <div class="time">
+                    <label class="selector-indicator" for="url">Date/Time</label>
+                    <input type="datetime" name="event_time" placeholder="month, date, time, whatever">
+                </div>
+
+                <div class="search">
+                    <input type="submit" value="Submit">
+                </div>
+
+                <div><label class="selector-indicator" for="code">Description</label></div>
+                <div>
+                    <input 
+                    type="text" 
+                    id="description-box"
+                    name="description" 
+                    placeholder="Description here"
+                    autofocus>
+                </div>
+                
+                
+                <!-- <div class="description">
+                    <div><label class="selector-indicator" for="code">Description</label></div>
+                    <input 
+                    type="text" 
+                    id="description-box"
+                    name="description" 
+                    placeholder="Description here">
+                </div> -->
+            </form>
+        </div>
+    </body>
+</html>
+
+{% endblock %}
