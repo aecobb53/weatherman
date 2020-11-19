@@ -279,6 +279,12 @@ class WeatherMan:
             for i,j in dct.items():
                 if i == 'time':
                     dct[i] = datetime.datetime.strftime(j, self.config['datetime_str'])
+                if i == 'name':
+                    for x,y in self.config['locations'].items():
+                        if int(dct['city']) == int(y):
+                            # dct['old_city_name'] = j
+                            j = x
+                            break
                 if i in self.config['dump_webpage_list']:
                     new_dct[i] = j
             self.dump_list.append(new_dct)
@@ -350,46 +356,89 @@ class WeatherMan:
         report1 = {}
         report2 = {}
         for name, city in self.config['locations'].items():
+            # create dict with the city names as the keys to keep all weather data together
             report1[name] = []
             for line in data:
-                if line['city'] == city:
+                if line['name'] == name:
                     report1[name].append(line)
         for name, reports in report1.items():
+            # Itterates through the new lists of weather data and places similar times together in to storms
             report2[name] = [[]]
             report_index = 0
             for index, line in enumerate(reports):
                 if index == 0:
                     report2[name][0].append(line)
                 else:
-                    if reports[index - 1]['time'] <= line['time'] - datetime.timedelta(minutes=35):
+                    if reports[index - 1]['time'] <= line['time'] - datetime.timedelta(minutes=int(self.config['storm_difference_time'])):
                         report2[name].append([])
                         report_index += 1
                 report2[name][report_index].append(line)
         report = {}
         for name, reports in report2.items():
+            # Adds the first and last element into the final storm list
+            # This is where i will add extra data such as notable weather fluxuations
             report[name] = []
             for index, event in enumerate(reports):
                 if len(event) == 0:
                     continue
                 elif len(event) == 1:
-                    report[name].append([event])
+                    report[name].append(event)
                 else:
                     report[name].append([event[0], event[-1]])
         logit.debug('Created a weather report')
         return report
 
+    # def weather_report(self, data):
+    #     report1 = {}
+    #     report2 = {}
+    #     for name, city in self.config['locations'].items():
+    #         report1[name] = []
+    #         for line in data:
+    #             if line['city'] == city:
+    #                 report1[name].append(line)
+    #     for name, reports in report1.items():
+    #         report2[name] = [[]]
+    #         report_index = 0
+    #         for index, line in enumerate(reports):
+    #             if index == 0:
+    #                 report2[name][0].append(line)
+    #             else:
+    #                 if reports[index - 1]['time'] <= line['time'] - datetime.timedelta(minutes=35):
+    #                     report2[name].append([])
+    #                     report_index += 1
+    #             report2[name][report_index].append(line)
+    #     report = {}
+    #     for name, reports in report2.items():
+    #         report[name] = []
+    #         for index, event in enumerate(reports):
+    #             if len(event) == 0:
+    #                 continue
+    #             elif len(event) == 1:
+    #                 report[name].append([event])
+    #             else:
+    #                 report[name].append([event[0], event[-1]])
+    #     logit.debug('Created a weather report')
+    #     return report
+
 
     def write_report(self, report, file_name=None):
         json_report = {}
-        first_last = self.db.get_first_and_last()
-        json_report['data_start'] = datetime.datetime.strftime(first_last[0]['time'], '%Y-%m-%dT%H:%M:%SZ')
-        json_report['data_end'] = datetime.datetime.strftime(first_last[-1]['time'], '%Y-%m-%dT%H:%M:%SZ')
+        print(report)
+        # first_last = self.db.get_first_and_last()
+        # json_report['data_start'] = datetime.datetime.strftime(first_last[0]['time'], '%Y-%m-%dT%H:%M:%SZ')
+        # json_report['data_end'] = datetime.datetime.strftime(first_last[-1]['time'], '%Y-%m-%dT%H:%M:%SZ')
         for name, storms in report.items():
             json_report[name] = []
             for storm in storms:
-                storm_durration = str(storm[-1]['time'] - storm[0]['time'])
-                new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
-                new_end = storm[-1]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
+                print(storm)
+                if len(storm) > 1:
+                    storm_durration = str(storm[-1]['time'] - storm[0]['time'])
+                    new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
+                    new_end = storm[-1]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
+                else:
+                    storm_durration = '0'
+                    new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
+                    new_end = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
                 storm[0]['time'] = new_start
                 storm[-1]['time'] = new_end
                 entry = {
@@ -401,13 +450,44 @@ class WeatherMan:
                 }
                 json_report[name].append(entry)
         if file_name == None:
-            file_name = self.reports_dir + \
+            file_name = self.config['weather_reports_dir'] + \
                 'Weather_report_' + \
                 datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%dT%H:%M:%SZ') + \
                 '.json'
         with open(file_name, 'w') as new_report:
             json.dump(json_report, new_report, indent=2)
         logit.debug(f'Wrote a weatehr report to a file {file_name}')
+
+
+    # def write_report(self, report, file_name=None):
+    #     json_report = {}
+    #     first_last = self.db.get_first_and_last()
+    #     json_report['data_start'] = datetime.datetime.strftime(first_last[0]['time'], '%Y-%m-%dT%H:%M:%SZ')
+    #     json_report['data_end'] = datetime.datetime.strftime(first_last[-1]['time'], '%Y-%m-%dT%H:%M:%SZ')
+    #     for name, storms in report.items():
+    #         json_report[name] = []
+    #         for storm in storms:
+    #             storm_durration = str(storm[-1]['time'] - storm[0]['time'])
+    #             new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
+    #             new_end = storm[-1]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
+    #             storm[0]['time'] = new_start
+    #             storm[-1]['time'] = new_end
+    #             entry = {
+    #                 'storm_start':storm[0]['time'],
+    #                 'storm_end':storm[-1]['time'],
+    #                 'storm_durration':storm_durration,
+    #                 'start_dct':storm[0],
+    #                 'end_dct':storm[-1],
+    #             }
+    #             json_report[name].append(entry)
+    #     if file_name == None:
+    #         file_name = self.reports_dir + \
+    #             'Weather_report_' + \
+    #             datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%dT%H:%M:%SZ') + \
+    #             '.json'
+    #     with open(file_name, 'w') as new_report:
+    #         json.dump(json_report, new_report, indent=2)
+    #     logit.debug(f'Wrote a weatehr report to a file {file_name}')
 
 
 
@@ -477,7 +557,7 @@ app.add_middleware(
 )
 
 @app.get('/')
-def reat_root(request: Request):
+def root(request: Request):
     logit.debug('home endpoint hit')
     info = {
         '/':'list of extentions',
@@ -767,6 +847,29 @@ async def read_items(
     else:
         logit.info(f"Invalid entry, skipping")
 
+@app.get("/report", response_class=HTMLResponse)
+async def reports(request: Request):
+    exact_list = list(range(100,800))
+    now = datetime.datetime.now(tz=datetime.timezone.utc)
+    while now.weekday() != 4:
+        now = now - datetime.timedelta(days=1)
+    end = now
+    start = now - datetime.timedelta(days=7)
+    start_time = validator.is_datetime(
+        datetime.datetime.strftime(start, '%Y-%m-%d')
+        )
+    end_time = validator.is_datetime(
+        datetime.datetime.strftime(end, '%Y-%m-%d')
+        )
+    parameters = {
+        'exact_list': exact_list,
+        'start_time': start_time,
+        'end_time': end_time,
+    }
+    report = WM.weather_report(WM.weather_dump(parameters))
+    WM.write_report(report)
+    return  root(request)
+
 # @app.get('/bug-report/', response_class=HTMLResponse)
 # async def submit_bug_report(request: Request):
 #     pass
@@ -806,36 +909,36 @@ async def read_items(
 #     dump = WM.wind_dump()
 #     return dump
 
-"""
-Reports
-"""
+# """
+# Reports
+# """
 
-@app.get('/full_report')
-def full_data_report():
-    logit.debug('Gathering full report')
-    report = WM.bad_weather_report()
-    return report
+# @app.get('/full_report')
+# def full_data_report():
+#     logit.debug('Gathering full report')
+#     report = WM.bad_weather_report()
+#     return report
 
-@app.get('/ica_report')
-def ica_report():
-    logit.debug('Gathering ica report')
-    report = WM.ica_report()
-    return report
+# @app.get('/ica_report')
+# def ica_report():
+#     logit.debug('Gathering ica report')
+#     report = WM.ica_report()
+#     return report
 
-@app.get('/rain_report')
-def rain_report():
-    logit.debug('Gathering rain report')
-    report = WM.rain_report()
-    return report
+# @app.get('/rain_report')
+# def rain_report():
+#     logit.debug('Gathering rain report')
+#     report = WM.rain_report()
+#     return report
 
-@app.get('/snow_report')
-def snow_report():
-    logit.debug('Gathering snow report')
-    report = WM.snow_report()
-    return report
+# @app.get('/snow_report')
+# def snow_report():
+#     logit.debug('Gathering snow report')
+#     report = WM.snow_report()
+#     return report
 
-@app.get('/wind_report')
-def wind_report():
-    logit.debug('Gathering wind report')
-    report = WM.wind_report()
-    return report
+# @app.get('/wind_report')
+# def wind_report():
+#     logit.debug('Gathering wind report')
+#     report = WM.wind_report()
+#     return report

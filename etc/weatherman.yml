@@ -142,3 +142,5 @@ accepted_owma_codes:
     clear:
         - 800
 bug_report_dir: 'out/'
+weather_reports_dir: out/
+storm_difference_time: 35
