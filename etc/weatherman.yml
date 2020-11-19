@@ -141,3 +141,4 @@ accepted_owma_codes:
         - 804
     clear:
         - 800
+bug_report_dir: 'out/'

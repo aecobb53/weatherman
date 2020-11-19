@@ -123,6 +123,7 @@ class WeatherMan:
 
         # Data holders
         self.dump_list = []
+        self.last_poll = None
 
 
     def poll_weather(self):
@@ -132,6 +133,7 @@ class WeatherMan:
         data = self.weather_butler.poll()
         logit.debug(f"request: {self.weather_butler.request}")
         logit.debug(f"request: {self.weather_butler.request.json()}")
+        self.last_poll = datetime.datetime.now(tz=datetime.timezone.utc)
         return data
 
 
@@ -530,10 +532,14 @@ def return_args(request: Request):
     # return WM.state
 
 @app.get('/poll')
-def poll_data():
+def poll_data(request: Request):
     logit.debug('About to poll data')
     WM.manage_polling()
-    return {'Success':True}
+    timestamp = datetime.datetime.strftime(WM.last_poll, WM.config['datetime_str'])
+    return templates.TemplateResponse("poll.html", {"request": request, "last_poll":timestamp})
+    # return {'Success':True}
+    # response = RedirectResponse(url='/')
+    # return response
 
 @app.get('/dump')
 def data_dump(request: Request):
@@ -657,7 +663,117 @@ async def read_items(
     # query_items = {"q": q}
     # return {query_items}
 
+# @app.get('/bug_report_list/')
+# def data_dump(request: Request):
+#     logit.debug('Sending dump')
+#     results_list = [{'firstreprot':'remember to replace with results!'}]
 
+#     return templates.TemplateResponse("bug_report_list.html", {"request": request, 'list':results_list})
+
+# /bug-report/entry
+@app.get("/bug-report", response_class=HTMLResponse)
+async def submit_bug_report(request: Request):
+    pass
+    return templates.TemplateResponse("bug_report.html", {"request": request})
+
+@app.get("/bug-report/entry", response_class=HTMLResponse)
+async def read_items(
+    request: Request,
+    prod=None,
+    dev=None,
+    test=None,
+    unit_test=None,
+    website=None,
+    home=None,
+    reports=None,
+    dump=None,
+    realtime=None,
+    state=None,
+    poll=None,
+    about=None,
+    report=None,
+    event_time=None,
+    description=None):
+
+    logit.debug(f"prod: {prod}")
+    logit.debug(f"dev: {dev}")
+    logit.debug(f"test: {test}")
+    logit.debug(f"unit-test: {unit_test}")
+    logit.debug(f"website: {website}")
+    logit.debug(f"home: {home}")
+    logit.debug(f"reports: {reports}")
+    logit.debug(f"dump: {dump}")
+    logit.debug(f"realtime: {realtime}")
+    logit.debug(f"state: {state}")
+    logit.debug(f"poll: {poll}")
+    logit.debug(f"about: {about}")
+    logit.debug(f"report: {report}")
+    logit.debug(f"event_time: {event_time}")
+    logit.debug(f"description: {description}")
+
+    entry_time = datetime.datetime.strftime(
+            datetime.datetime.now(tz=datetime.timezone.utc),
+            WM.config['datetime_str']
+        )
+
+    valid = False
+    none_list = [prod, dev, test, unit_test, website, home, reports, dump, realtime, state, poll, about, report]
+    if event_time == '' and description == '':
+        for check in none_list:
+            if check is not None:
+                valid = True
+                break
+    else:
+        valid = True
+
+    bug_info = {
+        'env':[],
+        'tab':[],
+        'datetime':[],
+        'description':'',
+    }
+
+    bug_info['env'] += ['prod'] if prod is not None else []
+    bug_info['env'] += ['dev'] if dev is not None else []
+    bug_info['env'] += ['test'] if test is not None else []
+    bug_info['env'] += ['unit_test'] if unit_test is not None else []
+    bug_info['env'] += ['website'] if website is not None else []
+
+    bug_info['tab'] += ['home'] if home is not None else []
+    bug_info['tab'] += ['reports'] if reports is not None else []
+    bug_info['tab'] += ['dump'] if dump is not None else []
+    bug_info['tab'] += ['realtime'] if realtime is not None else []
+    bug_info['tab'] += ['state'] if state is not None else []
+    bug_info['tab'] += ['poll'] if poll is not None else []
+    bug_info['tab'] += ['about'] if about is not None else []
+    bug_info['tab'] += ['report'] if report is not None else []
+
+    if event_time is None or event_time == '':
+        bug_info['datetime'] = entry_time
+    else:
+        bug_info['datetime'] = event_time
+
+    if description is None or description == '':
+        bug_info['description'] = ''
+    else:
+        bug_info['description'] = description
+
+    logit.info(f"bug report submitted {bug_info}")
+
+    if valid:
+        filename = 'bug_report_' + entry_time + '.json'
+        with open(WM.config['bug_report_dir'] + filename, 'w') as br:
+            json.dump(bug_info, br)
+    else:
+        logit.info(f"Invalid entry, skipping")
+
+# @app.get('/bug-report/', response_class=HTMLResponse)
+# async def submit_bug_report(request: Request):
+#     pass
+#     return templates.TemplateResponse("bug_report.html", {"request": request})
+    # return templates.TemplateResponse("bug_report.html", {"request": request})
+    # response = RedirectResponse(url='/bug_report_list')
+    # return response
 
 
 # @app.get('/full_dump')

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Weatherman poll{% endblock %}
+{% block main %}
+
+<html>
+    <head>
+        <link rel="stylesheet" href="static/poll.css">
+    </head>
+    <body>
+        <section class="poll">
+            <h2>Successfully polled data!</h2>
+            <p>Last successful poll was at:</p>
+            <p>
+                {{last_poll}}
+            </p>
+        </section>
+    </body>
+</html>
+
+{% endblock %}

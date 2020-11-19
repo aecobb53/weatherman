@@ -4,10 +4,48 @@
 
 <html>
     <head>
-        <link rel="stylesheet" href="static/state.css">
+        <link rel="stylesheet" href="static/main.css">
     </head>
     <body>
-        <h2>Home page stuff...</h2>
+        <section class="main-page">
+            <h2>Weatherman homepage</h2>
+            <div class="breakdown">
+                <h3>Reports</h3>
+                <p>
+                    Reports are used to condense the "Data dump" data so its easier to manage. 
+                    When it is built out instead of being a list of weather reports like the data dump is 
+                    it will be a list of storms. 
+                    The storm data will have the start, stop, and any large fluxuations during it. 
+                </p>
+
+                <h3>Data dump</h3>
+                <p>
+                    Data dump returns a list of all weather data that matches the search perameters. 
+                    You can select the ranges of weather type based on their sky_id. 
+                    The list can be further refined if you have specific ranges of interest. 
+                    Start and an end times are optional and highly customizable. 
+                    If you add dates it needs a data at minimum. 
+                    Hours, minutes, seconds are optional but data is polled in minutes so... 
+                </p>
+
+                <h3>Realtime weather</h3>
+                <p>
+                    Eventually I hope to display the current weather data over a map of the world. 
+                    This is a long way out though. 
+                </p>
+
+                <h3>State</h3>
+                <p>
+                    This is more for diagnostics. 
+                    It displays info about the backend like the current logfile and log level. 
+                </p>
+
+                <h3>Poll data</h3>
+                <p>
+                    When you hit this it instantly polls data from Open Weather Map. 
+                </p>
+            </div>
+        </section>
     </body>
 </html>
 
