@@ -1,5 +1,10 @@
 #! /bin/sh
 
+grep_port () {
+    echo "Activiating ports:"
+    grep -A8 $1 docker-compose.yml | grep -A2 ports | grep "-"
+}
+
 setup () {
     # Verify the directories and files that are not uplaoded to the github are there. 
     # This function also creates the two files that are ignored but needed. 
@@ -84,11 +89,13 @@ clean () {
 
 run () {
     # Use docker-compose to spin up the app. 
+    grep_port "weather"
     docker-compose up -d weather
 }
 
 dev () {
     # Spin up the dev environment. 
+    grep_port "dev"
     docker-compose up dev
 }
 
