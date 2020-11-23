@@ -532,6 +532,7 @@ Spin up the app using fastapp and uvicorn. See the docker-compose file for whats
 actually run
 """
 app = FastAPI()
+# app.include_router(frontend.router)
 WM = WeatherMan()
 validator = data_validator.DataValidator()
 templates = Jinja2Templates(directory="templates/")
@@ -587,6 +588,97 @@ async def read_item(request: Request, id: str):
     # This is here to remind myself how to pass data and to make things async
     return templates.TemplateResponse("item.html", {"request": request, "id": id})
 
+@app.get('/html_testing')
+async def testone(request: Request):
+    return templates.TemplateResponse("testing.html", {"request": request})
+
+# @app.get("/items/", response_class=HTMLResponse)
+# async def read_items():
+#     return """
+#     <html>
+#         <head>
+#             <title>Some HTML in here</title>
+#         </head>
+#         <body>
+#             <h1>Look ma! HTML!</h1>
+#         </body>
+#     </html>
+#     """
+
+@app.get('/html_testing2')
+async def testtwo(request: Request):
+    item_list = [
+        'one',
+        'two',
+        'three'
+    ]
+    return {'hello':'world!'}
+
+@app.get('/dump_testing')
+def return_args_test(request: Request):
+    logit.debug('state testing endpoint hit')
+    # lst = [
+    #     {'name': 'ha', 'sky': 'Clouds', 'sky_id': 803, 'sky_desc': 'broken clouds', 'temp': 70.81, 'wind': 2.24, 'time': datetime.datetime(2020, 11, 15, 20, 19, 40)},
+    #     {'name': 'du', 'sky': 'Clear', 'sky_id': 800, 'sky_desc': 'clear sky', 'temp': 77.0, 'wind': 9.17, 'time': datetime.datetime(2020, 11, 15, 20, 19, 40)},
+    #     {'name': 'si', 'sky': 'Rain', 'sky_id': 501, 'sky_desc': 'moderate rain', 'temp': 77.0, 'wind': 3.36, 'time': datetime.datetime(2020, 11, 15, 20, 19, 40)},
+    #     {'name': 'ba', 'sky': 'Clouds', 'sky_id': 803, 'sky_desc': 'broken clouds', 'temp': 70.79, 'wind': 8.05, 'time': datetime.datetime(2020, 11, 15, 20, 19, 40)},
+    #     {'name': 'pa', 'sky': 'Clear', 'sky_id': 800, 'sky_desc': 'clear sky', 'temp': 55.2, 'wind': 42.5, 'time': datetime.datetime(2020, 11, 15, 20, 19, 40)},
+    #     {'name': 'mi', 'sky': 'Clouds', 'sky_id': 804, 'sky_desc': 'overcast clouds', 'temp': 84.2, 'wind': 2.53, 'time': datetime.datetime(2020, 11, 15, 20, 19, 40)},
+    #     {'name': 'ri', 'sky': 'Clouds', 'sky_id': 802, 'sky_desc': 'scattered clouds', 'temp': 35.6, 'wind': 25.28, 'time': datetime.datetime(2020, 11, 15, 20, 19, 40)},
+    #     {'name': 'nw', 'sky': 'Clouds', 'sky_id': 803, 'sky_desc': 'broken clouds', 'temp': 44.6, 'wind': 19.46, 'time': datetime.datetime(2020, 11, 15, 20, 19, 40)},
+    #     {'name': 'tr', 'sky': 'Clouds', 'sky_id': 801, 'sky_desc': 'few clouds', 'temp': 15.8, 'wind': 8.05, 'time': datetime.datetime(2020, 11, 15, 20, 19, 40)},
+    #     {'name': 'ak', 'sky': 'Clear', 'sky_id': 800, 'sky_desc': 'clear sky', 'temp': 12.85, 'wind': 7.72, 'time': datetime.datetime(2020, 11, 15, 20, 19, 40)},
+    #     {'name': 'pb', 'sky': 'Snow', 'sky_id': 600, 'sky_desc': 'light snow', 'temp': 10.4, 'wind': 17.22, 'time': datetime.datetime(2020, 11, 15, 20, 19, 40)},
+    #     {'name': 'ha', 'sky': 'Clouds', 'sky_id': 803, 'sky_desc': 'broken clouds', 'temp': 68.92, 'wind': 1.12, 'time': datetime.datetime(2020, 11, 15, 22, 39, 49)},
+    #     {'name': 'du', 'sky': 'Clear', 'sky_id': 800, 'sky_desc': 'clear sky', 'temp': 75.07, 'wind': 5.82, 'time': datetime.datetime(2020, 11, 15, 22, 39, 49)},
+    #     {'name': 'si', 'sky': 'Rain', 'sky_id': 502, 'sky_desc': 'heavy intensity rain', 'temp': 77.5, 'wind': 11.43, 'time': datetime.datetime(2020, 11, 15, 22, 39, 49)},
+    #     {'name': 'ba', 'sky': 'Clouds', 'sky_id': 802, 'sky_desc': 'scattered clouds', 'temp': 70.29, 'wind': 6.93, 'time': datetime.datetime(2020, 11, 15, 22, 39, 49)},
+    #     {'name': 'pa', 'sky': 'Clear', 'sky_id': 800, 'sky_desc': 'clear sky', 'temp': 54.16, 'wind': 39.15, 'time': datetime.datetime(2020, 11, 15, 22, 39, 49)},
+    #     {'name': 'mi', 'sky': 'Clear', 'sky_id': 800, 'sky_desc': 'clear sky', 'temp': 81.93, 'wind': 1.72, 'time': datetime.datetime(2020, 11, 15, 22, 39, 49)},
+    #     {'name': 'ri', 'sky': 'Clouds', 'sky_id': 804, 'sky_desc': 'overcast clouds', 'temp': 37.4, 'wind': 19.46, 'time': datetime.datetime(2020, 11, 15, 22, 39, 49)},
+    #     {'name': 'nw', 'sky': 'Clouds', 'sky_id': 803, 'sky_desc': 'broken clouds', 'temp': 42.37, 'wind': 12.75, 'time': datetime.datetime(2020, 11, 15, 22, 39, 49)},
+    #     {'name': 'tr', 'sky': 'Clouds', 'sky_id': 801, 'sky_desc': 'few clouds', 'temp': 15.8, 'wind': 5.82, 'time': datetime.datetime(2020, 11, 15, 22, 39, 49)},
+    # ]
+    # lst = [
+    #     'one',
+    #     'two',
+    #     'three',
+    #     'four',
+    #     'five',
+    # ]
+    lst = [
+        {"GFGUserName":"User-1", "NoOfProblems":"100", "TotalScore":"100", "Articles":"10"},
+        {"GFGUserName":"User-2", "NoOfProblems":"200", "TotalScore":"120", "Articles":"20"},
+        {"GFGUserName":"User-3", "NoOfProblems":"300", "TotalScore":"130", "Articles":"30"},
+        {"GFGUserName":"User-4", "NoOfProblems":"400", "TotalScore":"140", "Articles":"40"}
+    ]
+
+    logit.debug(f"list sending {lst}")
+    return lst
+    # state_list = []
+    # for i,j in WM.state.items():
+    #     if i == 'cities':
+    #         state_list.append(i + ':')
+    #         for x,y in j.items():
+    #             state_list.append('    ' + x + ' : ' + str(y))
+    #     elif i == 'fh_logging':
+    #         state_list.append('file_logging' + ' : ' + j)
+    #     elif i == 'ch_logging':
+    #         state_list.append('consol_logging' + ' : ' + j)
+    #     else:
+    #         state_list.append(i + ' : ' + str(j))
+    #     logit.info(f"{i} : {j}")
+    #     logit.info(f"state test data {WM.state}")
+    #     return WM.state
+        # return state_list
+    # return templates.TemplateResponse("state.html", {"request": request, 'list':state_list})
+    # return WM.state
+
+@app.get('/testing_three')
+def return_args_test(request: Request):
+    return templates.TemplateResponse("testingtwo.html", {"request": request})
+
+
 @app.get("/about-weatherman", response_class=HTMLResponse)
 async def about_weatherman(request: Request):
     return templates.TemplateResponse("about_weatherman.html", {"request": request})
@@ -636,6 +728,8 @@ def data_dump(request: Request):
     #     dump_list.append(new_dct)
     # logit.debug(f"dump list{dump_list}")
     print(len(WM.dump_list))
+    for i in WM.dump_list[:20]:
+        print(i)
     return templates.TemplateResponse("dump.html", {"request": request, 'list':WM.dump_list})
     # return templates.TemplateResponse("dump.html", {"request": request})
 
