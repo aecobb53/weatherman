@@ -735,13 +735,25 @@ def data_dump(request: Request):
     #             new_dct[i] = j
     #     dump_list.append(new_dct)
     # logit.debug(f"dump list{dump_list}")
-    print(len(WM.dump_list))
-    for i in WM.dump_list[:20]:
-        print(i)
-    return templates.TemplateResponse("dump.html", {"request": request, 'list':WM.dump_list})
+    # lst = [
+    #     {"GFGUserName":"User-1", "NoOfProblems":"100", "TotalScore":"100", "Articles":"10"},
+    #     {"GFGUserName":"User-2", "NoOfProblems":"200", "TotalScore":"120", "Articles":"20"},
+    #     {"GFGUserName":"User-3", "NoOfProblems":"300", "TotalScore":"130", "Articles":"30"},
+    #     {"GFGUserName":"User-1", "NoOfProblems":"100", "TotalScore":"100", "Articles":"10"},
+    #     {"GFGUserName":"User-2", "NoOfProblems":"200", "TotalScore":"120", "Articles":"20"},
+    #     {"GFGUserName":"User-3", "NoOfProblems":"300", "TotalScore":"130", "Articles":"30"},
+    #     {"GFGUserName":"User-4", "NoOfProblems":"400", "TotalScore":"140", "Articles":"40"}
+    # ]
+    lst = WM.dump_list
+    print(len(lst))
+    # for i in lst:
+    #     print(i)
+    return lst
+    # return templates.TemplateResponse("dump.html", {"request": request, 'list':lst})
+    # return templates.TemplateResponse("dump.html", {"request": request, 'list':WM.dump_list})
     # return templates.TemplateResponse("dump.html", {"request": request})
 
-@app.get('/dump/search/')
+@app.post('/dump/search/')
 # async def read_items(q: Optional[List[str]] = Query(None)):
 # async def read_items(q: Optional[str] = Query(None)):
 async def read_items(
@@ -757,6 +769,7 @@ async def read_items(
     start_time=None,
     end_time=None):
 
+    logit.debug(f"request: {request}")
     logit.debug(f"thunderstorm: {thunderstorm}")
     logit.debug(f"drizzle: {drizzle}")
     logit.debug(f"rain: {rain}")
