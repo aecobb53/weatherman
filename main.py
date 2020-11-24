@@ -650,6 +650,9 @@ def return_args_test(request: Request):
         {"GFGUserName":"User-1", "NoOfProblems":"100", "TotalScore":"100", "Articles":"10"},
         {"GFGUserName":"User-2", "NoOfProblems":"200", "TotalScore":"120", "Articles":"20"},
         {"GFGUserName":"User-3", "NoOfProblems":"300", "TotalScore":"130", "Articles":"30"},
+        {"GFGUserName":"User-1", "NoOfProblems":"100", "TotalScore":"100", "Articles":"10"},
+        {"GFGUserName":"User-2", "NoOfProblems":"200", "TotalScore":"120", "Articles":"20"},
+        {"GFGUserName":"User-3", "NoOfProblems":"300", "TotalScore":"130", "Articles":"30"},
         {"GFGUserName":"User-4", "NoOfProblems":"400", "TotalScore":"140", "Articles":"40"}
     ]
 
@@ -676,7 +679,12 @@ def return_args_test(request: Request):
 
 @app.get('/testing_three')
 def return_args_test(request: Request):
+    # return templates.TemplateResponse("workinglist.html", {"request": request})
     return templates.TemplateResponse("testingtwo.html", {"request": request})
+
+@app.get('/data_extraction')
+def return_args_test(request: Request):
+    return templates.TemplateResponse("data_extract.html", {"request": request})
 
 
 @app.get("/about-weatherman", response_class=HTMLResponse)
