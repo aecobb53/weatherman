@@ -1,0 +1,31 @@
+body {
+	background: #3498db;
+}
+
+.big {
+	/* background: #ededed; */
+    display: block;
+	text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+	font-size: 5em;
+	width: 92%;
+}
+
+.little {
+	/* background: #ededed; */
+    display: block;
+	text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+	font-size: 5em;
+	width: 40%;
+}
+
+.centered {
+	/* background: #ededed; */
+    display: block;
+	text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}

@@ -1,0 +1,6 @@
+[
+    {"GFGUserName":"User-1", "NoOfProblems":"100", "TotalScore":"100", "Articles":"10"},
+    {"GFGUserName":"User-2", "NoOfProblems":"200", "TotalScore":"120", "Articles":"20"},
+    {"GFGUserName":"User-3", "NoOfProblems":"300", "TotalScore":"130", "Articles":"30"},
+    {"GFGUserName":"User-4", "NoOfProblems":"400", "TotalScore":"140", "Articles":"40"}
+]

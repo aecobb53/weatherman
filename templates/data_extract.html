@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Weatherman data dump{% endblock %}
+{% block main %}
+
+<html lang="en">
+    
+    <head>
+        <meta charset="UTF-8"> 
+        <title>Weatherman data</title> 
+
+        <!-- INCLUDING JQUERY-->
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+
+        <!-- CSS FOR STYLING THE PAGE -->
+        <link rel="stylesheet" href="static/data_extract.css">
+
+    </head>
+
+    <body>
+        
+        <form id="extract_form" action="/dump/search/" class="selectors">
+        <!-- <form id="extract_form" class="selectors"> -->
+            <div class="ranges">
+                <div><label class="selector-indicator" for="code">Weather range</label></div>
+                <div>
+                    <input type="checkbox" id="thunderstorm" name="thunderstorm" value="True" checked>
+                    <label class="selector-indicator" for="code">2## Thunderstorm</label>
+
+                    <input type="checkbox" name="drizzle" value="True" checked>
+                    <label class="selector-indicator" for="code">3## Drizzle</label>
+
+                    <input type="checkbox" name="rain" value="True" checked>
+                    <label class="selector-indicator" for="code">5## Rain</label>
+
+                    <input type="checkbox" name="snow" value="True" checked>
+                    <label class="selector-indicator" for="code">6## Snow</label>
+                </div>
+
+                <div>
+                    <input type="button" id="check_all" name="vehicle1" value="All" checked>
+                </div>
+
+                <div>
+                    <input type="checkbox" name="atmosphere" value="True" checked>
+                    <label class="selector-indicator" for="code">7## Atmosphere</label>
+
+                    <input type="checkbox" name="clouds" value="True" checked>
+                    <label class="selector-indicator" for="code">8## Clouds</label>
+
+                    <input type="checkbox" name="clear" value="True" checked>
+                    <label class="selector-indicator" for="code">800 Clear</label>
+                </div>
+            </div>
+
+            <div class="exact-search">
+                <div>
+                    <label class="selector-indicator" for="code">Exact list</label>
+                </div>
+                <input type="text" name="exact_list" placeholder="600-610, 700-800, 500">
+            </div>
+
+            <div class="time">
+                <label class="selector-indicator" for="url">Time range start</label>
+                <input 
+                type="datetime" 
+                name="start_time" 
+                pattern="^\d{4}[-/]\d\d?[-/]\d\d?[T ]?(\d{2}[:-]\d{2}[:-]\d{2}.\d*|\d{2}[:-]\d{2}[:-]\d{2}|\d{2}[:-]\d{2}|\d{2})?Z?$" 
+                placeholder="YYYY-MM-DD[THH:MM:SSZ]">
+                <label class="selector-indicator" for="url">Time range end</label>
+                <input 
+                type="datetime" 
+                name="end_time" 
+                pattern="^\d{4}[-/]\d\d?[-/]\d\d?[T ]?(\d{2}[:-]\d{2}[:-]\d{2}.\d*|\d{2}[:-]\d{2}[:-]\d{2}|\d{2}[:-]\d{2}|\d{2})?Z?$" 
+                placeholder="YYYY-MM-DD[THH:MM:SSZ]">
+            </div>
+
+            <div class="search">
+                <input id="get_data" type="submit" value="Get data" autofocus>
+                <!-- <input type="submit" id="get_data" value="Get data" autofocus> -->
+            </div>
+        </form>
+
+        <section class="dump-list"> 
+            <!-- <h1>GeeksForGeeks</h1>  -->
+      
+            <!-- TABLE CONSTRUCTION-->
+            <table id='table'> 
+                <!-- HEADING FORMATION -->
+                <tr> 
+                    <th class="dump-table-header">Location</th>
+                    <th class="dump-table-header">Weather</th>
+                    <th class="dump-table-header">Weather ID</th>
+                    <th class="dump-table-header">Description</th>
+                    <th class="dump-table-header">Temp (&#8457)</th>
+                    <th class="dump-table-header">Wind (mph)</th>
+                    <th class="dump-table-header">Time (Z)</th>
+                </tr> 
+        </section> 
+    </body>
+
+    <!-- JAVASCRIPT FILES -->
+    <!-- <script janguage="Javascript" src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script> -->
+    <script janguage="Javascript" src="static/data_extract.js?version=1"></script>
+
+</html>
+
+{% endblock %}
