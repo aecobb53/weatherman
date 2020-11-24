@@ -40,6 +40,7 @@
 - Remove json from the dump header
 - Update City name in the dup data to the identifier in the private json
 - When poll data is called, dont change html page
+- If i have different docker-compose &| Dockerfiles change the requirements.txt file to only include the testing for tests.
 
 ## Links
 

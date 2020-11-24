@@ -4,9 +4,7 @@
 
 <html>
     <head>
-        <!-- <link rel="stylesheet" href="static/base.css"> -->
         <link rel="stylesheet" href="static/dump.css">
-        <!-- <link rel="stylesheet" href="static/state.css"> -->
     </head>
     <body>
         <div>
@@ -14,31 +12,32 @@
                 <div class="ranges">
                     <div><label class="selector-indicator" for="code">Weather range</label></div>
                     <div>
-                        <input type="checkbox" name="thunderstorm" value="True" checked>
+                        <input type="checkbox" id="thunderstorm" name="thunderstorm" value="True" checked>
                         <label class="selector-indicator" for="code">2## Thunderstorm</label>
 
-                        <input type="checkbox" name="drizzle" value="True" checked>
+                        <input type="checkbox" id="drizzle" name="drizzle" value="True" checked>
                         <label class="selector-indicator" for="code">3## Drizzle</label>
 
-                        <input type="checkbox" name="rain" value="True" checked>
+                        <input type="checkbox" id="rain" name="rain" value="True" checked>
                         <label class="selector-indicator" for="code">5## Rain</label>
 
-                        <input type="checkbox" name="snow" value="True" checked>
+                        <input type="checkbox" id="snow" name="snow" value="True" checked>
                         <label class="selector-indicator" for="code">6## Snow</label>
                     </div>
 
                     <div>
-                        <input type="button" id="check_all" name="vehicle1" value="All" checked>
+                        <input type="button" id="check_all" name="vehicle1" onclick="toggle_menu()" value="All" checked>
+                        <!-- <input id="button" type="submit" name="button" onclick="myFunction();" value="enter"/> -->
                     </div>
 
                     <div>
-                        <input type="checkbox" name="atmosphere" value="True" checked>
+                        <input type="checkbox" id="atmosphere" name="atmosphere" value="True" checked>
                         <label class="selector-indicator" for="code">7## Atmosphere</label>
 
-                        <input type="checkbox" name="clouds" value="True" checked>
+                        <input type="checkbox" id="clouds" name="clouds" value="True" checked>
                         <label class="selector-indicator" for="code">8## Clouds</label>
 
-                        <input type="checkbox" name="clear" value="True" checked>
+                        <input type="checkbox" id="clear" name="clear" value="True" checked>
                         <label class="selector-indicator" for="code">800 Clear</label>
                     </div>
                 </div>
@@ -47,7 +46,7 @@
                     <div>
                         <label class="selector-indicator" for="code">Exact list</label>
                     </div>
-                    <input type="text" name="exact_list" placeholder="600-610, 700-800, 500">
+                    <input type="text" id="exact_list" name="exact_list" placeholder="600-610, 700-800, 500">
                 </div>
 
                 <div class="time">
@@ -55,6 +54,7 @@
                     <!-- <input type="date" name="start-date" pattern="regexsearch" placeholder="YYYY-MM" value="text"> -->
                     <input 
                     type="datetime" 
+                    id="start_time" 
                     name="start_time" 
                     pattern="^\d{4}[-/]\d\d?[-/]\d\d?[T ]?(\d{2}[:-]\d{2}[:-]\d{2}.\d*|\d{2}[:-]\d{2}[:-]\d{2}|\d{2}[:-]\d{2}|\d{2})?Z?$" 
                     placeholder="YYYY-MM-DD[THH:MM:SSZ]">
@@ -62,34 +62,22 @@
                     <!-- <input type="date" name="start-date" pattern="regexsearch" placeholder="YYYY-MM" value="text"> -->
                     <input 
                     type="datetime" 
+                    id="end_time" 
                     name="end_time" 
                     pattern="^\d{4}[-/]\d\d?[-/]\d\d?[T ]?(\d{2}[:-]\d{2}[:-]\d{2}.\d*|\d{2}[:-]\d{2}[:-]\d{2}|\d{2}[:-]\d{2}|\d{2})?Z?$" 
                     placeholder="YYYY-MM-DD[THH:MM:SSZ]">
                 </div>
 
                 <div class="search">
-                    <input type="submit" value="Get data" autofocus>
+                    <input type="submit" id="get_data" value="Get data" autofocus>
                 </div>
-                <!-- <div class="time">
-                    <label class="selector-indicator" for="url">Time range Start</label>
-                    <input type="url" name="url" value="" required>
-                </div>
-
-                <div class="time">
-                    <label class="selector-indicator" for="url">Time range End</label>
-                    <input type="url" name="url" value="" required>
-                </div>
-
-                <div class="ranges">
-                </div>
-
-                <label class="selector-indicator" for="code">Weather range</label>
-                <input type="text" name="code" value="" required>
-                <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike" checked>
-                <div class="submit">
-                    <input type="submit" value="Get data">
-                </div> -->
             </form>
+
+            <!-- <script>
+            function myFunction(){
+                alert("You button was pressed");
+            };   
+            </script> -->
         </div>
         <div class="dump-data">
             <h2>Dumped data</h2>
@@ -111,27 +99,9 @@
                     </tr>
                 {% endfor %}
             </table>
-
-
-            <!-- <section class="dump-list">
-                <p class="dump-table-header">name</p>
-                <p class="dump-table-header">sky</p>
-                <p class="dump-table-header">sky_id</p>
-                <p class="dump-table-header">sky_desc</p>
-                <p class="dump-table-header">temp</p>
-                <p class="dump-table-header">wind</p>
-                <p class="dump-table-header">time</p>
-                {% for dict_item in list %}
-                    {% for key, value in dict_item.items() %}
-                        <div>
-                            <p>{{value}}</p>
-                        </div>
-                    {% endfor %}
-                {% endfor %}
-            </section>
-            <p class="dump-header"> </p> -->
         </div>  
     </body>
+    <script janguage="Javascript" src="static/dump.js?version=1"></script>
 </html>
 
 {% endblock %}
