@@ -664,6 +664,7 @@ async def reports(request: Request):
     Saves a report to the out/ direcotry. 
     Eventually it may return the report but i dont have that working yet. 
     """
+    logit.debug('report endpoint hit')
     exact_list = list(range(100,800))
     now = datetime.datetime.now(tz=datetime.timezone.utc)
     while now.weekday() != 4:
@@ -683,4 +684,5 @@ async def reports(request: Request):
     }
     report = WM.weather_report(WM.weather_dump(parameters))
     WM.write_report(report)
-    return  root(request)
+    response = RedirectResponse(url='/')
+    return response
