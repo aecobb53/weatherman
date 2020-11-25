@@ -11,13 +11,16 @@ class DataValidator:
             self.config = yaml.load(ycf, Loader=yaml.FullLoader)
 
     def is_datetime(self, datetime_str):
+        """
+        Is the provided string a datetime object? 
+        """
         datetime_obj = None
         zulu = False
         local = False
         if datetime_str == '':
             return datetime_obj
 
-        # If its a zulu o local time, strip and set the flag. 
+        # If its a zulu or local time, strip and set the flag. 
         # I plan to use this eventually.
         # If the data is local it should be offset for zulu for the app. 
         # This is important in case the frontend formats timestamps locally or something like that
@@ -27,9 +30,6 @@ class DataValidator:
         if datetime_str.upper().endswith('L'):
             local = True
             datetime_str = datetime_str[:-1]
-        # if len(datetime_str) > 11:
-        #     if datetime_str[10] == ' ':
-        #         datetime_str = datetime_str[:10] + 'T' + datetime_str[11:]
 
         try:
             datetime_obj = datetime.strptime(datetime_str, self.config['valid_datetimes']['full'])
@@ -54,6 +54,7 @@ class DataValidator:
         if datetime_obj == None:
             raise ValueError('No datetime matches')
         return datetime_obj
+
 
     def is_exact_list(self, exact_str):
         """
