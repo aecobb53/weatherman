@@ -102,11 +102,19 @@ It was mostly for myself but I figured if im writing it down for myself I might 
 - [API](docs/api.md)
 - [Frontend](docs/frontend.md)
 - [Backend](docs/backend.md)
-    - [Docker](docs/backend.md#Logging)
-    - SQLite
+    - [Docker](docs/backend.md#docker)
+    - [SQLite](docs/backend.md#sqlite)
+    - [Technical breakdown](docs/backend.md#technical-breakdown)
+    - [Logging](docs/backend.md#logging)
+    - [Reports](docs/backend.md#reports)
 - [Testing](docs/testing.md)
+    - [Functional](docs/testing.md#functional)
+    - [Unit](docs/testing.md#unit)
 - [Open Weather Map API](docs/open_weather_map_api.md)
 - [Catchall](docs/catchall.md)
+    - [TODO](docs/catchall.md#todo)
+    - [Links](docs/catchall.md#links)
+    - [Resources](docs/catchall.md#resources)
 
 ## Contact me
 
