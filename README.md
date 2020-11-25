@@ -11,9 +11,9 @@ The data is returned in two notable ways.
 Either a dump which will return all data that meats the search parameters or a report which will shorten the data and give you an overview of each storm at the location. 
 The reports currently show the start and end of the storm but I want to add intermitant data from the storm such as what was the worst weather experienced. 
 
-> Release:  0.6.0-beta
+> Release:  0.7.0-beta
 
-> Last modified:  2020-11-13
+> Last modified:  2020-11-25
 
 <!-- 
 Currently its in a Beta phase. People can use it and it gathers weather data fine, it just needs some hand holding in the setup process. I am also still building out major systems so its not perfectly on its own yet. 
@@ -45,11 +45,11 @@ Try it out and let me know.
 2. Clone this repo. 
 3. Update config files. ADD HOW TO DO THAT HERE
 4. To spin up the server you need to use `docker-compose up -d weather`. 
-  - For the first time I recommend using `docker-compose up --build weather`. Thisway you can see the output and see errors easier. 
-  - `--build` will build a new image every time. Unless the code changed this is useless. 
-  - `-d` spins up the server as a headless instance. It is set to reload if it is stopped. 
-  - If you need to get a readout after it was started headless run `docker logs <container id>`. 
-  - If you need to follow the output run `docker logs <container id> --follow`. 
+    - For the first time I recommend using `docker-compose up --build weather`. Thisway you can see the output and see errors easier. 
+    - `--build` will build a new image every time. Unless the code changed this is useless. 
+    - `-d` spins up the server as a headless instance. It is set to reload if it is stopped. 
+    - If you need to get a readout after it was started headless run `docker logs <container id>`. 
+    - If you need to follow the output run `docker logs <container id> --follow`. 
 5. Now that it is spun up and working you can verify the frontend by going to `localhost:8000`. 
 
 You will know the backend is spun up if you see these two lines
@@ -102,9 +102,19 @@ It was mostly for myself but I figured if im writing it down for myself I might 
 - [API](docs/api.md)
 - [Frontend](docs/frontend.md)
 - [Backend](docs/backend.md)
+    - [Docker](docs/backend.md#docker)
+    - [SQLite](docs/backend.md#sqlite)
+    - [Technical breakdown](docs/backend.md#technical-breakdown)
+    - [Logging](docs/backend.md#logging)
+    - [Reports](docs/backend.md#reports)
 - [Testing](docs/testing.md)
+    - [Functional](docs/testing.md#functional)
+    - [Unit](docs/testing.md#unit)
 - [Open Weather Map API](docs/open_weather_map_api.md)
 - [Catchall](docs/catchall.md)
+    - [TODO](docs/catchall.md#todo)
+    - [Links](docs/catchall.md#links)
+    - [Resources](docs/catchall.md#resources)
 
 ## Contact me
 

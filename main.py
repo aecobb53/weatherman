@@ -61,15 +61,15 @@ class WeatherMan:
 
         self.name = self.config['name']
         self.private_config_path = self.config['private_config_path']
-        self.public_config_path = 'etc/weather_api_public.json'
         self.db_name = self.config['db_name'] # The type will be appended in the db
         self.weather_butler = weather_butler.WeatherButler(
             self.config['private_config_path'],
-            self.config['owma_url']
+            self.config['owma_url'],
+            self.config['key_path']
         )
         self.state = self.config['starting_state']
         with open(self.private_config_path) as configfile:
-            self.config.update(json.load(configfile))
+            self.config.update(yaml.load(configfile, Loader=yaml.FullLoader))
         self.state['cities'] = self.config['locations']
 
         # Setup and more state setting
@@ -459,7 +459,7 @@ async def poll_data(request: Request):
     Poll OWMA for new weather data. 
     """
     logit.debug('about to poll data')
-    poll_api_data(request)
+    WM.manage_polling()
     timestamp = datetime.datetime.strftime(WM.last_poll, WM.config['datetime_str'])
     return templates.TemplateResponse("poll.html", {"request": request, "last_poll":timestamp})
 
@@ -474,7 +474,7 @@ async def data_dump(request: Request):
 
 
 @app.get('/dump/search/')
-async def read_items(
+def read_items(
     request: Request,
     thunderstorm=False,
     drizzle=False,
@@ -656,6 +656,8 @@ async def read_items(
             json.dump(bug_info, br)
     else:
         logit.info(f"Invalid entry, skipping")
+    response = RedirectResponse(url='/')
+    return response
 
 
 @app.get("/report", response_class=HTMLResponse)

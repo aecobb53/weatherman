@@ -1,7 +1,8 @@
 name: weatherman
 db_name: db/weatherman
 owma_url: https://api.openweathermap.org/data/2.5/
-private_config_path: etc/weather_api_private.json
+private_config_path: etc/weather_api_private.yml
+key_path: etc/key.yml
 starting_state:
     db_name: db/weatherman
     env: null
@@ -25,7 +26,7 @@ environments:
         file_handler_level: DEBUG
         consol_handler_level: DEBUG
         testing_flag: False
-        db_addition: 'dev'
+        db_addition: '_dev'
         docker_working_dir: /usr/src/
         log_parameters:
             log_suffix: 'dev'
@@ -45,7 +46,7 @@ environments:
         file_handler_level: DEBUG
         consol_handler_level: INFO
         testing_flag: True
-        db_addition: 'test'
+        db_addition: '_test'
         docker_working_dir: /usr/src/
         log_parameters:
             log_suffix: 'test'

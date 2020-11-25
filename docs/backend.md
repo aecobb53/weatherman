@@ -6,6 +6,7 @@
 - [SQLite](#sqlite)
 - [Technical breakdown](#technical-breakdown)
 - [Logging](#logging)
+- [Reports](#reports)
 
 ## Docker
 
@@ -211,3 +212,42 @@ If the script is spun up outside of docker "text" is added to the scriptname.
 
 In a nutshell weatherman logs to `logs/weatherman.log` if we are in prod, `logs/weatherman_dev.log` if 
 tweaking in dev, and `logs/weatherman_dev_test.log` if running behave testing. 
+
+## Reports
+
+Reports take the data from the database and create a condensed list of weather storms. 
+It accomplishes this by creating a json where the keys are the locations and the values are a 
+list of storms. 
+Each storm contains a start, end, durration, start weather report, and end weather report. 
+Eventually i want to add notable weather spikes in the middle. 
+
+```json
+{
+    "location1": [
+        {
+            "storm_start": "YYYY-MM-DDTHH:MM:SSZ",
+            "storm_end": "YYYY-MM-DDTHH:MM:SSZ",
+            "storm_durration": "D:HH:MM",
+            "start_dct": {
+                "name": "location1",
+                "sky": "Rain",
+                "sky_id": 501,
+                "sky_desc": "moderate rain",
+                "temp": 77.0,
+                "wind": 3.36,
+                "time": "YYYY-MM-DDTHH:MM:SSZ"
+            },  
+            "end_dct": {
+                "name": "location1",
+                "sky": "Rain",
+                "sky_id": 501,
+                "sky_desc": "moderate rain",
+                "temp": 77.0,
+                "wind": 3.36,
+                "time": "YYYY-MM-DDTHH:MM:SSZ"
+            }
+        }
+    ],
+    "location2": []
+}
+```

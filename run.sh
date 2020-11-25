@@ -7,7 +7,7 @@ PY="/usr/local/bin/python3.7"
 # SCRIPT="run.py"
 # pwd
 SCRIPT="/home/acobb/weatherman/run.py"
-LOG="logs/run.log"
+LOG="weatherman/logs/run_files.log"
 
 if [ $# -eq 0 ]; then
     ARGS="-p"
@@ -15,4 +15,4 @@ else
     ARGS="$*"
 fi
 
-${PY} ${SCRIPT} ${ARGS}
+${PY} ${SCRIPT} ${ARGS} >> $LOG
