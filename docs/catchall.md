@@ -11,7 +11,7 @@
 - ~~better error handling.~~
 - ~~verify the run scripts error silently and capture all returns so the cront does not get full.~~
 - ~~logging in the readme.~~
-- reports in the readme. 
+- ~~reports in the readme.~~
 - db structure in the readme. 
 - ~~update Dockerfile or docker-compose itteration numbers.~~
 - log rotating.

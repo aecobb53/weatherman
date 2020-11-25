@@ -61,7 +61,6 @@ class WeatherMan:
 
         self.name = self.config['name']
         self.private_config_path = self.config['private_config_path']
-        # self.public_config_path = 'etc/weather_api_public.json'
         self.db_name = self.config['db_name'] # The type will be appended in the db
         self.weather_butler = weather_butler.WeatherButler(
             self.config['private_config_path'],
@@ -70,7 +69,7 @@ class WeatherMan:
         )
         self.state = self.config['starting_state']
         with open(self.private_config_path) as configfile:
-            self.config.update(json.load(configfile))
+            self.config.update(yaml.load(configfile, Loader=yaml.FullLoader))
         self.state['cities'] = self.config['locations']
 
         # Setup and more state setting

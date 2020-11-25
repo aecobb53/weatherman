@@ -11,9 +11,9 @@ The data is returned in two notable ways.
 Either a dump which will return all data that meats the search parameters or a report which will shorten the data and give you an overview of each storm at the location. 
 The reports currently show the start and end of the storm but I want to add intermitant data from the storm such as what was the worst weather experienced. 
 
-> Release:  0.6.0-beta
+> Release:  0.7.0-beta
 
-> Last modified:  2020-11-13
+> Last modified:  2020-11-25
 
 <!-- 
 Currently its in a Beta phase. People can use it and it gathers weather data fine, it just needs some hand holding in the setup process. I am also still building out major systems so its not perfectly on its own yet. 

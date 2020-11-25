@@ -1,6 +1,7 @@
 import json
 import requests
 import datetime
+import yaml
 
 
 class WeatherButler:
@@ -12,16 +13,16 @@ class WeatherButler:
         """Load configs"""
         self.config = {}
         
-        with open(private_config_path, 'r') as private_config:
-            private_conf = json.load(private_config)
+        with open(private_config_path) as private_config:
+            private_conf = yaml.load(private_config, Loader=yaml.FullLoader)
+
         self.config.update(private_conf)
         public_conf = {'url':owma_url}
         self.config.update(public_conf)
 
         """Load key"""
-        # key_path = 'etc/key.json'
         with open(key_path) as keyfile:
-            self.key = json.load(keyfile)
+            self.key = yaml.load(keyfile, Loader=yaml.FullLoader)
 
 
     def get_response(self, url, args):
