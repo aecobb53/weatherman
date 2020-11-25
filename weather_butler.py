@@ -29,21 +29,7 @@ class WeatherButler:
         Get a response... yep.
         It also returns the request object and the json data.
         """
-        error_location = 'weather_butler>get_response'
-
-        try:
-            request = requests.get(url, args)
-        except requests.exceptions.HTTPError as errh:
-            raise TypeError(f"{error_location}: Http Error: {errh}")
-        except requests.exceptions.ConnectionError as errc:
-            raise TypeError(f"{error_location}: Error Connecting: {errc}")
-        except requests.exceptions.Timeout as errt:
-            raise TypeError(f"{error_location}: Timeout Error: {errt}")
-        except requests.exceptions.InvalidSchema as errs:
-            raise TypeError(f"{error_location}: Incorrect url: {errs}")
-        except requests.exceptions.RequestException as err:
-            raise TypeError(f"{error_location}: Other error: {err}")
-
+        request = requests.get(url, args)
         return request, request.json()['list']
 
 

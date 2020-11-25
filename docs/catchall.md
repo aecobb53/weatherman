@@ -8,9 +8,9 @@
 
 ## TODO
 
-- better error handling. 
-- verify the run scripts error silently and capture all returns so the cront does not get full. 
-- logging in the readme. 
+- ~~better error handling.~~
+- ~~verify the run scripts error silently and capture all returns so the cront does not get full.~~
+- ~~logging in the readme.~~
 - reports in the readme. 
 - db structure in the readme. 
 - ~~update Dockerfile or docker-compose itteration numbers.~~
@@ -32,6 +32,7 @@
 - ~~Update City name in the dup data to the identifier in the private json~~
 - ~~When poll data is called, dont change html page~~
 - If i have different docker-compose &| Dockerfiles change the requirements.txt file to only include the testing for tests.
+- Update the readme api
 
 ## Links
 

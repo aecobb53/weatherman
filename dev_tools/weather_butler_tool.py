@@ -57,6 +57,14 @@ if args.get_response:
 # format_request_city_id_list
 
 
+if args.format_request_city_id_list:
+    url, arguments = WB.format_request_city_id_list(
+        WB.config['url'], 
+        WB.config['locations'].values(), 
+        WB.key['Weather_Key']
+    )
+    print(url, arguments)
+
 # format_response
 
 
