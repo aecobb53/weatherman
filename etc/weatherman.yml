@@ -2,6 +2,7 @@ name: weatherman
 db_name: db/weatherman
 owma_url: https://api.openweathermap.org/data/2.5/
 private_config_path: etc/weather_api_private.json
+key_path: etc/key.json
 starting_state:
     db_name: db/weatherman
     env: null

@@ -8,7 +8,7 @@ class WeatherButler:
     WeatherButler handles API calls of the weather website. 
     """
 
-    def __init__(self, private_config_path, owma_url):
+    def __init__(self, private_config_path, owma_url, key_path):
         """Load configs"""
         self.config = {}
         
@@ -19,7 +19,7 @@ class WeatherButler:
         self.config.update(public_conf)
 
         """Load key"""
-        key_path = 'etc/key.json'
+        # key_path = 'etc/key.json'
         with open(key_path) as keyfile:
             self.key = json.load(keyfile)
 
@@ -29,7 +29,21 @@ class WeatherButler:
         Get a response... yep.
         It also returns the request object and the json data.
         """
-        request = requests.get(url, args)
+        error_location = 'weather_butler>get_response'
+
+        try:
+            request = requests.get(url, args)
+        except requests.exceptions.HTTPError as errh:
+            raise TypeError(f"{error_location}: Http Error: {errh}")
+        except requests.exceptions.ConnectionError as errc:
+            raise TypeError(f"{error_location}: Error Connecting: {errc}")
+        except requests.exceptions.Timeout as errt:
+            raise TypeError(f"{error_location}: Timeout Error: {errt}")
+        except requests.exceptions.InvalidSchema as errs:
+            raise TypeError(f"{error_location}: Incorrect url: {errs}")
+        except requests.exceptions.RequestException as err:
+            raise TypeError(f"{error_location}: Other error: {err}")
+
         return request, request.json()['list']
 
 
