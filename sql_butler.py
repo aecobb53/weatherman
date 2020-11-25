@@ -1,6 +1,8 @@
 import sqlite3
 import datetime
 
+
+
 class SQLButler:
     """
     SQLButler handles data addition and extraction from the database. There is a csv
@@ -9,6 +11,7 @@ class SQLButler:
     """
 
     def __init__(self, database_name):
+
         self.headers = {
             'time':'datetime',
             'city':'integer',
@@ -67,8 +70,6 @@ class SQLButler:
         """
         insert_data = []
         try:
-            # insert_data.append(datetime.datetime.strftime(data['time'], '%Y-%m-%dT%H:%M:%SZ'))
-            # insert_data.append(data['time'])
             insert_data.append(data['time'].strftime('%Y-%m-%dT%H:%M:%SZ'))
         except:
             insert_data.append('')
@@ -161,20 +162,6 @@ class SQLButler:
         insert = self.format_for_insert(data)
         sql = f"""INSERT INTO weather({','.join(self.headers.keys())})
         VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"""
-        # insert = (
-        #     data['time'],
-        #     data['city'],
-        #     data['name'],
-        #     data['sky_id'],
-        #     data['sky'],
-        #     data['sky_desc'],
-        #     data['temp'],
-        #     data['humidity'],
-        #     data['wind'],
-        #     data['cover'],
-        #     data['rain'],
-        #     data['snow']
-        # )
 
         self.c.execute(sql, insert)
 
@@ -225,6 +212,9 @@ class SQLButler:
 
 
     def query_database(self, parameters):
+        """
+        Based on the parameters, grab data from the database and filter it. 
+        """
         dump = []
         refined = []
         self.c = self.create_database()
@@ -268,11 +258,6 @@ class SQLButler:
             sky_id BETWEEN 200 AND 799
         """)
         data = self.c.fetchall()
-        # for line_t in data:
-        #     line = list(line_t)
-        #     line[0] = datetime.datetime.strptime(line[0], '%Y-%m-%dT%H:%M:%SZ')
-        #     dump.append({k:v for k,v in zip(self.headers.keys(),line)})
-        # return dump
         dump = self.list_tuple_to_list_dict(data)
         return dump
 

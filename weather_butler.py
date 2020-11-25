@@ -9,20 +9,12 @@ class WeatherButler:
     """
 
     def __init__(self, private_config_path, owma_url):
-
         """Load configs"""
-        # print(private_config_path)
-        # if private_config_path == None:
-        #     private_config_path = 'etc/weather_api_private.json'
-        # print(private_config_path)
-        # public_config_path = 'etc/weather_api_public.json'
         self.config = {}
         
         with open(private_config_path, 'r') as private_config:
             private_conf = json.load(private_config)
         self.config.update(private_conf)
-        # with open(public_config_path, 'r') as public_config:
-        #     public_conf = json.load(public_config)
         public_conf = {'url':owma_url}
         self.config.update(public_conf)
 
@@ -49,7 +41,11 @@ class WeatherButler:
         args = {'appid':key, 'id':','.join([str(i) for i in city_id_list]), 'units':'imperial'}
         return url, args
 
+
     def format_response(self, data):
+        """
+        Format data from weather call
+        """
         report = []
         
         for weather in data:
@@ -130,9 +126,3 @@ class WeatherButler:
         self.request, data = self.get_response(url, args)
         report  = self.format_response(data)
         return report
-
-
-"""
-dict.get("<key>", <default value>)
-returns the default value if the key does not exist
-"""

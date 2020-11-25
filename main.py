@@ -51,13 +51,13 @@ class WeatherMan:
 
     def __init__(self):
 
+        # Load config file and set some parameters
         self.master_config = 'etc/weatherman.yml'
         with open(self.master_config) as ycf:
             self.config = yaml.load(ycf, Loader=yaml.FullLoader)
 
         logit.info(f"lines of the config")
         logit.info(f"Yml config {json.dumps(self.config)}")
-        # logit.info(f"{json.dumps(self.config, indent=4)}")
 
         self.name = self.config['name']
         self.private_config_path = self.config['private_config_path']
@@ -67,22 +67,12 @@ class WeatherMan:
             self.config['private_config_path'],
             self.config['owma_url']
         )
-
         self.state = self.config['starting_state']
-
-
         with open(self.private_config_path) as configfile:
             self.config.update(json.load(configfile))
-            # self.config = json.load(configfile)
         self.state['cities'] = self.config['locations']
 
-        """
-        If the IS_IN_DOCKER env variable is set then it imports and sets up the SQL database.
-        If not then it sets up a text file. I did this for testing because I couldnt get
-        SQL on my VDI at first and in case this ever needs to be bruit forced down the road.
-        """
-
-        # Setup
+        # Setup and more state setting
         import sql_butler
         if os.environ.get('ENVIRONMENT') == 'prod':
             environment = 'prod'
@@ -112,7 +102,6 @@ class WeatherMan:
             app_name_in_file=True,
             log_suffix=self.config['environments'][environment]['log_parameters']['log_suffix']
         )
-        # self.state['log_file'] = logger.update_file(self.name, app_name_in_file=True, log_suffix=None)
         self.state['db_name'] += '.sql'
         self.state['working_directory'] = self.config['environments'][environment]['docker_working_dir']
         self.state['in_docker'] = True
@@ -139,7 +128,7 @@ class WeatherMan:
 
     def manage_polling(self):
         """
-        I used to have a use case for needing two functions to do that...
+        I used to have a use case for needing two functions to do this...
         now i just have two functions...
         """
         data = self.poll_weather()
@@ -267,8 +256,7 @@ class WeatherMan:
 
     def weather_dump(self, parameters):
         """
-        Bad weather dump grabs any weather between 200 and 899. 800+ is generally good
-        weather (800 being "clear").
+        Takes the parameters to filter out results from the database. 
         """
         logit.debug(f'weather dump based on parameters {parameters}')
         data = self.db.query_database(parameters)
@@ -282,77 +270,35 @@ class WeatherMan:
                 if i == 'name':
                     for x,y in self.config['locations'].items():
                         if int(dct['city']) == int(y):
-                            # dct['old_city_name'] = j
                             j = x
                             break
                 if i in self.config['dump_webpage_list']:
                     new_dct[i] = j
             self.dump_list.append(new_dct)
         return self.dump_list
-        # return data
 
 
     def bad_weather_dump(self):
         """
         Bad weather dump grabs any weather between 200 and 899. 800+ is generally good
         weather (800 being "clear").
+
+        This is being depreciated
         """
         data = self.db.get_bad_data()
         logit.debug('Created bad weather dump')
         return data
 
-    # def ica_dump(self):
-    #     """
-    #     ICA dump takes the bad weather dump and refines it for weather that could cause
-    #     bad signal. The reason its so general is to grab the full scope of a storm if it rolls in.
-    #     """
-    #     data = self.bad_weather_dump()
-    #     dump = []
-    #     for line in data:
-    #         if line['sky_id'] >= 200 and line['sky_id'] < 300 or \
-    #         line['sky_id'] >= 310 and line['sky_id'] < 400 or \
-    #         line['sky_id'] >= 500 and line['sky_id'] < 600 or \
-    #         line['sky_id'] >= 601 and line['sky_id'] < 700 or \
-    #         line['sky_id'] in [731, 751, 762, 771, 781]:
-    #             dump.append(line)
-    #     logit.debug('Created ica weather dump')
-    #     return dump
-
-    # def rain_dump(self):
-    #     """Rain"""
-    #     data = self.bad_weather_dump()
-    #     dump = []
-    #     for line in data:
-    #         if line['sky_id'] >= 300 and line['sky_id'] < 600:
-    #             dump.append(line)
-    #     logit.debug('Created rain weather dump')
-    #     return dump
-
-    # def snow_dump(self):
-    #     """Snow"""
-    #     data = self.bad_weather_dump()
-    #     dump = []
-    #     for line in data:
-    #         if line['sky_id'] >= 600 and line['sky_id'] < 700:
-    #             dump.append(line)
-    #     logit.debug('Created snow weather dump')
-    #     return dump
-
-    # def wind_dump(self):
-    #     """wind"""
-    #     data = self.bad_weather_dump()
-    #     dump = []
-    #     for line in data:
-    #         if line['wind'] > 5:
-    #             dump.append(line)
-    #     logit.debug('Created wind weather dump')
-    #     return dump
 
     """
     End of the dump secion and start of the report secion
     """
 
+
     def weather_report(self, data):
+        """
+        This takes a list of dumped weather data and saves off the important bits for a report
+        """
         report1 = {}
         report2 = {}
         for name, city in self.config['locations'].items():
@@ -388,45 +334,12 @@ class WeatherMan:
         logit.debug('Created a weather report')
         return report
 
-    # def weather_report(self, data):
-    #     report1 = {}
-    #     report2 = {}
-    #     for name, city in self.config['locations'].items():
-    #         report1[name] = []
-    #         for line in data:
-    #             if line['city'] == city:
-    #                 report1[name].append(line)
-    #     for name, reports in report1.items():
-    #         report2[name] = [[]]
-    #         report_index = 0
-    #         for index, line in enumerate(reports):
-    #             if index == 0:
-    #                 report2[name][0].append(line)
-    #             else:
-    #                 if reports[index - 1]['time'] <= line['time'] - datetime.timedelta(minutes=35):
-    #                     report2[name].append([])
-    #                     report_index += 1
-    #             report2[name][report_index].append(line)
-    #     report = {}
-    #     for name, reports in report2.items():
-    #         report[name] = []
-    #         for index, event in enumerate(reports):
-    #             if len(event) == 0:
-    #                 continue
-    #             elif len(event) == 1:
-    #                 report[name].append([event])
-    #             else:
-    #                 report[name].append([event[0], event[-1]])
-    #     logit.debug('Created a weather report')
-    #     return report
-
 
     def write_report(self, report, file_name=None):
+        """
+        Takes the list of data, updates the datetime objects to strings and saves to a file. 
+        """
         json_report = {}
-        print(report)
-        # first_last = self.db.get_first_and_last()
-        # json_report['data_start'] = datetime.datetime.strftime(first_last[0]['time'], '%Y-%m-%dT%H:%M:%SZ')
-        # json_report['data_end'] = datetime.datetime.strftime(first_last[-1]['time'], '%Y-%m-%dT%H:%M:%SZ')
         for name, storms in report.items():
             json_report[name] = []
             for storm in storms:
@@ -459,73 +372,6 @@ class WeatherMan:
         logit.debug(f'Wrote a weatehr report to a file {file_name}')
 
 
-    # def write_report(self, report, file_name=None):
-    #     json_report = {}
-    #     first_last = self.db.get_first_and_last()
-    #     json_report['data_start'] = datetime.datetime.strftime(first_last[0]['time'], '%Y-%m-%dT%H:%M:%SZ')
-    #     json_report['data_end'] = datetime.datetime.strftime(first_last[-1]['time'], '%Y-%m-%dT%H:%M:%SZ')
-    #     for name, storms in report.items():
-    #         json_report[name] = []
-    #         for storm in storms:
-    #             storm_durration = str(storm[-1]['time'] - storm[0]['time'])
-    #             new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
-    #             new_end = storm[-1]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
-    #             storm[0]['time'] = new_start
-    #             storm[-1]['time'] = new_end
-    #             entry = {
-    #                 'storm_start':storm[0]['time'],
-    #                 'storm_end':storm[-1]['time'],
-    #                 'storm_durration':storm_durration,
-    #                 'start_dct':storm[0],
-    #                 'end_dct':storm[-1],
-    #             }
-    #             json_report[name].append(entry)
-    #     if file_name == None:
-    #         file_name = self.reports_dir + \
-    #             'Weather_report_' + \
-    #             datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%dT%H:%M:%SZ') + \
-    #             '.json'
-    #     with open(file_name, 'w') as new_report:
-    #         json.dump(json_report, new_report, indent=2)
-    #     logit.debug(f'Wrote a weatehr report to a file {file_name}')
-
-
-
-    def bad_weather_report(self):
-        report = self.weather_report(self.bad_weather_dump())
-        self.write_report(report)
-        logit.debug('Created a bad weather report')
-        return report
-
-
-    def ica_report(self):
-        report = self.weather_report(self.ica_dump())
-        self.write_report(report)
-        logit.debug('Created an ica weather report')
-        return report
-
-
-    def rain_report(self):
-        report = self.weather_report(self.rain_dump())
-        self.write_report(report)
-        logit.debug('Created a rain weather report')
-        return report
-
-
-    def snow_report(self):
-        report = self.weather_report(self.snow_dump())
-        self.write_report(report)
-        logit.debug('Created a snow weather report')
-        return report
-
-
-    def wind_report(self):
-        report = self.weather_report(self.wind_dump())
-        self.write_report(report)
-        logit.debug('Created a wind weather report')
-        return report
-
-
 
 """
 Spin up the app using fastapp and uvicorn. See the docker-compose file for whats
@@ -534,20 +380,10 @@ actually run
 app = FastAPI()
 WM = WeatherMan()
 validator = data_validator.DataValidator()
+
 templates = Jinja2Templates(directory="templates/")
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
-# origins = [
-#     "http://localhost.tiangolo.com",
-#     "https://localhost.tiangolo.com",
-#     "http://localhost",
-#     "http://localhost:8080",
-#     "http://localhost:8000",
-#     "http://127.0.0.1:8000",
-# ]
-
 origins = ["*"]
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -556,51 +392,48 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get('/')
-def root(request: Request):
+async def root(request: Request):
+    """
+    The home page has some explanation of what each tab does. 
+    Eventually it would be great to have picutres of the tabs here as well. 
+    """
     logit.debug('home endpoint hit')
-    info = {
-        '/':'list of extentions',
-        '/state':'Info about the instance',
-        '/poll':'Get data from Open Weather Map',
-        'Dump format':'is all data gathered matching search',
-        '/full_dump':'Return a list of all bad weather in db',
-        '/ica_dump':'Return bad weather for ICAs',
-        '/rain_dump':'Return rain data',
-        '/snow_dump':'Return snow data',
-        '/wind_dump':'Return wind data',
-        'Report format':'is the start and end of bad data in a csv file',
-        '/full_report':'File of bad data in report',
-        '/ica_report':'File of bad weather for ICAs',
-        '/rain_report':'File of rain data',
-        '/snow_report':'File of snow data',
-        '/wind_report':'File of wind data',
-    }
+    return templates.TemplateResponse("main.html", {"request": request})
 
-    new_l = [i+' : '+j for i,j in info.items()]
-    return templates.TemplateResponse("main.html", {"request": request, 'list':new_l})
-
-
-
-@app.get("/items/{id}", response_class=HTMLResponse)
-async def read_item(request: Request, id: str):
-    # This is here to remind myself how to pass data and to make things async
-    return templates.TemplateResponse("item.html", {"request": request, "id": id})
 
 @app.get("/about-weatherman", response_class=HTMLResponse)
 async def about_weatherman(request: Request):
+    """
+    If people had more questions I wanted to have a place to answer some of them. 
+    """
+    logit.debug('about-weatherman endpoint hit')
     return templates.TemplateResponse("about_weatherman.html", {"request": request})
 
 
+@app.get('/api/state')
+async def return_api_args(request: Request):
+    """
+    The api endpoint for state. 
+    """
+    logit.debug('api state endpoint hit')
+    return WM.state
+
+
 @app.get('/state')
-def return_args(request: Request):
+async def return_args(request: Request):
+    """
+    This returns the state of the app. 
+    Useful for some debugging. 
+    """
     logit.debug('state endpoint hit')
     state_list = []
     for i,j in WM.state.items():
         if i == 'cities':
             state_list.append(i + ':')
             for x,y in j.items():
-                state_list.append('    ' + x + ' : ' + str(y))
+                state_list.append('-' + x + ' : ' + str(y))
         elif i == 'fh_logging':
             state_list.append('file_logging' + ' : ' + j)
         elif i == 'ch_logging':
@@ -609,39 +442,38 @@ def return_args(request: Request):
             state_list.append(i + ' : ' + str(j))
         logit.info(f"{i} : {j}")
     return templates.TemplateResponse("state.html", {"request": request, 'list':state_list})
-    # return WM.state
+
+
+@app.get('/api/poll')
+async def poll_api_data(request: Request):
+    """
+    This fires off a poll to the app. 
+    """
+    logit.debug('api poll endpoint hit')
+    WM.manage_polling()
+
 
 @app.get('/poll')
-def poll_data(request: Request):
-    logit.debug('About to poll data')
-    WM.manage_polling()
+async def poll_data(request: Request):
+    """
+    Poll OWMA for new weather data. 
+    """
+    logit.debug('about to poll data')
+    poll_api_data(request)
     timestamp = datetime.datetime.strftime(WM.last_poll, WM.config['datetime_str'])
     return templates.TemplateResponse("poll.html", {"request": request, "last_poll":timestamp})
-    # return {'Success':True}
-    # response = RedirectResponse(url='/')
-    # return response
+
 
 @app.get('/dump')
-def data_dump(request: Request):
-    logit.debug('Sending dump')
-    # dump_list = []
-    # for weatherdata in WM.bad_weather_dump():
-    #     new_dct = {i:None for i in WM.config['dump_webpage_list']}
-    #     dct = dict(weatherdata)
-    #     for i,j in dct.items():
-    #         if i == 'time':
-    #             dct[i] = datetime.datetime.strftime(j, WM.config['datetime_str'])
-    #         if i in WM.config['dump_webpage_list']:
-    #             new_dct[i] = j
-    #     dump_list.append(new_dct)
-    # logit.debug(f"dump list{dump_list}")
-    print(len(WM.dump_list))
+async def data_dump(request: Request):
+    """
+    This returns the html to load the results from the database dump. 
+    """
+    logit.debug('dump endpoint hit')
     return templates.TemplateResponse("dump.html", {"request": request, 'list':WM.dump_list})
-    # return templates.TemplateResponse("dump.html", {"request": request})
+
 
 @app.get('/dump/search/')
-# async def read_items(q: Optional[List[str]] = Query(None)):
-# async def read_items(q: Optional[str] = Query(None)):
 async def read_items(
     request: Request,
     thunderstorm=False,
@@ -654,6 +486,9 @@ async def read_items(
     exact_list=None,
     start_time=None,
     end_time=None):
+    """
+    Takes a query and tells the app to grab data. 
+    """
 
     logit.debug(f"thunderstorm: {thunderstorm}")
     logit.debug(f"drizzle: {drizzle}")
@@ -706,16 +541,12 @@ async def read_items(
         start_time = validator.is_datetime(start_time)
     except ValueError:
         start_time = None
-        # start_time = datetime.datetime.strptime(
-        #     WM.config['earliest_datetime'],
-        #     WM.config['valid_datetimes']['day']
-        # )
+
     try:
         logit.debug(f"validating wnd_time")
         end_time = validator.is_datetime(end_time)
     except ValueError:
         end_time = None
-        # end_time = datetime.datetime.now(tz=datetime.timezone.utc) + datetime.timedelta(days=1)
 
     parameters = {
         'exact_list': exact_list,
@@ -723,38 +554,14 @@ async def read_items(
         'end_time': end_time,
     }
     WM.weather_dump(parameters)
-    # logit.debug(f'Sending query with parameters {parameters}')
-    # dump_list = []
-    # for weatherdata in WM.weather_dump(parameters):
-    #     new_dct = {i:None for i in WM.config['dump_webpage_list']}
-    #     dct = dict(weatherdata)
-    #     for i,j in dct.items():
-    #         if i == 'time':
-    #             dct[i] = datetime.datetime.strftime(j, WM.config['datetime_str'])
-    #         if i in WM.config['dump_webpage_list']:
-    #             new_dct[i] = j
-    #     dump_list.append(new_dct)
-    # return templates.TemplateResponse("dump.html", {"request": request, 'list':dump_list})
     response = RedirectResponse(url='/dump')
     return response
-    # data_dump(Request, dump_list)
-    
-    
-    # query_items = {"q": q}
-    # return {query_items}
 
-# @app.get('/bug_report_list/')
-# def data_dump(request: Request):
-#     logit.debug('Sending dump')
-#     results_list = [{'firstreprot':'remember to replace with results!'}]
 
-#     return templates.TemplateResponse("bug_report_list.html", {"request": request, 'list':results_list})
-
-# /bug-report/entry
 @app.get("/bug-report", response_class=HTMLResponse)
 async def submit_bug_report(request: Request):
-    pass
     return templates.TemplateResponse("bug_report.html", {"request": request})
+
 
 @app.get("/bug-report/entry", response_class=HTMLResponse)
 async def read_items(
@@ -774,6 +581,9 @@ async def read_items(
     report=None,
     event_time=None,
     description=None):
+    """
+    Receive bug-report. 
+    """
 
     logit.debug(f"prod: {prod}")
     logit.debug(f"dev: {dev}")
@@ -847,8 +657,13 @@ async def read_items(
     else:
         logit.info(f"Invalid entry, skipping")
 
+
 @app.get("/report", response_class=HTMLResponse)
 async def reports(request: Request):
+    """
+    Saves a report to the out/ direcotry. 
+    Eventually it may return the report but i dont have that working yet. 
+    """
     exact_list = list(range(100,800))
     now = datetime.datetime.now(tz=datetime.timezone.utc)
     while now.weekday() != 4:
@@ -869,76 +684,3 @@ async def reports(request: Request):
     report = WM.weather_report(WM.weather_dump(parameters))
     WM.write_report(report)
     return  root(request)
-
-# @app.get('/bug-report/', response_class=HTMLResponse)
-# async def submit_bug_report(request: Request):
-#     pass
-#     return templates.TemplateResponse("bug_report.html", {"request": request})
-    # return templates.TemplateResponse("bug_report.html", {"request": request})
-    # response = RedirectResponse(url='/bug_report_list')
-    # return response
-
-
-# @app.get('/full_dump')
-# def full_data_dump():
-#     logit.debug('Gathering full dump')
-#     dump = WM.bad_weather_dump()
-#     return dump
-
-# @app.get('/ica_dump')
-# def ica_dump():
-#     logit.debug('Gathering ica dump')
-#     dump = WM.ica_dump()
-#     return dump
-
-# @app.get('/rain_dump')
-# def rain_dump():
-#     logit.debug('Gathering rain dump')
-#     dump = WM.rain_dump()
-#     return dump
-
-# @app.get('/snow_dump')
-# def snow_dump():
-#     logit.debug('Gathering snow dump')
-#     dump = WM.snow_dump()
-#     return dump
-
-# @app.get('/wind_dump')
-# def wind_dump():
-#     logit.debug('Gathering wind dump')
-#     dump = WM.wind_dump()
-#     return dump
-
-# """
-# Reports
-# """
-
-# @app.get('/full_report')
-# def full_data_report():
-#     logit.debug('Gathering full report')
-#     report = WM.bad_weather_report()
-#     return report
-
-# @app.get('/ica_report')
-# def ica_report():
-#     logit.debug('Gathering ica report')
-#     report = WM.ica_report()
-#     return report
-
-# @app.get('/rain_report')
-# def rain_report():
-#     logit.debug('Gathering rain report')
-#     report = WM.rain_report()
-#     return report
-
-# @app.get('/snow_report')
-# def snow_report():
-#     logit.debug('Gathering snow report')
-#     report = WM.snow_report()
-#     return report
-
-# @app.get('/wind_report')
-# def wind_report():
-#     logit.debug('Gathering wind report')
-#     report = WM.wind_report()
-#     return report
