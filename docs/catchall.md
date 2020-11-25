@@ -13,33 +13,24 @@
 - logging in the readme. 
 - reports in the readme. 
 - db structure in the readme. 
-- update Dockerfile or docker-compose itteration numbers. 
+- ~~update Dockerfile or docker-compose itteration numbers.~~
 - log rotating.
 - Add to report the worst conditions of a storm. 
-- Date search from the database
-- Condensed sql db
+- ~~Date search from the database~~
+- Condensed sql db. As in a report database for longer term trending. 
 - Set import versions in the requirements file
-- Add CICD daily testing. pull changes, run tests, send results. 
-- Change all backends to be `async`
-- Eventually set the main app logging to file only
-- ~~Shorten up main README and add it to an extended README~~
-  - ~~README - Basics of the app and where to go for more information~~
-  - ~~Testing - Details on testing how to perform, what to expect~~
-  - ~~OWA - Details about the weather service~~
-  - ~~Env - Docker, SQL, ~~
-  - ~~Frontend - html, css, if i write an actual frontend which is very tempting~~
-  - ~~Other - Catchall~~
+- ~~Add CICD daily testing. pull changes, run tests, send results.~~
+- ~~Change all backends to be `async`~~
+- ~~Eventually set the main app logging to file only~~
 - Transition off a crontab
-- ~~Add intervul detail to the json dump?~~ no.
-- lock requirements.txt versions
-- mo config
-- update log levels of master to the intended levels. 
-- Create a setup script that grabs the list of potential locations for a user to select places. 
+- ~~mo config~~
+- ~~update log levels of master to the intended levels.~~
+- ~~Create a setup script that grabs the list of potential locations for a user to select places.~~
 - Transition the jsons in etc/ to yml
-- From main web page rout to an intermediate dump return
-- Remove json from the dump header
-- Update City name in the dup data to the identifier in the private json
-- When poll data is called, dont change html page
+- ~~From main web page rout to an intermediate dump return~~
+- ~~Remove json from the dump header~~
+- ~~Update City name in the dup data to the identifier in the private json~~
+- ~~When poll data is called, dont change html page~~
 - If i have different docker-compose &| Dockerfiles change the requirements.txt file to only include the testing for tests.
 
 ## Links

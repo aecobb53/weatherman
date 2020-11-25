@@ -474,7 +474,7 @@ async def data_dump(request: Request):
 
 
 @app.get('/dump/search/')
-async def read_items(
+def read_items(
     request: Request,
     thunderstorm=False,
     drizzle=False,
@@ -656,6 +656,8 @@ async def read_items(
             json.dump(bug_info, br)
     else:
         logit.info(f"Invalid entry, skipping")
+    response = RedirectResponse(url='/')
+    return response
 
 
 @app.get("/report", response_class=HTMLResponse)
