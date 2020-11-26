@@ -6,7 +6,6 @@ import sys
 import yaml
 
 sys.path.append("..")
-# sys.path.append("../etc")
 import weather_butler
 
 master_config = '../etc/weatherman.yml'

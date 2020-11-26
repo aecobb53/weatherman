@@ -97,10 +97,12 @@ class WeatherMan:
         self.state['db_name'] += self.config['environments'][environment]['db_addition']
         self.state['fh_logging'] = self.config['environments'][environment]['file_handler_level']
         self.state['ch_logging'] = self.config['environments'][environment]['consol_handler_level']
+        if self.config['environments'][environment]['log_parameters']['log_suffix'] == 'None':
+            log_suffix = None
         self.state['log_file'] = logger.update_file(
             self.name,
             app_name_in_file=True,
-            log_suffix=self.config['environments'][environment]['log_parameters']['log_suffix']
+            log_suffix=log_suffix
         )
         self.state['db_name'] += '.sql'
         self.state['working_directory'] = self.config['environments'][environment]['docker_working_dir']

@@ -12,7 +12,7 @@
 - log rotating.
 - ~~Add to report the worst conditions of a storm.~~
 - Condensed sql db. As in a report database for longer term trending. 
-- Set import versions in the requirements file
+- ~~Set import versions in the requirements file~~
 - Transition off a crontab
 - If i have different docker-compose &| Dockerfiles change the requirements.txt file to only include the testing for tests.
 - Update the readme api
