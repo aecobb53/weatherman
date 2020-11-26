@@ -392,18 +392,37 @@ class WeatherMan:
                     report[name].append(event)
                 else:
                     report[name].append([event[0], event[-1]])
-                memory = {
-                    'sky_id':[]
-                }
-                for itterate, line in enumerate(event):
-                    # print(line['sky_id'], line['wind'])
-                    # print('-')
-                    if not recursive_search(line['sky_id'], 'sky_id', itterate, event, self.config['storm_difference_itteration']):
-                        # pass
+                    memory = {
+                        'sky_id':[]
+                    }
+                    for itterate, line in enumerate(event):
+                        # print(line['sky_id'], line['wind'])
+                        # print('-')
                         # print(line)
-                        report[name].insert(-2, line)
-                        # here is where im trying to add the data but its not working
-                        
+                        if itterate in [0, len(event)-1]:
+                            # print('start or last')
+                            continue
+                        if not recursive_search(line['sky_id'], 'sky_id', itterate, event, self.config['storm_difference_itteration']):
+                            # pass
+                            # print(line)
+                            report[name][index].insert(-1, line)
+                            # for i in report[name]:
+                            #     print(len(i))
+                            #     for j in i:
+                            #         print(f"\t\t\t{j}")
+                            # print('')
+                            # print('')
+                            # print(len(report[name]))
+                            # print(type(report[name]))
+                            # print(len(report[name][0]))
+                            # print(type(report[name][0]))
+                            # report[name].insert(-1, line)
+                            # here is where im trying to add the data but its not working
+                # for i in report[name]:
+                #     print(name)
+                #     # print(f"\t\t\t{i}")
+                #     for j in i:
+                #         print(f"\t\t\t{j}")
                 # print('===========================================================')
                 # print('===========================================================')
                 # print('===========================================================')
@@ -427,17 +446,26 @@ class WeatherMan:
                     new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
                     new_end = storm[-1]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
                 else:
-                    storm_durration = '0'
-                    new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
-                    new_end = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
-                storm[0]['time'] = new_start
-                storm[-1]['time'] = new_end
+                    if self.config['single_storm_event_flag']:
+                        # If the single_storm_event_flag is true the single event storms will be added. else they will be skipped. 
+                        storm_durration = '0'
+                        new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
+                        new_end = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
+                    else:
+                        continue
+                for line in storm:
+                    # print(line['time'])
+                    # print(datetime.datetime.strftime(line['time'], self.config['datetime_str']))
+                    line['time'] = datetime.datetime.strftime(line['time'], self.config['datetime_str'])
+                # storm[0]['time'] = new_start
+                # storm[-1]['time'] = new_end
                 entry = {
                     'storm_start':storm[0]['time'],
                     'storm_end':storm[-1]['time'],
                     'storm_durration':storm_durration,
                     'start_dct':storm[0],
                     'end_dct':storm[-1],
+                    'storm_events':storm,
                 }
                 json_report[name].append(entry)
         if file_name == None:
