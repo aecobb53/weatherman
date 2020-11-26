@@ -145,3 +145,5 @@ accepted_owma_codes:
 bug_report_dir: 'out/'
 weather_reports_dir: out/
 storm_difference_time: 35
+storm_difference_itteration: 10
+single_storm_event_flag: True
