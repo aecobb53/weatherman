@@ -302,63 +302,15 @@ class WeatherMan:
 
         def recursive_search(value, key, index, lst, itterations):
             # Is this a duplicate weather response?
-            # print(value, key, index, len(lst), itterations)
-            # print(f"main run item -- {lst[index]}")
 
             dex = 0
             for thingy, el in enumerate(reversed(lst[:index])):
-                # print(el, thingy)
-
                 if value == el[key]:
                     return True
-
                 dex += 1
                 if dex >= itterations:
                     return False
             return False
-
-            #     print(value, el[key], value == el[key], el['time'])
-            #     # print(value, lst[key], value == lst[key])
-            #     if value == el[key]:
-            #         print('duplicate')
-            #         return True
-
-            #     dex += 1
-            #     print(dex)
-            #     if dex >= itterations:
-            #         print('limit reached')
-            #         return False
-            # print('end of list')
-            # return False
-
-
-            # # # print(value)
-            # # # print(lst)
-            # # # print(itterations)
-            # print(value)
-            # print(len(lst[index+1:]))
-            # dex = 0
-            # for el in reversed(lst[index+1:]):
-            #     # print(el)
-            #     # # print(el[key])
-            #     # print(
-            #     #     value,
-            #     #     el[key],
-            #     #     type(value),
-            #     #     type(el[key]),
-            #     #     value == el[key]
-            #     # )
-            #     if value == el[key]:
-            #         print('duplicate')
-            #         return True
-            #     dex += 1
-            #     if dex >= itterations:
-            #         print('max itteration reached')
-            #         return False
-            #     print(f'---------{value} -- {el[key]}')
-            # print('end of list')
-            # return False
-
 
         report1 = {}
         report2 = {}
@@ -396,38 +348,10 @@ class WeatherMan:
                         'sky_id':[]
                     }
                     for itterate, line in enumerate(event):
-                        # print(line['sky_id'], line['wind'])
-                        # print('-')
-                        # print(line)
                         if itterate in [0, len(event)-1]:
-                            # print('start or last')
                             continue
                         if not recursive_search(line['sky_id'], 'sky_id', itterate, event, self.config['storm_difference_itteration']):
-                            # pass
-                            # print(line)
                             report[name][index].insert(-1, line)
-                            # for i in report[name]:
-                            #     print(len(i))
-                            #     for j in i:
-                            #         print(f"\t\t\t{j}")
-                            # print('')
-                            # print('')
-                            # print(len(report[name]))
-                            # print(type(report[name]))
-                            # print(len(report[name][0]))
-                            # print(type(report[name][0]))
-                            # report[name].insert(-1, line)
-                            # here is where im trying to add the data but its not working
-                # for i in report[name]:
-                #     print(name)
-                #     # print(f"\t\t\t{i}")
-                #     for j in i:
-                #         print(f"\t\t\t{j}")
-                # print('===========================================================')
-                # print('===========================================================')
-                # print('===========================================================')
-
-
         logit.debug('Created a weather report')
         return report
 
@@ -454,11 +378,8 @@ class WeatherMan:
                     else:
                         continue
                 for line in storm:
-                    # print(line['time'])
-                    # print(datetime.datetime.strftime(line['time'], self.config['datetime_str']))
-                    line['time'] = datetime.datetime.strftime(line['time'], self.config['datetime_str'])
-                # storm[0]['time'] = new_start
-                # storm[-1]['time'] = new_end
+                    if not isinstance(line['time'], str):
+                        line['time'] = datetime.datetime.strftime(line['time'], self.config['datetime_str'])
                 entry = {
                     'storm_start':storm[0]['time'],
                     'storm_end':storm[-1]['time'],
@@ -596,6 +517,7 @@ def read_items(
     Takes a query and tells the app to grab data. 
     """
 
+    logit.debug(f"dump/search endpoint hit")
     logit.debug(f"thunderstorm: {thunderstorm}")
     logit.debug(f"drizzle: {drizzle}")
     logit.debug(f"rain: {rain}")
@@ -767,32 +689,132 @@ async def read_items(
 
 
 @app.get("/report", response_class=HTMLResponse)
-async def reports(request: Request):
+async def report(request: Request):
     """
     Saves a report to the out/ direcotry. 
     Eventually it may return the report but i dont have that working yet. 
     """
     logit.debug('report endpoint hit')
-    exact_list = list(range(100,800))
-    now = datetime.datetime.now(tz=datetime.timezone.utc)
-    while now.weekday() != 4:
-        now = now - datetime.timedelta(days=1)
+    # exact_list = list(range(100,800))
+    # now = datetime.datetime.now(tz=datetime.timezone.utc)
+    # while now.weekday() != 4:
+    #     now = now - datetime.timedelta(days=1)
     # end = now
     # start = now - datetime.timedelta(days=7)
 
-    #DELETE THIS LINE WHEN YOU ARE DONE TESTING HERE HERE HERE
+    # start_time = validator.is_datetime(
+    #     datetime.datetime.strftime(start, '%Y-%m-%d')
+    #     )
+    # end_time = validator.is_datetime(
+    #     datetime.datetime.strftime(end, '%Y-%m-%d')
+    #     )
+    # parameters = {
+    #     'exact_list': exact_list,
+    #     'start_time': start_time,
+    #     'end_time': end_time,
+    # }
+    # report = WM.weather_report(WM.weather_dump(parameters))
+    # WM.write_report(report)
+
+    # return templates.TemplateResponse("report.html", {"request": request})
+    return templates.TemplateResponse("report.html", {"request": request, 'list':WM.dump_list})
+    # response = RedirectResponse(url='/')
+    # return response
+
+@app.get('/report/search/')
+def report_items(
+    request: Request,
+    thunderstorm=False,
+    drizzle=False,
+    rain=False,
+    snow=False,
+    atmosphere=False,
+    clouds=False,
+    clear=False,
+    exact_list=None,
+    start_time=None,
+    end_time=None):
+    """
+    Takes a query and tells the app to grab data. 
+    """
+
+    logit.debug(f"report/search endpoint hit")
+    logit.debug(f"thunderstorm: {thunderstorm}")
+    logit.debug(f"drizzle: {drizzle}")
+    logit.debug(f"rain: {rain}")
+    logit.debug(f"snow: {snow}")
+    logit.debug(f"atmosphere: {atmosphere}")
+    logit.debug(f"clouds: {clouds}")
+    logit.debug(f"clear: {clear}")
+    logit.debug(f"exact_list: {exact_list}")
+    logit.debug(f"start_time: {start_time}")
+    logit.debug(f"end_time: {end_time}")
+
+    if thunderstorm:
+        for num in WM.config['accepted_owma_codes']['thunderstorm']:
+            exact_list += f",{str(num)}"
+
+    if drizzle:
+        for num in WM.config['accepted_owma_codes']['drizzle']:
+            exact_list += f",{str(num)}"
+
+    if rain:
+        for num in WM.config['accepted_owma_codes']['rain']:
+            exact_list += f",{str(num)}"
+
+    if snow:
+        for num in WM.config['accepted_owma_codes']['snow']:
+            exact_list += f",{str(num)}"
+
+    if atmosphere:
+        for num in WM.config['accepted_owma_codes']['atmosphere']:
+            exact_list += f",{str(num)}"
+
+    if clouds:
+        for num in WM.config['accepted_owma_codes']['clouds']:
+            exact_list += f",{str(num)}"
+
+    if clear:
+        for num in WM.config['accepted_owma_codes']['clear']:
+            exact_list += f",{str(num)}"
+
+
+    try:
+        logit.debug(f"validating exact_list")
+        exact_list = validator.is_exact_list(exact_list)
+    except ValueError:
+        exact_list = None
+
+    # If there are no dates provided, set them to one week starting on Monday
     now = datetime.datetime.now(tz=datetime.timezone.utc)
+    while now.weekday() != 0:
+        now = now - datetime.timedelta(days=1)
     end = now
-    start = now - datetime.timedelta(days=20)
+    start = now - datetime.timedelta(days=7)
 
-
-
-    start_time = validator.is_datetime(
+    new_start_time = validator.is_datetime(
         datetime.datetime.strftime(start, '%Y-%m-%d')
         )
-    end_time = validator.is_datetime(
+    new_end_time = validator.is_datetime(
         datetime.datetime.strftime(end, '%Y-%m-%d')
         )
+
+    try:
+        logit.debug(f"validating start_time")
+        start_time = validator.is_datetime(start_time)
+        if start_time is None:
+            raise ValueError
+    except ValueError:
+        start_time = new_start_time
+
+    try:
+        logit.debug(f"validating wnd_time")
+        end_time = validator.is_datetime(end_time)
+        if end_time is None:
+            raise ValueError
+    except ValueError:
+        end_time = new_end_time
+
     parameters = {
         'exact_list': exact_list,
         'start_time': start_time,
@@ -800,5 +822,6 @@ async def reports(request: Request):
     }
     report = WM.weather_report(WM.weather_dump(parameters))
     WM.write_report(report)
-    response = RedirectResponse(url='/')
+    response = RedirectResponse(url='/report')
     return response
+

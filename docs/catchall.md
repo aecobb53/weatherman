@@ -10,7 +10,7 @@
 
 - db structure in the readme. 
 - log rotating.
-- Add to report the worst conditions of a storm. 
+- ~~Add to report the worst conditions of a storm.~~
 - Condensed sql db. As in a report database for longer term trending. 
 - Set import versions in the requirements file
 - Transition off a crontab
