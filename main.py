@@ -399,6 +399,10 @@ class WeatherMan:
             json.dump(json_report, new_report, indent=2)
         logit.debug(f'Wrote a weatehr report to a file {file_name}')
 
+    def clear_search(self):
+        self.dump_list = []
+        self.report = {}
+
 
 
 """
@@ -498,7 +502,9 @@ async def data_dump(request: Request):
     This returns the html to load the results from the database dump.
     """
     logit.debug('dump endpoint hit')
-    return templates.TemplateResponse("dump.html", {"request": request, 'list':WM.dump_list})
+    data = WM.dump_list
+    WM.clear_search()
+    return templates.TemplateResponse("dump.html", {"request": request, 'list':data})
 
 
 @app.get('/dump/search/')
@@ -696,7 +702,9 @@ async def report(request: Request):
     Eventually it may return the report but i dont have that working yet.
     """
     logit.debug('report endpoint hit')
-    return templates.TemplateResponse("report.html", {"request": request, 'dict':WM.report})
+    data = WM.report
+    WM.clear_search()
+    return templates.TemplateResponse("report.html", {"request": request, 'dict':data})
 
 @app.get('/report/search/')
 def report_items(

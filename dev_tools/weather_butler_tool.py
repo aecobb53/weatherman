@@ -28,10 +28,17 @@ aparse.add_argument('-get_response',                action='store_true', help="u
 aparse.add_argument('-format_request_city_id_list', action='store_true', help="url, city_id_list, key")
 aparse.add_argument('-format_response',             action='store_true', help="data")
 aparse.add_argument('-poll',                        action='store_true', help="")
+aparse.add_argument('-versions',                    action='store_true', help="")
 aparse.add_argument('args', nargs='*')
 
 args = aparse.parse_args()
 print(args)
+
+# Functions
+def str_sizer(string, length, add_char=' '):
+    while len(string) < length:
+        string += add_char
+    return string
 
 # get_response
 
@@ -79,3 +86,26 @@ if args.poll:
     print(weather_response)
     # print(weather_response.json())
     # print(weather_response.code)
+
+# Versions
+if args.versions:
+    import os
+    print(f"running versions")
+    modules = {}
+    with open('../requirements.txt') as rtf:
+        for line in rtf:
+            name, current = line[:-1].split('==')
+            modules[name] = current
+    mod_str_size = 0
+    for mod, old_version in modules.items():
+        mod_str_size = max(mod_str_size, len(mod))
+
+    for mod, old_version in modules.items():
+        # print(f"{str_sizer(mod, mod_str_size + 2, '.')}{old_version}")
+        print('')
+        print(f"Module: {mod}")
+        print(f"Current version: {old_version}")
+        # pip search mod | grep mod
+        # output = os.system(f'pip search {mod} | grep {mod}')
+        # print(output)
+
