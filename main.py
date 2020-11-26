@@ -299,6 +299,67 @@ class WeatherMan:
         """
         This takes a list of dumped weather data and saves off the important bits for a report
         """
+
+        def recursive_search(value, key, index, lst, itterations):
+            # Is this a duplicate weather response?
+            # print(value, key, index, len(lst), itterations)
+            # print(f"main run item -- {lst[index]}")
+
+            dex = 0
+            for thingy, el in enumerate(reversed(lst[:index])):
+                # print(el, thingy)
+
+                if value == el[key]:
+                    return True
+
+                dex += 1
+                if dex >= itterations:
+                    return False
+            return False
+
+            #     print(value, el[key], value == el[key], el['time'])
+            #     # print(value, lst[key], value == lst[key])
+            #     if value == el[key]:
+            #         print('duplicate')
+            #         return True
+
+            #     dex += 1
+            #     print(dex)
+            #     if dex >= itterations:
+            #         print('limit reached')
+            #         return False
+            # print('end of list')
+            # return False
+
+
+            # # # print(value)
+            # # # print(lst)
+            # # # print(itterations)
+            # print(value)
+            # print(len(lst[index+1:]))
+            # dex = 0
+            # for el in reversed(lst[index+1:]):
+            #     # print(el)
+            #     # # print(el[key])
+            #     # print(
+            #     #     value,
+            #     #     el[key],
+            #     #     type(value),
+            #     #     type(el[key]),
+            #     #     value == el[key]
+            #     # )
+            #     if value == el[key]:
+            #         print('duplicate')
+            #         return True
+            #     dex += 1
+            #     if dex >= itterations:
+            #         print('max itteration reached')
+            #         return False
+            #     print(f'---------{value} -- {el[key]}')
+            # print('end of list')
+            # return False
+
+
         report1 = {}
         report2 = {}
         for name, city in self.config['locations'].items():
@@ -331,6 +392,23 @@ class WeatherMan:
                     report[name].append(event)
                 else:
                     report[name].append([event[0], event[-1]])
+                memory = {
+                    'sky_id':[]
+                }
+                for itterate, line in enumerate(event):
+                    # print(line['sky_id'], line['wind'])
+                    # print('-')
+                    if not recursive_search(line['sky_id'], 'sky_id', itterate, event, self.config['storm_difference_itteration']):
+                        # pass
+                        # print(line)
+                        report[name].insert(-2, line)
+                        # here is where im trying to add the data but its not working
+                        
+                # print('===========================================================')
+                # print('===========================================================')
+                # print('===========================================================')
+
+
         logit.debug('Created a weather report')
         return report
 
@@ -343,7 +421,7 @@ class WeatherMan:
         for name, storms in report.items():
             json_report[name] = []
             for storm in storms:
-                print(storm)
+                # print(storm)
                 if len(storm) > 1:
                     storm_durration = str(storm[-1]['time'] - storm[0]['time'])
                     new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -671,8 +749,16 @@ async def reports(request: Request):
     now = datetime.datetime.now(tz=datetime.timezone.utc)
     while now.weekday() != 4:
         now = now - datetime.timedelta(days=1)
+    # end = now
+    # start = now - datetime.timedelta(days=7)
+
+    #DELETE THIS LINE WHEN YOU ARE DONE TESTING HERE HERE HERE
+    now = datetime.datetime.now(tz=datetime.timezone.utc)
     end = now
-    start = now - datetime.timedelta(days=7)
+    start = now - datetime.timedelta(days=20)
+
+
+
     start_time = validator.is_datetime(
         datetime.datetime.strftime(start, '%Y-%m-%d')
         )
