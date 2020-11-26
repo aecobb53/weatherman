@@ -112,6 +112,7 @@ class WeatherMan:
 
         # Data holders
         self.dump_list = []
+        self.report = {}
         self.last_poll = None
 
 
@@ -256,7 +257,7 @@ class WeatherMan:
 
     def weather_dump(self, parameters):
         """
-        Takes the parameters to filter out results from the database. 
+        Takes the parameters to filter out results from the database.
         """
         logit.debug(f'weather dump based on parameters {parameters}')
         data = self.db.query_database(parameters)
@@ -358,20 +359,19 @@ class WeatherMan:
 
     def write_report(self, report, file_name=None):
         """
-        Takes the list of data, updates the datetime objects to strings and saves to a file. 
+        Takes the list of data, updates the datetime objects to strings and saves to a file.
         """
         json_report = {}
         for name, storms in report.items():
             json_report[name] = []
             for storm in storms:
-                # print(storm)
                 if len(storm) > 1:
                     storm_durration = str(storm[-1]['time'] - storm[0]['time'])
                     new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
                     new_end = storm[-1]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
                 else:
                     if self.config['single_storm_event_flag']:
-                        # If the single_storm_event_flag is true the single event storms will be added. else they will be skipped. 
+                        # If the single_storm_event_flag is true the single event storms will be added. else they will be skipped.
                         storm_durration = '0'
                         new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
                         new_end = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -394,6 +394,7 @@ class WeatherMan:
                 'Weather_report_' + \
                 datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%dT%H:%M:%SZ') + \
                 '.json'
+        self.report = json_report
         with open(file_name, 'w') as new_report:
             json.dump(json_report, new_report, indent=2)
         logit.debug(f'Wrote a weatehr report to a file {file_name}')
@@ -423,8 +424,8 @@ app.add_middleware(
 @app.get('/')
 async def root(request: Request):
     """
-    The home page has some explanation of what each tab does. 
-    Eventually it would be great to have picutres of the tabs here as well. 
+    The home page has some explanation of what each tab does.
+    Eventually it would be great to have picutres of the tabs here as well.
     """
     logit.debug('home endpoint hit')
     return templates.TemplateResponse("main.html", {"request": request})
@@ -433,7 +434,7 @@ async def root(request: Request):
 @app.get("/about-weatherman", response_class=HTMLResponse)
 async def about_weatherman(request: Request):
     """
-    If people had more questions I wanted to have a place to answer some of them. 
+    If people had more questions I wanted to have a place to answer some of them.
     """
     logit.debug('about-weatherman endpoint hit')
     return templates.TemplateResponse("about_weatherman.html", {"request": request})
@@ -442,7 +443,7 @@ async def about_weatherman(request: Request):
 @app.get('/api/state')
 async def return_api_args(request: Request):
     """
-    The api endpoint for state. 
+    The api endpoint for state.
     """
     logit.debug('api state endpoint hit')
     return WM.state
@@ -451,8 +452,8 @@ async def return_api_args(request: Request):
 @app.get('/state')
 async def return_args(request: Request):
     """
-    This returns the state of the app. 
-    Useful for some debugging. 
+    This returns the state of the app.
+    Useful for some debugging.
     """
     logit.debug('state endpoint hit')
     state_list = []
@@ -474,7 +475,7 @@ async def return_args(request: Request):
 @app.get('/api/poll')
 async def poll_api_data(request: Request):
     """
-    This fires off a poll to the app. 
+    This fires off a poll to the app.
     """
     logit.debug('api poll endpoint hit')
     WM.manage_polling()
@@ -483,7 +484,7 @@ async def poll_api_data(request: Request):
 @app.get('/poll')
 async def poll_data(request: Request):
     """
-    Poll OWMA for new weather data. 
+    Poll OWMA for new weather data.
     """
     logit.debug('about to poll data')
     WM.manage_polling()
@@ -494,7 +495,7 @@ async def poll_data(request: Request):
 @app.get('/dump')
 async def data_dump(request: Request):
     """
-    This returns the html to load the results from the database dump. 
+    This returns the html to load the results from the database dump.
     """
     logit.debug('dump endpoint hit')
     return templates.TemplateResponse("dump.html", {"request": request, 'list':WM.dump_list})
@@ -514,7 +515,7 @@ def read_items(
     start_time=None,
     end_time=None):
     """
-    Takes a query and tells the app to grab data. 
+    Takes a query and tells the app to grab data.
     """
 
     logit.debug(f"dump/search endpoint hit")
@@ -610,7 +611,7 @@ async def read_items(
     event_time=None,
     description=None):
     """
-    Receive bug-report. 
+    Receive bug-report.
     """
 
     logit.debug(f"prod: {prod}")
@@ -681,7 +682,7 @@ async def read_items(
     if valid:
         filename = 'bug_report_' + entry_time + '.json'
         with open(WM.config['bug_report_dir'] + filename, 'w') as br:
-            json.dump(bug_info, br)
+            json.dump(bug_info, br, indent=4)
     else:
         logit.info(f"Invalid entry, skipping")
     response = RedirectResponse(url='/')
@@ -691,35 +692,11 @@ async def read_items(
 @app.get("/report", response_class=HTMLResponse)
 async def report(request: Request):
     """
-    Saves a report to the out/ direcotry. 
-    Eventually it may return the report but i dont have that working yet. 
+    Saves a report to the out/ direcotry.
+    Eventually it may return the report but i dont have that working yet.
     """
     logit.debug('report endpoint hit')
-    # exact_list = list(range(100,800))
-    # now = datetime.datetime.now(tz=datetime.timezone.utc)
-    # while now.weekday() != 4:
-    #     now = now - datetime.timedelta(days=1)
-    # end = now
-    # start = now - datetime.timedelta(days=7)
-
-    # start_time = validator.is_datetime(
-    #     datetime.datetime.strftime(start, '%Y-%m-%d')
-    #     )
-    # end_time = validator.is_datetime(
-    #     datetime.datetime.strftime(end, '%Y-%m-%d')
-    #     )
-    # parameters = {
-    #     'exact_list': exact_list,
-    #     'start_time': start_time,
-    #     'end_time': end_time,
-    # }
-    # report = WM.weather_report(WM.weather_dump(parameters))
-    # WM.write_report(report)
-
-    # return templates.TemplateResponse("report.html", {"request": request})
-    return templates.TemplateResponse("report.html", {"request": request, 'list':WM.dump_list})
-    # response = RedirectResponse(url='/')
-    # return response
+    return templates.TemplateResponse("report.html", {"request": request, 'dict':WM.report})
 
 @app.get('/report/search/')
 def report_items(
@@ -735,7 +712,7 @@ def report_items(
     start_time=None,
     end_time=None):
     """
-    Takes a query and tells the app to grab data. 
+    Takes a query and tells the app to grab data.
     """
 
     logit.debug(f"report/search endpoint hit")

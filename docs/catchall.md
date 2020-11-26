@@ -16,6 +16,9 @@
 - Transition off a crontab
 - If i have different docker-compose &| Dockerfiles change the requirements.txt file to only include the testing for tests.
 - Update the readme api
+- Enable dump and reportrs for specific locations.
+    - temperature
+    - winds
 
 ## Links
 
