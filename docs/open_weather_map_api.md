@@ -5,7 +5,7 @@ I am using the Free calls:
 ```
 60 calls/minute
 1,000,000 calls/month
-Curent Weather
+Current Weather
 Minute Forecast 1 hour*
 Hourly Forecast 2 days*
 Daily Forecast 7 days*
@@ -20,11 +20,11 @@ Uptime 95%
 ** - 2,000 API calls per day by using One Call API
 ```
 
-Note: I read somewhere the polling type i am using maxes out at 20. 
+Note: I read somewhere the polling type I am using maxes out at 20. 
 I cant find where that was again so maybe that changed. 
 It appears i can call for current weather up to 60/min or 1M/month. 
-If that is the case i can poll up to 22 cities every minute. 
-Currently i only get 11 cities data every 15 minutes. 
+If that is the case I can poll up to 22 cities every minute. 
+Currently I only get 11 cities data every 15 minutes. 
 I plan to increase to every 5 minutes.
 
 
