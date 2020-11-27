@@ -1,7 +1,3 @@
-how to use
-what does it have
-response forms and examples
-
 ## Weatherman API
 
 You can reach the service from any web gui by going to 
@@ -61,21 +57,28 @@ Note the commas matter but not the spaces.
 
 `*_time` is looking for a datetime like this `YYYY-MM-DDTHH:MM:SSZ`. 
 But will accept a space instead of the `T`, and a `L` or no character ending. 
-I havnt built it out yet but i want to accept Zulu and local timestamps even though the database is saved in Zulu. 
+I havnt built it out yet but I want to accept Zulu and local timestamps even though the database is saved in Zulu. 
 
 `/api/report` _Not working yet_
 
 Currently this is called the exact same as the `/api/dump` but it returns a differently formatted list. 
 The format of the returned json. 
 ```text
+[
 list of cities
+    [
     list of storms
-        storm_start
-        storm_end
-        storm_durration
-        start_dct
-        end_dct
-        storm_events
+        {
+        storm_start,
+        storm_end,
+        storm_durration,
+        start_dct:{},
+        end_dct:{},
+        [
+            storm_events,
+        ]
+    ]
+]
 ```
 
 The start and end dct are the first and last weather reports in the storm. 
