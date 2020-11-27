@@ -22,8 +22,8 @@ Commands wrapped in `[]` are optional stuff, and `<>` are user input
 | Command | explanation |
 | --- | --- |
 | docker ps -a | View current containers |
-| docker stop <CONTAINER ID> | Stop the running container |
-| docker rm <CONTAINER ID> | Remove the stopped container |
+| docker stop < CONTAINER ID > | Stop the running container |
+| docker rm < CONTAINER ID > | Remove the stopped container |
 | docker-compose up [--build] [-d] weather | Spinup the server |
 | docker logs <CONTAINER ID> [--follow] | View the terminal readout for the container |
 | docker-compose up --build test | Run the tests for Weatherman |
@@ -31,6 +31,7 @@ Commands wrapped in `[]` are optional stuff, and `<>` are user input
 ---
 
 I use `docker-compose` but regular `Docker` works just as well. 
+If you decide to use Dockerfile exclusivly you will need to copy a lot from the docker-compose.yml file. 
 I use four pre-configured containers `weather`, `dev`, `test`, `unit-test`. 
 This number will fluctuate with time but will likely reduce to only the needed ones in time. 
 I intend to have a second docker-compose file for testing and a main one for the program. 
@@ -90,8 +91,6 @@ Notable docker-compose.xml events:
 The [docker-compose.yml](/docker-compose.yml)
 
 ## SQLite
-
-Add form and basic commands
 
 SQL is hard to install and much easier in a container. 
 There is a little/lot to SQL so i will get to it eventually. 
