@@ -99,6 +99,8 @@ class WeatherMan:
         self.state['ch_logging'] = self.config['environments'][environment]['consol_handler_level']
         if self.config['environments'][environment]['log_parameters']['log_suffix'] == 'None':
             log_suffix = None
+        else:
+            log_suffix = self.config['environments'][environment]['log_parameters']['log_suffix']
         self.state['log_file'] = logger.update_file(
             self.name,
             app_name_in_file=True,

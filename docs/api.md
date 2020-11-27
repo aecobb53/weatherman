@@ -19,17 +19,72 @@ or
 localhost:8000
 ```
 
-Going to any of the above addresses will bring you to a makeshift menu i created. 
-This will give you a list of all url extentions and a brief description of what they do. 
-In general 
-- `/state` is for general system stuff like is it in Docker or not. 
-- `/*dump` is for returning a list of dicts for all data matching the weather type.
-- `/*report` returnsthe folowing nested data and creates a json report with the same data
-  but formatted a bit better. 
 
+
+
+
+
+
+`/api/poll`
+
+When this endpoint is hit the script grabs data from OWMA. 
+
+`/api/state`
+
+This returns the state of the app. 
+
+| Key               | Shorthand                 |
+| ---               | ---                       |
+| db_name           | Current database          |
+| env               | Env (prod, dev, test)     |
+| in_docker         | Bool, in Docker           |
+| log_file          | Current log file          |
+| testing           | bool Running tests        |
+| working_directory | Directory in container    |
+| cities            | List of cities            |
+| file_logging      | File logging level        |
+| consol_logging    | Console loggign level     |
+
+`/api/dump` _Not working yet_
+
+This takes kwargs and returns a list of dicts from data that matches the search. 
+
+| Key           | Datatype      | Default value | Description |
+| ---           | ---           | ---   | --- |
+| thunderstorm  | Bool          | False | All 2## sky_key's |
+| drizzle       | Bool          | False | All 3## sky_key's |
+| rain          | Bool          | False | All 5## sky_key's |
+| snow          | Bool          | False | All 6## sky_key's |
+| atmosphere    | Bool          | False | All 7## sky_key's |
+| clouds        | Bool          | False | All 8## sky_key's |
+| clear         | Bool          | False | The 800 sky_key   |
+| exact_list    | list(ints)    | None  | Exact sky_keys    |
+| start_time    | datetime(str) | None  | _See below_       |
+| end_time      | datetime(str) | None  | _See below_       |
+
+`Exact_list` will take any combination of keys or ranges. 
+So it will take `200, 202,350-510, 530 - 800`. 
+Note the commas matter but not the spaces. 
+
+`*_time` is looking for a datetime like this `YYYY-MM-DDTHH:MM:SSZ`. 
+But will accept a space instead of the `T`, and a `L` or no character ending. 
+I havnt built it out yet but i want to accept Zulu and local timestamps even though the database is saved in Zulu. 
+
+`/api/report` _Not working yet_
+
+Currently this is called the exact same as the `/api/dump` but it returns a differenly formatted list. 
+The format of the returned json. 
 ```text
 list of cities
-    list of storms two elements long
-        dict of first element is the start of the storm
-        dict of second element is the last of the storm
+    list of storms
+        storm_start
+        storm_end
+        storm_durration
+        start_dct
+        end_dct
+        storm_events
 ```
+
+The start and end dct are the first and last weather reports in the storm. 
+If there are any changes in the storm or notable events they get listed out in the storm_events. 
+The start and end storm are excluded from this list to prevent duplication of data. 

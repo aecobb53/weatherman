@@ -19,6 +19,16 @@
 - Enable dump and reportrs for specific locations.
     - temperature
     - winds
+- Try to move the dump and report guts to another function so it can be called easier
+
+
+### 1.0 release requirements
+
+- [ ] Review all markdown 
+- [ ] Spellcheck markdown
+- [x] Figure out what happend to PB
+- [ ] Add api to markdown
+
 
 ## Links
 
@@ -30,9 +40,9 @@
 - [SQL help](https://www.sqlite.org/lang_expr.html#cosub)
 - [Open Weather Map (OWM)](https://openweathermap.org)
 - [Open Weather Map Api](https://openweathermap.org/current#format). 
-  This is the link to the main OWM api info. 
+    This is the link to the main OWM api info. 
 - [OWM weather conditions](https://openweathermap.org/weather-conditions). 
-  This is where the weather codes, icons, and brief descriptions are. 
+    This is where the weather codes, icons, and brief descriptions are. 
 - [OWM FAQ](https://openweathermap.org/faq)
 - [OWM Pricing](https://openweathermap.org/price)
 
