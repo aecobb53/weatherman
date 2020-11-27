@@ -31,8 +31,8 @@ In Docker:
 
 In terminal (this is fine to run wherever as long as you have `behave` installed). 
 Make sure you are in the man directory. 
-Sadly i havnt found a good way to pass arguments to the behave testing so i update the 
-`docker-compose.yml` file when i dont want to run everything. 
+Sadly I havnt found a good way to pass arguments to the behave testing so I update the 
+`docker-compose.yml` file when I dont want to run everything. 
 
 `behave` - Full behave run
 
@@ -47,13 +47,13 @@ get the line where the scenario starts.
 There are different before and after setup/teardown events for each Feature and Scenario. 
 They are run from the `environment.py` file in steps. 
 
-Before each behave testing session the testing databse is deleted and the old logging files are archived. 
-After each testing session the testing databse is deleted as well. 
+Before each behave testing session the testing database is deleted and the old logging files are archived. 
+After each testing session the testing database is deleted as well. 
 
 There are not currently feature setup/teardown. 
 
-For each scenario you can add `@DEBUG`, `@INFO`, or `@WARNING` tags to set the consol logging level for the scenario. 
-By default the logging level for file/consol is DEBUG/WARNING. 
+For each scenario you can add `@DEBUG`, `@INFO`, or `@WARNING` tags to set the console logging level for the scenario. 
+By default the logging level for file/console is DEBUG/WARNING. 
 This makes it easy to run tests but see detailed readouts for whats desired. 
 I tried to have the Then scenarios return info but the rest return debug. 
 Logging is handled in the `steps_logging.py` wrapper of the logger class. 
@@ -67,8 +67,8 @@ At the end of each scenario the logging is reset back to WARNING.
 The major tags for the weather butler feature are `owma` and `on`/`off`. 
 the owma stands for Open Weather Map api. 
 It is the tag for the website functional tests. 
-The on/off flags are used to turn on and off polling the databse in the `environment.py` file. 
-Because there is a limitid numbher of polls you can use per month with the free subscription 
+The on/off flags are used to turn on and off polling the database in the `environment.py` file. 
+Because there is a limited number of polls you can use per month with the free subscription 
 it made sense to add a limiter. 
 If you dont have either it will assume on. 
 
