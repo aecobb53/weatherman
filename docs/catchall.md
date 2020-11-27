@@ -20,6 +20,7 @@
     - temperature
     - winds
 - Try to move the dump and report guts to another function so it can be called easier
+- Add `build` explanation to the readme files.
 
 
 ### 1.0 release requirements
