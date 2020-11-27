@@ -8,16 +8,11 @@ Really what you need to know is it would be nice to have a way to save weather d
 Weatherman collects data every x number of minutes and saves it to a sql database. 
 (Currently I use a crontab but I want to switch to an internal timer of some sort). 
 The data is returned in two notable ways. 
-Either a dump which will return all data that meats the search parameters or a report which will shorten the data and give you an overview of each storm at the location. 
-The reports currently show the start and end of the storm but I want to add intermittent data from the storm such as what was the worst weather experienced. 
+Either a dump which will return all data that meets the search parameters or a report which will shorten the data and give you an overview of each storm at the location. 
 
 > Release:  0.7.0-beta
 
-> Last modified:  2020-11-25
-
-<!-- 
-Currently its in a Beta phase. People can use it and it gathers weather data fine, it just needs some hand holding in the setup process. I am also still building out major systems so its not perfectly on its own yet. 
- -->
+> Last modified:  2020-11-27
 
 ## Table of contents
 
@@ -31,9 +26,8 @@ This program was put together because I needed weather data but I also realized 
 It then showed me the gaps in what I knew how to do for a program so it has been a fun experience putting it together. 
 
 Currently it runs out of a Docker container with exposed endpoints. 
-I am still working on the web gui setup but that will be super nice when its up and running. 
 I am not a frontend developer so its pretty clunky and takes me a while. 
-The data is gathered from [Open Weather Map](https://openweathermap.org) which I abbreviate to `OWM`. 
+The data is gathered from [Open Weather Map](https://openweathermap.org) which I abbreviate to `OWM` or Open Weather Map API`OWMA` when it comes up. 
 
 ### Setup
 
@@ -43,8 +37,12 @@ Try it out and let me know.
 
 1. Install Docker. 
 2. Clone this repo. 
-3. Update config files. ADD HOW TO DO THAT HERE
-4. To spin up the server you need to use `docker-compose up -d weather`. 
+3. Run `build setup` to create the needed directories and config files. 
+    - Update the etc/key.yml with your OWMA key
+    - Update the etc/weather_api_private.yml to the locations you want to get weather data from. 
+    If you dont know the locations you want you can find them on their website. 
+    Download the large city zip file, unzip and find it. 
+4. To spin up the server you need to use `build run`. 
     - For the first time I recommend using `docker-compose up --build weather`. This way you can see the output and see errors easier. 
     - `--build` will build a new image every time. Unless the code changed this is useless. 
     - `-d` spins up the server as a headless instance. It is set to reload if it is stopped. 
@@ -59,40 +57,36 @@ You will know the backend is spun up if you see these two lines
 ```
 
 All configurations will need the repo downloaded locally, and an "openweathermap.org" API key. 
-To set up a key add the following to a file in the repo called `key.ignore`. 
+To set up a key as seen in step 3 above, modify the `etc/key.yml` file. 
 
-```json
-{"Weather_Key": "<key>"}
+```yaml
+Weather_Key: <key>
 ```
 
 The config is also not added to protect the locations I look at. 
-Copy the config example below. 
-The shorthand abbreviations are only used for human reference. 
+To set up your locations, modify the `etc/weather_api_private.yml` file. 
+The shorthand abbreviations are only used for human reference and the Data dump/reports. 
 The app looks exclusively at the location ID. 
 
 Config:
 
-```json
-{
-    "locations": {
-        "shorthand abreviation": 00000,
-    },
-    "url":"https://api.openweathermap.org/data/2.5/"
-}
+```yaml
+locations:
+    LOCATION_SHORTHAND: CITY-ID
 ```
 
 ### General frontend use
 
 The five main buttons on the web gui are `Reports`, `Json dump`, `Realtime Weather`, `State`, `Poll data on click`. 
-Reports will generate a JSON that gives an overview of each storm. 
+`Reports` will generate a JSON that gives an overview of each storm. 
 For more info check out the API section. 
-Json dump will return a list of every database entry that meets the search parameters. 
+`Data dump` will return a list of every database entry that meets the search parameters. 
 Its not recommended to use unless you need that granular of detail. 
-Real-time weather is not used but I hope to display the current weather indicator over a map of the world. 
+`Real-time Weather` is not used but I hope to display the current weather indicator over a map of the world. 
 Its still only a concept but I think it would be super cool if I can get it to work. 
-State gives a breakdown of the current running instance. 
+`State` gives a breakdown of the current running instance. 
 This is super useful for diagnosing some problems. 
-Poll data on click will instantly grab data from OWM. 
+`Poll` data on click will instantly grab data from OWM. 
 
 ## More details
 
