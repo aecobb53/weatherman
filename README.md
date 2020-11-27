@@ -2,14 +2,14 @@
 
 Historic weather data is surprisingly hard to come by. 
 Thus the Weather man was born. 
-(His hero backstory is is ***REALLY*** lame). 
+(His hero backstory is ***REALLY*** lame). 
 Really what you need to know is it would be nice to have a way to save weather data and recall it later. 
 
 Weatherman collects data every x number of minutes and saves it to a sql database. 
 (Currently I use a crontab but I want to switch to an internal timer of some sort). 
 The data is returned in two notable ways. 
 Either a dump which will return all data that meats the search parameters or a report which will shorten the data and give you an overview of each storm at the location. 
-The reports currently show the start and end of the storm but I want to add intermitant data from the storm such as what was the worst weather experienced. 
+The reports currently show the start and end of the storm but I want to add intermittent data from the storm such as what was the worst weather experienced. 
 
 > Release:  0.7.0-beta
 
@@ -37,7 +37,7 @@ The data is gathered from [Open Weather Map](https://openweathermap.org) which I
 
 ### Setup
 
-I run it out of Linuix but its possible it could be run out of macOS or Windows. 
+I run it out of Linux but its possible it could be run out of macOS or Windows. 
 I dont really know :man_shrugging:. 
 Try it out and let me know. 
 
@@ -45,7 +45,7 @@ Try it out and let me know.
 2. Clone this repo. 
 3. Update config files. ADD HOW TO DO THAT HERE
 4. To spin up the server you need to use `docker-compose up -d weather`. 
-    - For the first time I recommend using `docker-compose up --build weather`. Thisway you can see the output and see errors easier. 
+    - For the first time I recommend using `docker-compose up --build weather`. This way you can see the output and see errors easier. 
     - `--build` will build a new image every time. Unless the code changed this is useless. 
     - `-d` spins up the server as a headless instance. It is set to reload if it is stopped. 
     - If you need to get a readout after it was started headless run `docker logs <container id>`. 
@@ -59,16 +59,16 @@ You will know the backend is spun up if you see these two lines
 ```
 
 All configurations will need the repo downloaded locally, and an "openweathermap.org" API key. 
-To set up a key add the folowing to a file in the repo called `key.ignore`. 
+To set up a key add the following to a file in the repo called `key.ignore`. 
 
 ```json
 {"Weather_Key": "<key>"}
 ```
 
-The config is also not added to protect the locations i look at. 
+The config is also not added to protect the locations I look at. 
 Copy the config example below. 
 The shorthand abbreviations are only used for human reference. 
-The app looks exclusivly at the location ID. 
+The app looks exclusively at the location ID. 
 
 Config:
 
@@ -87,8 +87,8 @@ The five main buttons on the web gui are `Reports`, `Json dump`, `Realtime Weath
 Reports will generate a JSON that gives an overview of each storm. 
 For more info check out the API section. 
 Json dump will return a list of every database entry that meets the search parameters. 
-Its not reccomended to use unless you need that granular of detail. 
-Realtime weather is not used but I hope to display the current weather indicator over a map of the world. 
+Its not recommended to use unless you need that granular of detail. 
+Real-time weather is not used but I hope to display the current weather indicator over a map of the world. 
 Its still only a concept but I think it would be super cool if I can get it to work. 
 State gives a breakdown of the current running instance. 
 This is super useful for diagnosing some problems. 
