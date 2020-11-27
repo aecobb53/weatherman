@@ -25,9 +25,9 @@
 ### 1.0 release requirements
 
 - [ ] Review all markdown 
-- [ ] Spellcheck markdown
+- [x] Spellcheck markdown
 - [x] Figure out what happened to PB
-- [ ] Add api to markdown
+- [x] Add api to markdown
 
 
 ## Links
