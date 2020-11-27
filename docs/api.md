@@ -4,7 +4,6 @@ response forms and examples
 
 ## Weatherman API
 
-
 You can reach the service from any web gui by going to 
 
 ```http
@@ -18,12 +17,6 @@ or
 
 localhost:8000
 ```
-
-
-
-
-
-
 
 `/api/poll`
 
@@ -43,7 +36,7 @@ This returns the state of the app.
 | working_directory | Directory in container    |
 | cities            | List of cities            |
 | file_logging      | File logging level        |
-| consol_logging    | Console loggign level     |
+| consol_logging    | Console logging level     |
 
 `/api/dump` _Not working yet_
 
@@ -72,7 +65,7 @@ I havnt built it out yet but i want to accept Zulu and local timestamps even tho
 
 `/api/report` _Not working yet_
 
-Currently this is called the exact same as the `/api/dump` but it returns a differenly formatted list. 
+Currently this is called the exact same as the `/api/dump` but it returns a differently formatted list. 
 The format of the returned json. 
 ```text
 list of cities
