@@ -32,31 +32,27 @@ setup () {
         echo "making logs/archive/ dir"
         mkdir logs/archive; fi
 
-    if [ ! -f etc/key.json ]; then
-        echo "making etc/key.json file"
+    if [ ! -f etc/key.yml ]; then
+        echo "making etc/key.yml file"
         {
-            echo '{'
-            echo '    "Weather_Key": "REPLACE TEXT WITH KEY"'
-            echo '}'
+            echo 'Weather_Key: "REPLACE TEXT WITH KEY'
             echo ''
-        } > etc/testkey.json;
+        } > etc/testkey.yml;
         echo ''
         echo 'If you dont have a key set up one here:'
         echo 'https://openweathermap.org/appid'
         echo ''
         fi
 
-    if [ ! -f etc/weather_api_private.json ]; then
-        echo "making etc/weather_api_private.json file"
+    if [ ! -f etc/weather_api_private.yml ]; then
+        echo "making etc/weather_api_private.yml file"
         {
-            echo '{'
-            echo '    "locations": {'
-            echo '        "YOUR LOCATION NAME": CITY-ID,'
-            echo '        "YOUR LOCATION NAME": CITY-ID'
-            echo '    }'
-            echo '}'
             echo ''
-        } > etc/testweather_api_private.json;
+            echo 'locations:'
+            echo '    YOUR_LOCATION_NAME: CITY-ID'
+            echo '    YOUR_LOCATION_NAME: CITY-ID'
+            echo ''
+        } > etc/testweather_api_private.yml;
         echo ''
         echo 'If you dont know what city-ids you need, download this zip:'
         echo 'http://bulk.openweathermap.org/sample/city.list.json.gz'
