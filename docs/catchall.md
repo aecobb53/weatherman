@@ -8,7 +8,7 @@
 
 ## TODO
 
-- db structure in the readme. 
+- ~~db structure in the readme.~~
 - log rotating.
 - ~~Add to report the worst conditions of a storm.~~
 - Condensed sql db. As in a report database for longer term trending. 
@@ -25,7 +25,7 @@
 
 ### 1.0 release requirements
 
-- [ ] Review all markdown 
+- [x] Review all markdown 
 - [x] Spellcheck markdown
 - [x] Figure out what happened to PB
 - [x] Add api to markdown
