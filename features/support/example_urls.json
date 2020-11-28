@@ -1,9 +1,0 @@
-{
-    "url":"https://api.openweathermap.org/data/2.5/",
-    "group_id_url":"https://api.openweathermap.org/data/2.5/group?",
-    "group_arguments":{
-        "id": "2643741,5128581,5419384,5809844", 
-        "units": "imperial"
-    },
-    "":""
-}

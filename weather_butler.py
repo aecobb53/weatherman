@@ -31,7 +31,11 @@ class WeatherButler:
         It also returns the request object and the json data.
         """
         request = requests.get(url, args)
-        return request, request.json()['list']
+        try:
+            return_list = request.json()['list']
+        except:
+            return_list = []
+        return request, return_list
 
 
     def format_request_city_id_list(self, url, city_id_list, key):
@@ -123,7 +127,11 @@ class WeatherButler:
         An easy module to handle all parts of grabbing the data. Its run and successful weather 
         comes out... or an error... an error can happen too.
         """
-        url, args = self.format_request_city_id_list(self.config['url'], self.config['locations'].values(), self.key['Weather_Key'])
+        url, args = self.format_request_city_id_list(
+            self.config['url'], 
+            self.config['locations'].values(), 
+            self.key['Weather_Key']
+        )
         self.request, data = self.get_response(url, args)
         report  = self.format_response(data)
         return report

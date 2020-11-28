@@ -1,5 +1,6 @@
 import sqlite3
 import datetime
+import yaml
 
 
 
@@ -27,11 +28,13 @@ class SQLButler:
             'snow':'float',
         }
 
+        # Load config file and set some parameters
+        self.master_config = 'etc/weatherman.yml'
+        with open(self.master_config) as ycf:
+            self.config = yaml.load(ycf, Loader=yaml.FullLoader)
+
         if not isinstance(database_name, str):
             raise TypeError('The provided database name is not a string')
-
-        if database_name == 'Exception':
-            raise ValueError('Testing errors for unit tests')
 
         self.database_name = database_name + '.sql'
 
@@ -70,7 +73,8 @@ class SQLButler:
         """
         insert_data = []
         try:
-            insert_data.append(data['time'].strftime('%Y-%m-%dT%H:%M:%SZ'))
+            insert_data.append(data['time'].strftime(self.config['datetime_str']))
+            # insert_data.append(data['time'].strftime('%Y-%m-%dT%H:%M:%SZ'))
         except:
             insert_data.append('')
 
@@ -191,10 +195,10 @@ class SQLButler:
         """
         line = list(tpl)
         try:
-            line[0] = datetime.datetime.strptime(line[0], '%Y-%m-%dT%H:%M:%SZ')
+            line[0] = datetime.datetime.strptime(line[0], self.config['datetime_str'])
         except ValueError:
             # HERE purge the bad data eventually
-            line[0] = datetime.datetime.strptime(line[0], '%Y-%m-%d %H:%M:%S.%f+00:00')
+            line[0] = datetime.datetime.strptime(line[0], self.config['datetime_utc_str'])
         dct = {k:v for k,v in zip(self.headers.keys(),line)}
         return dct
 

@@ -2,11 +2,26 @@
 
 ## Table of contents
 
+- [Setup](#setup)
 - [Docker](#docker)
 - [SQLite](#sqlite)
 - [Technical breakdown](#technical-breakdown)
 - [Logging](#logging)
 - [Reports](#reports)
+
+## Setup
+
+Link for new account:
+https://home.openweathermap.org/users/sign_up
+
+Generate a new key:
+https://home.openweathermap.org/api_keys
+
+city zip:
+http://bulk.openweathermap.org/sample/city.list.json.gz
+
+Pricing:
+https://openweathermap.org/price
 
 ## Docker
 

@@ -68,8 +68,7 @@ The major tags for the weather butler feature are `owma` and `on`/`off`.
 the owma stands for Open Weather Map api. 
 It is the tag for the website functional tests. 
 The on/off flags are used to turn on and off polling the database in the `environment.py` file. 
-Because there is a limited number of polls you can use per month with the free subscription 
-it made sense to add a limiter. 
+Because there is a limited number of polls you can use per month with the free subscription it made sense to add a limiter. 
 If you dont have either it will assume on. 
 
 Tests:

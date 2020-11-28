@@ -6,9 +6,9 @@ Feature: Weather butler
 Scenario: Generating a poll url
 Does the database set up a proper url and argument setup
 
-    Given I start with a new url from example_weather_api_private.json and example_urls.json
+    Given I start with a new url from example_weather_api_private.yml and example_urls.yml
     When I map the url
-    Then I verify the url matches example_urls.json base
+    Then I verify the url matches example_urls.yml base
 
 @owma @off
 Scenario: Successful poll
@@ -33,4 +33,3 @@ Does the data formatter format data properly
 
     Given I start with a new url from example_weather_api_private.json and example_urls.json
     When I load the example response data in good_owma_response.json
-
