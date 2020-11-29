@@ -32,7 +32,7 @@ services:
         build: .
         image: weather-dev:latest
         # command: behave features/data_validator.feature
-        # command: behave features/data_validator.feature:6
+        # command: behave features/main.feature:6
         # command: behave --tags="@owma"
         command: behave
         volumes:
