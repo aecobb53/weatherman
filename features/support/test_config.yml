@@ -1,0 +1,22 @@
+locations:
+    london: 2643741
+    New York City: 5128581
+    Denver: 5419384
+    Seattle: 5809844
+url: https://api.openweathermap.org/data/2.5/
+group_id_url: https://api.openweathermap.org/data/2.5/group?
+group_arguments:
+    id: 
+        - 2643741
+        - 5128581
+        - 5419384
+        - 5809844
+    units: imperial
+private_config_name: testing_private_config.yml
+key_name: key.yml
+etc_path: etc/
+features_path: features/
+steps_path: features/steps/
+support_path: features/support/
+database_name: db/weatherman_behave
+datetime_str: '%Y-%m-%dT%H:%M:%SZ'

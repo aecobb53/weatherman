@@ -141,9 +141,3 @@ I dont know how to run frontend tests.
 I will get to it eventually. 
 
 [Back to top](#table-of-contents)
-
-
-
-
-
-

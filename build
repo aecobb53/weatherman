@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 grep_port () {
     echo "Activiating ports:"
@@ -6,60 +6,8 @@ grep_port () {
 }
 
 setup () {
-    # Verify the directories and files that are not uplaoded to the github are there. 
-    # This function also creates the two files that are ignored but needed. 
-    # This is a good thing to run after cloaning a new github branch. 
-
-    echo "Setting up directories and files that may not be in the github. "
-
-    if [ ! -d db ]; then
-        echo "making db/ dir"
-        mkdir db;fi
-
-    if [ ! -d db/archive ]; then
-        echo "making db/archive/ dir"
-        mkdir db;fi
-
-    if [ ! -d out ]; then
-        echo "making out/ dir"
-        mkdir out; fi
-
-    if [ ! -d logs/behave/old ]; then
-        echo "making logs/behave/old/ dir"
-        mkdir logs/behave/old; fi
-
-    if [ ! -d logs/archive ]; then
-        echo "making logs/archive/ dir"
-        mkdir logs/archive; fi
-
-    if [ ! -f etc/key.yml ]; then
-        echo "making etc/key.yml file"
-        {
-            echo 'Weather_Key: "REPLACE TEXT WITH KEY'
-            echo ''
-        } > etc/testkey.yml;
-        echo ''
-        echo 'If you dont have a key set up one here:'
-        echo 'https://openweathermap.org/appid'
-        echo ''
-        fi
-
-    if [ ! -f etc/weather_api_private.yml ]; then
-        echo "making etc/weather_api_private.yml file"
-        {
-            echo ''
-            echo 'locations:'
-            echo '    YOUR_LOCATION_NAME: CITY-ID'
-            echo '    YOUR_LOCATION_NAME: CITY-ID'
-            echo ''
-        } > etc/testweather_api_private.yml;
-        echo ''
-        echo 'If you dont know what city-ids you need, download this zip:'
-        echo 'http://bulk.openweathermap.org/sample/city.list.json.gz'
-        echo ''
-        fi
-
-    echo "Done!"
+    # echo "${@}"
+    ./setup.sh $@
 }
 
 clean () {
@@ -134,6 +82,8 @@ about () {
     echo "
     This is a makeshift Makefile
     setup               - Set up dir and files (run if its a new cloan)
+                            For more info run 'build setup help'
+                            For a full program setup run 'build setup reset-all'
     clean               - Move log files to the logs/archive directory
     run                 - Run the container
     dev                 - Run a dev instance
@@ -151,7 +101,7 @@ about () {
 case "$1" in
     # Setup
     setup)
-        setup
+        setup "${@}"
         ;;
 
     clean)

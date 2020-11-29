@@ -1,0 +1,30 @@
+[
+   {
+        "time": "2020-11-29T01:01:24Z",
+        "city": 2643741,
+        "name": "City of London",
+        "sky_id": 601,
+        "sky": "Snow",
+        "sky_desc": "light snow",
+        "temp": 54.9,
+        "humidity": 71,
+        "wind": 3.36,
+        "cover": 40,
+        "rain": 0.0,
+        "snow": 0.0
+    },
+    {
+        "time": "2020-11-29T01:01:24Z",
+        "city": 5128581,
+        "name": "New York",
+        "sky_id": 601,
+        "sky": "Snow",
+        "sky_desc": "light snow",
+        "temp": 63.21,
+        "humidity": 39,
+        "wind": 12.75,
+        "cover": 1,
+        "rain": 0.0,
+        "snow": 0.0
+    } 
+]
