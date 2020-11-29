@@ -31,10 +31,10 @@ services:
     test:
         build: .
         image: weather-dev:latest
-        command: behave features/sql_butler.feature
-        # command: behave features/sql_butler.feature:45
+        # command: behave features/data_validator.feature
+        # command: behave features/data_validator.feature:6
         # command: behave --tags="@owma"
-        # command: behave
+        command: behave
         volumes:
             - .:/usr/src
         ports:

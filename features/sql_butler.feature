@@ -13,7 +13,7 @@ Does the database set up and accept perfect data?
     When I try to select element(s) 0 from the database return
     Then I verify the database response matches good_weather_data.json
 
-@database @DEBUG
+@database
 Scenario: Adding multiple weather reports to database
 Does the database take a list of weather and return the list?
 
@@ -55,10 +55,3 @@ Does the database take a list of weather and return the list?
     When I add exact_list=601
     When I use the parameters to get data from the database
     Then I verify the database response matches good_parameter_data.json
-
-
-# gets all data
-# gets bad data
-# gets first and last data
-
-

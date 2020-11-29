@@ -4,12 +4,13 @@
 
 Backend
 - [Functional](#functional)
-  - [Running](#running)
-  - [Features](#features)
-  - [Steps](#steps)
+    - [Running](#running)
+    - [Features](#features)
+    - [Steps](#steps)
+    - [Data Validation]{#data-validation}
 - [Unit](#unit)
-  - [Running](#running)
-  - [Tests](#tests)
+    - [Running](#running)
+    - [Tests](#tests)
 
 Frontend
 - [uhhh...](#uhhh)
@@ -59,8 +60,8 @@ I tried to have the Then scenarios return info but the rest return debug.
 Logging is handled in the `steps_logging.py` wrapper of the logger class. 
 At the end of each scenario the logging is reset back to WARNING. 
 
- - [Weather Butler](#weather-butler)
- - [SQL Butler](#sql-butler)
+- [Weather Butler](#weather-butler)
+- [SQL Butler](#sql-butler)
 
 ##### Weather Butler
 
@@ -74,13 +75,13 @@ If you dont have either it will assume on.
 Tests:
 
 - Generating a poll url
-  - Does the database set up a properly formatted url for the requests module?
+    - Does the database set up a properly formatted url for the requests module?
 - Successful poll
-  - Does the response module get a proper response?
+    - Does the response module get a proper response?
 - weather butler poll function
-  - Does the poll function do everything it needs to?
+    - Does the poll function do everything it needs to?
 - data returned is formatted correctly
-  - Does the data formatter module return valid data 
+    - Does the data formatter module return valid data 
 
 > Still need negative tests
 
@@ -89,10 +90,29 @@ Tests:
 The major tags for sql butler is `@database`. 
 For each database scenario I delete the testing databases. 
 
-- Scenario: Creating a sql database
-  - Does the database set up and accept data?
-- Scenario: Adding multiple weather reports to database
-  - Does the database accept a list of data?
+- Creating a sql database
+    - Does the database set up and accept perfect data?
+- Adding multiple weather reports to database
+    - Does the database take a list of weather and return the list?
+- Tuple to dict
+    - Does the tupe to dict function work properly?
+- List of tuples to list of dicts
+    - Does the list tuple to list dict function work properly?
+- Use parameters to return results from the database
+    - Does the database take a list of weather and return the list?
+
+> Still need negative tests
+
+##### Data Validation
+
+The major tags for sql butler is `@validator`. 
+Verify the data validator interprits the input strings appropriatly. 
+
+- Exact_list
+    - Does the validator handle the exact list types appropriatly?
+
+- Datetime validator
+    - Does the validator handle the datetime strings appropriatly?
 
 > Still need negative tests
 
