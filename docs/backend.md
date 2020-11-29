@@ -16,6 +16,8 @@ For first time setup follow this list:
 2. ```bash
     git clone git@github.com:aecobb53/weatherman.git
 
+    cd weatherman
+
     ./build setup reset-all
 
     docker-compose up weather
