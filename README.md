@@ -22,6 +22,8 @@ Either a dump which will return all data that meets the search parameters or a r
 
 ## How to use
 
+For first time setup follow [Setup](docs/backend.md#setup). 
+
 This program was put together because I needed weather data but I also realized it was a great way to pull together a lof of what I have learned over the years. 
 It then showed me the gaps in what I knew how to do for a program so it has been a fun experience putting it together. 
 
@@ -96,6 +98,7 @@ It was mostly for myself but I figured if im writing it down for myself I might 
 - [API](docs/api.md)
 - [Frontend](docs/frontend.md)
 - [Backend](docs/backend.md)
+    - [Setup](docs/backend.md#setup)
     - [Docker](docs/backend.md#docker)
     - [SQLite](docs/backend.md#sqlite)
     - [Technical breakdown](docs/backend.md#technical-breakdown)
