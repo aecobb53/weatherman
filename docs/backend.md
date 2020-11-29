@@ -20,7 +20,7 @@ For first time setup follow this list:
 
     ./build setup reset-all
 
-    docker-compose up weather
+    build run
     ```
 
 #### Details about the setup script
