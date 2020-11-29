@@ -10,7 +10,7 @@ Weatherman collects data every x number of minutes and saves it to a sql databas
 The data is returned in two notable ways. 
 Either a dump which will return all data that meets the search parameters or a report which will shorten the data and give you an overview of each storm at the location. 
 
-> Release:  1.0.0
+> Release:  1.1.0
 
 > Last modified:  2020-11-27
 
