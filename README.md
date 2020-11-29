@@ -3,7 +3,7 @@
 Historic weather data is surprisingly hard to come by. 
 Thus the Weather man was born. 
 (His hero backstory is ***REALLY*** lame). 
-Really what you need to know is it would be nice to have a way to save weather data and recall it later. 
+What you need to know is it would be nice to have a way to save weather data and recall it later. 
 
 Weatherman collects data every x number of minutes and saves it to a sql database. 
 (Currently I use a crontab but I want to switch to an internal timer of some sort). 
