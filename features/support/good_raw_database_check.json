@@ -1,0 +1,16 @@
+[
+    {
+        "time": "2020-01-01T00:00:00Z", 
+        "city": 2643741, 
+        "name": "London", 
+        "sky_id": 800, 
+        "sky": "Clear", 
+        "sky_desc": "clear sky", 
+        "temp": 60.01, 
+        "humidity": 24, 
+        "wind": 3.0, 
+        "cover": 0, 
+        "rain": "", 
+        "snow": ""
+    }
+]
