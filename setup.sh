@@ -1,7 +1,6 @@
+#! /bin/bash
 
-echo $@
-
-
+# Program setup
 
 check_directory () {
     if [ ! -d ${1} ]; then
@@ -33,15 +32,17 @@ remove_file () {
 # Directories
 check_directory "db/"
 check_directory "db/archive/"
-check_directory "out"
+check_directory "out/"
+check_directory "out/archive/"
+check_directory "logs/"
+check_directory "logs/archive/"
 check_directory "logs/behave/old"
-check_directory "logs/archive"
 
 
 # Files
 # Names
-KEY_FILE_NAME='etc/test_key.yml'
-LOCATIONS_FILE_NAME='etc/test_weather_api_private.yml'
+KEY_FILE_NAME='etc/key.yml'
+LOCATIONS_FILE_NAME='etc/weather_api_private.yml'
 
 # Key file
 create_key() {

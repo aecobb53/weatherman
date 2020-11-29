@@ -11,17 +11,43 @@
 
 ## Setup
 
-Link for new account:
-https://home.openweathermap.org/users/sign_up
+For first time setup follow this list:
+1. Create your own OWMA key [here](https://home.openweathermap.org/users/sign_up).
+2. ```bash
+    git clone git@github.com:aecobb53/weatherman.git
 
-Generate a new key:
-https://home.openweathermap.org/api_keys
+    ./build setup reset-all
 
-city zip:
-http://bulk.openweathermap.org/sample/city.list.json.gz
+    docker-compose up weather
+    ```
 
-Pricing:
-https://openweathermap.org/price
+#### Details about the setup script
+
+There are 3 setup args. 
+Every run including no arguments verifies the appropriate directories that are not uploaded to github are there. 
+
+Directories that are not automatickly uploaded to github
+- db/
+- db/archive/
+- out/
+- out/archive/
+- logs/
+- logs/archive/
+- logs/behave/old
+
+| Argument | Description |
+| --- | --- |
+| _none_ | Verifies all directories have been created |
+| `reset-key` | Creates and populates the `etc/key.yml` file |
+| `reset-locations` | Creates and populates the `etc/weather_api_private.yml` file |
+| `reset-all` | Runs `reset-key` then `reset-locations` |
+
+The app needs both `etc/key.yml` and `etc/weather_api_private.yml` to work. 
+Because you need to prove you are not a robot when you generate a OWMA key you need to set it up yourself here [OWMA sign up](https://home.openweathermap.org/users/sign_up). 
+If you need to generate a new key you can do so here [generate new key](https://home.openweathermap.org/api_keys). 
+All downloads for data OWMA will accept can be found [here](http://bulk.openweathermap.org/sample) but the one I use is [this one](http://bulk.openweathermap.org/sample/city.list.json.gz).
+I use the free version but you can upgrade [here](https://openweathermap.org/price). 
+For details on the free version look [here](open_weather_map_api.md)
 
 ## Docker
 
