@@ -156,6 +156,162 @@
             "dt": 1602188017,
             "id": 5809844,
             "name": "Seattle"
+        },
+        {
+            "coord": {
+                "lon": -0.09,
+                "lat": 51.51
+            },
+            "sys": {
+                "country": "GB",
+                "timezone": 3600,
+                "sunrise": 1602137575,
+                "sunset": 1602177744
+            },
+            "weather": [
+                {
+                    "id": 601,
+                    "main": "Snow",
+                    "description": "light snow",
+                    "icon": "03n"
+                }
+            ],
+            "main": {
+                "temp": 54.9,
+                "feels_like": 52,
+                "temp_min": 54,
+                "temp_max": 57.2,
+                "pressure": 1017,
+                "humidity": 71
+            },
+            "visibility": 10000,
+            "wind": {
+                "speed": 3.36,
+                "deg": 0
+            },
+            "clouds": {
+                "all": 40
+            },
+            "dt": 1602187855,
+            "id": 2643741,
+            "name": "City of London"
+        },
+        {
+            "coord": {
+                "lon": -74.01,
+                "lat": 40.71
+            },
+            "sys": {
+                "country": "US",
+                "timezone": -14400,
+                "sunrise": 1602154805,
+                "sunset": 1602195989
+            },
+            "weather": [
+                {
+                    "id": 601,
+                    "main": "Snow",
+                    "description": "light snow",
+                    "icon": "01d"
+                }
+            ],
+            "main": {
+                "temp": 63.21,
+                "feels_like": 53.4,
+                "temp_min": 61,
+                "temp_max": 64.99,
+                "pressure": 1016,
+                "humidity": 39
+            },
+            "visibility": 10000,
+            "wind": {
+                "speed": 12.75,
+                "deg": 270
+            },
+            "clouds": {
+                "all": 1
+            },
+            "dt": 1602188003,
+            "id": 5128581,
+            "name": "New York"
+        },
+        {
+            "coord": {
+                "lon": -104.98,
+                "lat": 39.74
+            },
+            "sys": {
+                "country": "US",
+                "timezone": -21600,
+                "sunrise": 1602162204,
+                "sunset": 1602203453
+            },
+            "weather": [
+                {
+                    "id": 600,
+                    "main": "Snow",
+                    "description": "snow",
+                    "icon": "02d"
+                }
+            ],
+            "main": {
+                "temp": 82.04,
+                "feels_like": 72.7,
+                "temp_min": 80.01,
+                "temp_max": 84,
+                "pressure": 1018,
+                "humidity": 8
+            },
+            "visibility": 10000,
+            "wind": {
+                "speed": 6.93,
+                "deg": 40
+            },
+            "clouds": {
+                "all": 20
+            },
+            "dt": 1602188012,
+            "id": 5419384,
+            "name": "Denver"
+        },
+        {
+            "coord": {
+                "lon": -122.33,
+                "lat": 47.61
+            },
+            "sys": {
+                "country": "US",
+                "timezone": -25200,
+                "sunrise": 1602166729,
+                "sunset": 1602207254
+            },
+            "weather": [
+                {
+                    "id": 600,
+                    "main": "Snow",
+                    "description": "snow",
+                    "icon": "04d"
+                }
+            ],
+            "main": {
+                "temp": 62.98,
+                "feels_like": 57.78,
+                "temp_min": 61,
+                "temp_max": 64.99,
+                "pressure": 1013,
+                "humidity": 67
+            },
+            "visibility": 10000,
+            "wind": {
+                "speed": 10.29,
+                "deg": 170
+            },
+            "clouds": {
+                "all": 75
+            },
+            "dt": 1602188017,
+            "id": 5809844,
+            "name": "Seattle"
         }
     ]
 }

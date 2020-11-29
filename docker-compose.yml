@@ -32,7 +32,7 @@ services:
         build: .
         image: weather-dev:latest
         command: behave features/sql_butler.feature
-        # command: behave features/sql_butler.feature:29
+        # command: behave features/sql_butler.feature:45
         # command: behave --tags="@owma"
         # command: behave
         volumes:

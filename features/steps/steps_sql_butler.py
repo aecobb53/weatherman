@@ -4,6 +4,9 @@ import json
 import yaml
 
 import sql_butler
+import data_validator
+validator = data_validator.DataValidator()
+
 
 # Logging
 import steps_logging
@@ -12,6 +15,7 @@ logit, logger = steps_logging.setup()
 # Config
 import steps_config
 config = steps_config.load_config()
+main_config = steps_config.load_config('weatherman.yml', 'etc/')
 
 @given('I create an empty database')
 def database_setup(context):
@@ -74,20 +78,6 @@ def load_weather_response_data(context, json_file):
     context.data = context.WB.format_response(raw_data['list'])
     logit.debug(f"context formatted data {context.data}")
 
-# @when('I load the weather data in {json_file}')
-# def load_weather_data_from_file(context, json_file):
-#     """
-#     Load in the data in the provided json file
-#     """
-#     json_file = config['support_path'] + json_file
-#     logit.debug(f"loading data from {json_file}")
-#     with open(json_file, 'r') as read_file:
-#         context.data = json.load(read_file)
-#     for index, line in enumerate(context.data):
-#         context.data[index]['time'] = datetime.datetime.strptime(line['time'], config['datetime_str'])
-#     logit.info(f"the json that was loaded: {context.data}")
-#     return context.data
-
 @when('I try to set up a {change_datatype} from {json_file}')
 def setup_raw_database_return(context, change_datatype, json_file):
     """
@@ -106,6 +96,47 @@ def setup_raw_database_return(context, change_datatype, json_file):
         context.return_data = context.db.list_tuple_to_list_dict(raw_data)
     logit.debug(f"returned data: {context.return_data}")
 
+@when('I set up a parameters search')
+def setup_parameters_search(context):
+    """
+    Set up a parameter search
+    """
+    context.parameters = {
+        'exact_list': None,
+        'start_time': None,
+        'end_time': None
+    }
+    logit.debug('New parameter search set up')
+
+@when('I add {parameter}={argument}')
+def update_parameter_search(context, parameter, argument):
+    """
+    Given parameter and argument, update the context.parameter search
+    """
+    if parameter not in context.parameters.keys():
+        logit.warning(f"Parameter {parameter} not found in {context.parameters.keys()}")
+        raise KeyError('parameter not in list of parameters available')
+    if parameter == 'exact_list':
+        if context.parameters['exact_list'] == None:
+            context.parameters['exact_list'] = []
+        logit.debug(f"added numbers {validator.is_exact_list(argument)}")
+        context.parameters['exact_list'].extend(validator.is_exact_list(argument))
+    elif parameter in ['start_time', 'end_time']:
+        context.parameters[parameter] = validator.is_datetime(argument)
+        logit.debug(f"updating {parameter} {validator.is_exact_list(argument)}")
+    else:
+        logit.warning(f'The provided parameter is not in the context parameters')
+        raise KeyError('parameter not in list of parameters available')
+    logit.debug(f"parameters updated {parameter}:{argument}")
+
+@when('I use the parameters to get data from the database')
+def database_parameter_search(context):
+    """
+    Based on the parameters updated before, grab results from the database. 
+    """
+    logit.info(f"using parameters to get data from the database {context.parameters}")
+    context.selection = context.db.query_database(context.parameters)
+    logit.debug(f"data from the database {context.selection}")
 
 @then('I verify the database response matches {json_file}')
 def compare_to_json_data(context, json_file):
