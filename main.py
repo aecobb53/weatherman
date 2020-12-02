@@ -859,49 +859,177 @@ def report_items(
 async def report(request: Request):
     return "Dont forget to build this out. should run the setup stuff"
 
+# @app.get("/setup", response_class=HTMLResponse)
+# async def report(request: Request):
+#     setup_dct= {
+#         'key':'ENTER-YOUR-KEY-HERE',
+#         'locations':{
+#             'one':123456,
+#             'two':789123,
+#             'three':456789
+#         },
+#         'results':[
+#             {
+#                 "id":14256,
+#                 "name": "Āzādshahr",
+#                 "state": "",
+#                 "country": "IR",
+#                 "coord": {
+#                     "lon": 48.570728,
+#                     "lat": 34.790878
+#                 }
+#             },
+#             {
+#                 "id": 12795,
+#                 "name": "Aş Şūrah aş Şaghīrah",
+#                 "state": "",
+#                 "country": "SY",
+#                 "coord": {
+#                     "lon": 36.573872,
+#                     "lat": 33.032669
+#                 }
+#             },
+#             {
+#                 "id": 30689,
+#                 "name": "Dawran",
+#                 "state": "",
+#                 "country": "YE",
+#                 "coord": {
+#                     "lon": 44.441959,
+#                     "lat": 13.77436
+#                 }
+#             }
+#         ]
+#     }
+#     return templates.TemplateResponse("setup.html", {"request": request, 'dict':setup_dct})
+
 @app.get("/setup", response_class=HTMLResponse)
 # async def report(request: Request):
-async def read_item(request: Request, q: str = Form(...)):
-    print(q)
-    print(type(q))
-    setup_dct= {
-        'key':'ENTER-YOUR-KEY-HERE',
-        'locations':{
-            'one':123456,
-            'two':789123,
-            'three':456789
-        },
-        'results':[
-            {
-                "id":14256,
-                "name": "Āzādshahr",
-                "state": "",
-                "country": "IR",
-                "coord": {
-                    "lon": 48.570728,
-                    "lat": 34.790878
-                }
-            },
-            {
-                "id": 12795,
-                "name": "Aş Şūrah aş Şaghīrah",
-                "state": "",
-                "country": "SY",
-                "coord": {
-                    "lon": 36.573872,
-                    "lat": 33.032669
-                }
-            },
-            {
-                "id": 30689,
-                "name": "Dawran",
-                "state": "",
-                "country": "YE",
-                "coord": {
-                    "lon": 44.441959,
-                    "lat": 13.77436
-                }
-            }
-        ]
-    }
-    return templates.TemplateResponse("setup.html", {"request": request, 'dict':setup_dct})
+async def setup(
+    request: Request, 
+    action: str = None,
+
+    key: str = None,
+    
+    delete: List[str] = Query([]),
+    newname: List[str] = Query([]),
+    city: List[str] = Query([]),
+
+    citySearch: str = '',
+    cityId: str = '',
+    stateAbbr: str = '',
+    countryAbbr: str = '',
+    lat: str = '',
+    lon: str = ''
+
+    ):
+
+    logit.debug(f"action: {action}")
+    logit.debug(f"key: {key}")
+    logit.debug(f"delete: {delete}")
+    logit.debug(f"newname: {newname}")
+    logit.debug(f"city: {city}")
+    logit.debug(f"citySearch: {citySearch}")
+    logit.debug(f"cityId: {cityId}")
+    logit.debug(f"stateAbbr: {stateAbbr}")
+    logit.debug(f"countryAbbr: {countryAbbr}")
+    logit.debug(f"lat: {lat}")
+    logit.debug(f"lon: {lon}")
+
+    import setup_weatherman
+    SW = setup_weatherman.SetupWeatherman()
+    SW.verify_directories()
+    SW.read_key()
+    SW.read_locations()
+    print(SW.key)
+    print(SW.locations)
+    # SW.create_key_file()
+    # SW.create_locations_file()
+
+    # SW.download_city_list()
+    SW.gzip_city_list()
+    parameters = {}
+    parameters['id'] = cityId if cityId != SW.default_perameters['cityId'] else ''
+    parameters['name'] = citySearch if citySearch != SW.default_perameters['citySearch'] else ''
+    parameters['state'] = stateAbbr if stateAbbr != SW.default_perameters['stateAbbr'] else ''
+    parameters['country'] = countryAbbr if countryAbbr != SW.default_perameters['countryAbbr'] else ''
+    parameters['lon'] = lon if lon != SW.default_perameters['lon'] else ''
+    parameters['lat'] = lat if lat != SW.default_perameters['lat'] else ''
+
+    #     'id': cityId,
+    #     'name': citySearch,
+    #     'state': stateAbbr,
+    #     'country': countryAbbr,
+    #     'lon': lon,
+    #     'lat': lat,
+    # }
+    newlist = []
+    newlist = SW.search_city_dict(parameters)
+    # setup_dct= {
+    #     'key':'ENTER-YOUR-KEY-HERE',
+    #     'locations':{
+    #         'one':123456,
+    #         'two':789123,
+    #         'three':456789
+    #     },
+    #     'parameters':{
+    #         'citySearch':'City name',
+    #         'cityId': 'city ID',
+    #         'stateAbbr': 'XX',
+    #         'countryAbbr': 'XX',
+    #         'lat': '##.#',
+    #         'lon': '##.#',
+    #     },
+    #     'results':[
+    #         {
+    #             "id":14256,
+    #             "name": "Āzādshahr",
+    #             "state": "",
+    #             "country": "IR",
+    #             "coord": {
+    #                 "lon": 48.570728,
+    #                 "lat": 34.790878
+    #             }
+    #         },
+    #         {
+    #             "id": 12795,
+    #             "name": "Aş Şūrah aş Şaghīrah",
+    #             "state": "",
+    #             "country": "SY",
+    #             "coord": {
+    #                 "lon": 36.573872,
+    #                 "lat": 33.032669
+    #             }
+    #         },
+    #         {
+    #             "id": 30689,
+    #             "name": "Dawran",
+    #             "state": "",
+    #             "country": "YE",
+    #             "coord": {
+    #                 "lon": 44.441959,
+    #                 "lat": 13.77436
+    #             }
+    #         }
+    #     ]
+    # }
+    print(json.dumps(SW.setup_dct(), indent=4))
+    # setup_dct['results'] = newlist
+    return templates.TemplateResponse("setup.html", {"request": request, 'dict':SW.setup_dct()})
+
+
+
+
+
+
+
+
+
+
+
+# fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
+
+
+# @app.get("/items/")
+# async def read_item(q: List[str] = Query(['one','two'])):
+#     return q
