@@ -8,10 +8,10 @@ function clear_menu(){
     console.log('clear button pressed');
 
 
-    document.getElementById("city-search").value = "";
-    document.getElementById("city-id").value = "";
-    document.getElementById("state-abbr").value = "";
-    document.getElementById("country-abbr").value = "";
+    document.getElementById("citySearch").value = "";
+    document.getElementById("cityId").value = "";
+    document.getElementById("stateAbbr").value = "";
+    document.getElementById("countryAbbr").value = "";
     document.getElementById("lat").value = "";
     document.getElementById("lon").value = "";
 

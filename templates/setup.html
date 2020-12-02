@@ -37,7 +37,8 @@
                                 <label for="delete:{{value}}">(Delete)</label>
 
                                 <label class="locations-check" for="newname">New name</label>
-                                <input type="text" name="newname" value="{{key}}">
+                                <input type="text" name="newname" placeholder="New city name">
+                                <!-- <input type="text" name="newname" value="{{key}}" placeholder="New city name"> -->
                             </p>
                         {% endfor %}
                     </div>
@@ -57,21 +58,21 @@
                         <div>
                             <div class="inline-search">
                                 <label for="cityname">City name</label>
-                                <input type="text" id="citySearch" name="citySearch" value="{{dict.parameters.citySearch}}">
+                                <input type="text" id="citySearch" name="citySearch" value="{{dict.parameters.citySearch}}" placeholder="{{dict.parameters.name}}">
                                 <label for="cityid">City ID</label>
-                                <input type="text" id="cityId" name="cityId" value="{{dict.parameters.cityId}}" pattern="^\d*$">
+                                <input type="text" id="cityId" name="cityId" value="{{dict.parameters.cityId}}" pattern="^\d*$" placeholder="{{dict.parameters.id}}">
                             </div>
                             <div class="inline-search">
                                 <label for="state-abbr">State abbr</label>
-                                <input type="text" id="stateAbbr" name="stateAbbr" size="2" value="{{dict.parameters.stateAbbr}}" pattern="^[A-Z]{2}?$">
+                                <input type="text" id="stateAbbr" name="stateAbbr" size="2" value="{{dict.parameters.stateAbbr}}" pattern="^[A-Z]{2}?$" placeholder="{{dict.parameters.state}}">
                                 <label for="country-abbr">Country abbr</label>
-                                <input type="text" id="countryAbbr" name="countryAbbr" size="2" value="{{dict.parameters.countryAbbr}}" pattern="^[A-Z]{2}?$">    
+                                <input type="text" id="countryAbbr" name="countryAbbr" size="2" value="{{dict.parameters.countryAbbr}}" pattern="^[A-Z]{2}?$" placeholder="{{dict.parameters.country}}">
                             </div>
                             <div class="inline-search">
                                 <label for="lat">Lat</label>
-                                <input type="text" id="lat" name="lat" value="{{dict.parameters.lat}}">
+                                <input type="text" id="lat" name="lat" placeholder="{{dict.parameters.lat}}">
                                 <label for="lon">Lon</label>
-                                <input type="text" id="lon" name="lon" value="{{dict.parameters.lon}}">
+                                <input type="text" id="lon" name="lon" placeholder="{{dict.parameters.lon}}">
                             </div>
                             <div>
                                 <input type="button" id="clear_search" onclick="clear_menu()" value="Clear">
@@ -93,7 +94,7 @@
                                     <td>{{location.country}}</td>
                                     <td>{{location.coord.lon}}</td>
                                     <td>{{location.coord.lat}}</td>
-                                    <td><input type="checkbox" id="grab-city" name="city" value="{{location.id}}"></td>
+                                    <td><input type="checkbox" id="grab-city" name="city" value="{{location.name}}={{location.id}}"></td>
                                 </tr>
                             {% endfor %}
                             </table>

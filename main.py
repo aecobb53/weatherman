@@ -15,6 +15,8 @@ from typing import Optional, List
 
 import weather_butler
 import data_validator
+import setup_weatherman
+
 
 # Logging
 import logger
@@ -422,6 +424,7 @@ except FileNotFoundError:
     setup = True
     logit.warning('app not set up yet! setting setup flag to {setup}')
 validator = data_validator.DataValidator()
+SW = setup_weatherman.SetupWeatherman()
 
 templates = Jinja2Templates(directory="templates/")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -915,12 +918,12 @@ async def setup(
     newname: List[str] = Query([]),
     city: List[str] = Query([]),
 
-    citySearch: str = '',
-    cityId: str = '',
-    stateAbbr: str = '',
-    countryAbbr: str = '',
-    lat: str = '',
-    lon: str = ''
+    citySearch: str = None,
+    cityId: str = None,
+    stateAbbr: str = None,
+    countryAbbr: str = None,
+    lat: str = None,
+    lon: str = None
 
     ):
 
@@ -936,35 +939,105 @@ async def setup(
     logit.debug(f"lat: {lat}")
     logit.debug(f"lon: {lon}")
 
-    import setup_weatherman
-    SW = setup_weatherman.SetupWeatherman()
-    SW.verify_directories()
-    SW.read_key()
-    SW.read_locations()
-    print(SW.key)
-    print(SW.locations)
-    # SW.create_key_file()
-    # SW.create_locations_file()
 
-    # SW.download_city_list()
-    SW.gzip_city_list()
-    parameters = {}
-    parameters['id'] = cityId if cityId != SW.default_perameters['cityId'] else ''
-    parameters['name'] = citySearch if citySearch != SW.default_perameters['citySearch'] else ''
-    parameters['state'] = stateAbbr if stateAbbr != SW.default_perameters['stateAbbr'] else ''
-    parameters['country'] = countryAbbr if countryAbbr != SW.default_perameters['countryAbbr'] else ''
-    parameters['lon'] = lon if lon != SW.default_perameters['lon'] else ''
-    parameters['lat'] = lat if lat != SW.default_perameters['lat'] else ''
+    # Key
+    if key != None and key != '':
+        SW.key = key
 
-    #     'id': cityId,
-    #     'name': citySearch,
-    #     'state': stateAbbr,
-    #     'country': countryAbbr,
-    #     'lon': lon,
-    #     'lat': lat,
-    # }
-    newlist = []
-    newlist = SW.search_city_dict(parameters)
+    # Search parameterse
+    if citySearch != None and citySearch != '':
+        SW.update_parameters('name', citySearch)
+    if cityId != None and cityId != '':
+        SW.update_parameters('id', cityId)
+    if stateAbbr != None and stateAbbr != '':
+        SW.update_parameters('state', stateAbbr)
+    if countryAbbr != None and countryAbbr != '':
+        SW.update_parameters('country', countryAbbr)
+    if lat != None and lat != '':
+        SW.update_parameters('lat', lat)
+    if lon != None and lon != '':
+        SW.update_parameters('lon', lon)
+    
+    # Modifying to list
+    # location_lst = [(k,v) for k,v in SW.locations.items()]
+    ## Updating
+    location_lst = [(k,v) for k,v in SW.locations.items()]
+    for index, element in enumerate(newname):
+        if element != '':
+            SW.update_locations(location_lst[index][0], element)
+    ## Removing
+    location_lst = [(k,v) for k,v in SW.locations.items()]
+    if delete != ['']:
+        for tup in location_lst:
+            print(tup)
+            if tup[1] in delete:
+                SW.remove_location(tup[0])
+    ## Adding
+    for element in city:
+        element_info = element.split('=')
+        SW.add_locations(element_info[0], element_info[1])
+
+
+
+    # SW.read_key()
+    # SW.read_locations()
+    # # print(SW.key)
+    # # print(SW.locations)
+    # # SW.create_key_file()
+    # # SW.create_locations_file()
+
+
+    # # Key
+    # SW.update_key(key)
+
+    # # Manage Cities
+    # parameters = {}
+    # parameters = SW.update_parameters('name', citySearch)
+    # SW.search_city_dict(parameters)
+
+
+
+    # # SW.download_city_list()
+    # SW.gzip_city_list()
+    # # parameters = {}
+    # # parameters = SW.update_parameters('name', citySearch)
+
+    # location_lst = [(k,v) for k,v in SW.locations.items()]
+    # for index, element in enumerate(newname):
+    #     if element != '':
+    #         SW.udpate_location_name(location_lst[index][0], element)
+
+    # location_lst = [(k,v) for k,v in SW.locations.items()]
+    # if delete != ['']:
+    #     for tup in location_lst:
+    #         print(tup)
+    #         if tup[1] in delete:
+    #             SW.remove_location(tup[0])
+
+    # for element in city:
+    #     element_info = element.split('=')
+    #     SW.add_location(element_info[0], element_info[1])
+    # # for locations in newname:
+    # #     location_info = locations.split('=')
+    # #     if len(location_info) == 2:
+    # #         print(location_info)
+    # #     # SW.add_location(location_info[0], location_info[1])
+    # # parameters['id'] = cityId if cityId != SW.default_perameters['cityId'] else ''
+    # # parameters['name'] = citySearch if citySearch != SW.default_perameters['citySearch'] else ''
+    # # parameters['state'] = stateAbbr if stateAbbr != SW.default_perameters['stateAbbr'] else ''
+    # # paraparametersmeparametersters['country'] = countryAbbr if countryAbbr != SW.default_perameters['countryAbbr'] else ''
+    # # parameters['lon'] = lon if lon != SW.default_perameters['lon'] else ''
+    # # parameters['lat'] = lat if lat != SW.default_perameters['lat'] else ''
+
+    # #     'id': cityId,
+    # #     'name': citySearch,
+    # #     'state': stateAbbr,
+    # #     'country': countryAbbr,
+    # #     'lon': lon,
+    # #     'lat': lat,
+    # # }
+    # # newlist = []
+    # # newlist = SW.search_city_dict(parameters)
     # setup_dct= {
     #     'key':'ENTER-YOUR-KEY-HERE',
     #     'locations':{
@@ -1013,8 +1086,17 @@ async def setup(
     #         }
     #     ]
     # }
-    print(json.dumps(SW.setup_dct(), indent=4))
+
+    # if action == 'refresh':
+    #     print('refreshing')
+    # elif action == 'setup':
+    #     print('settingup')
+    #     SW.verify_directories()
+
+
+    print(f"html dict: {json.dumps(SW.setup_dct(), indent=4)}")
     # setup_dct['results'] = newlist
+    # return templates.TemplateResponse("setup.html", {"request": request, 'dict':setup_dct})
     return templates.TemplateResponse("setup.html", {"request": request, 'dict':SW.setup_dct()})
 
 
