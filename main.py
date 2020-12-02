@@ -414,7 +414,13 @@ Spin up the app using fastapp and uvicorn. See the docker-compose file for whats
 actually run
 """
 app = FastAPI()
-WM = WeatherMan()
+setup = True
+try:
+    WM = WeatherMan()
+    setup = False
+except FileNotFoundError:
+    setup = True
+    logit.warning('app not set up yet! setting setup flag to {setup}')
 validator = data_validator.DataValidator()
 
 templates = Jinja2Templates(directory="templates/")
@@ -465,6 +471,10 @@ async def return_args(request: Request):
     """
     logit.debug('state endpoint hit')
     state_list = []
+    if setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
     for i,j in WM.state.items():
         if i == 'cities':
             state_list.append(i + ':')
@@ -495,6 +505,10 @@ async def poll_data(request: Request):
     Poll OWMA for new weather data.
     """
     logit.debug('about to poll data')
+    if setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
     WM.manage_polling()
     timestamp = datetime.datetime.strftime(WM.last_poll, WM.config['datetime_str'])
     return templates.TemplateResponse("poll.html", {"request": request, "last_poll":timestamp})
@@ -506,6 +520,10 @@ async def data_dump(request: Request):
     This returns the html to load the results from the database dump.
     """
     logit.debug('dump endpoint hit')
+    if setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
     data = WM.dump_list
     WM.clear_search()
     return templates.TemplateResponse("dump.html", {"request": request, 'list':data})
@@ -539,6 +557,15 @@ def read_items(
     logit.debug(f"exact_list: {exact_list}")
     logit.debug(f"start_time: {start_time}")
     logit.debug(f"end_time: {end_time}")
+
+    if setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
+
+    if setup:
+        response = RedirectResponse(url='/setup')
+        return response
 
     if thunderstorm:
         for num in WM.config['accepted_owma_codes']['thunderstorm']:
@@ -640,6 +667,11 @@ async def read_items(
     logit.debug(f"event_time: {event_time}")
     logit.debug(f"description: {description}")
 
+    if setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
+
     entry_time = datetime.datetime.strftime(
             datetime.datetime.now(tz=datetime.timezone.utc),
             WM.config['datetime_str']
@@ -706,6 +738,10 @@ async def report(request: Request):
     Eventually it may return the report but i dont have that working yet.
     """
     logit.debug('report endpoint hit')
+    if setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
     data = WM.report
     WM.clear_search()
     return templates.TemplateResponse("report.html", {"request": request, 'dict':data})
@@ -738,6 +774,11 @@ def report_items(
     logit.debug(f"exact_list: {exact_list}")
     logit.debug(f"start_time: {start_time}")
     logit.debug(f"end_time: {end_time}")
+
+    if setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
 
     if thunderstorm:
         for num in WM.config['accepted_owma_codes']['thunderstorm']:
@@ -814,3 +855,53 @@ def report_items(
     response = RedirectResponse(url='/report')
     return response
 
+@app.get("/api/setup", response_class=HTMLResponse)
+async def report(request: Request):
+    return "Dont forget to build this out. should run the setup stuff"
+
+@app.get("/setup", response_class=HTMLResponse)
+# async def report(request: Request):
+async def read_item(request: Request, q: str = Form(...)):
+    print(q)
+    print(type(q))
+    setup_dct= {
+        'key':'ENTER-YOUR-KEY-HERE',
+        'locations':{
+            'one':123456,
+            'two':789123,
+            'three':456789
+        },
+        'results':[
+            {
+                "id":14256,
+                "name": "Āzādshahr",
+                "state": "",
+                "country": "IR",
+                "coord": {
+                    "lon": 48.570728,
+                    "lat": 34.790878
+                }
+            },
+            {
+                "id": 12795,
+                "name": "Aş Şūrah aş Şaghīrah",
+                "state": "",
+                "country": "SY",
+                "coord": {
+                    "lon": 36.573872,
+                    "lat": 33.032669
+                }
+            },
+            {
+                "id": 30689,
+                "name": "Dawran",
+                "state": "",
+                "country": "YE",
+                "coord": {
+                    "lon": 44.441959,
+                    "lat": 13.77436
+                }
+            }
+        ]
+    }
+    return templates.TemplateResponse("setup.html", {"request": request, 'dict':setup_dct})
