@@ -21,8 +21,6 @@ class SetupWeatherman:
         self._results = None
         self._city_list_dict = None
 
-        # print(f"{self.config['default_city_list_search']}")
-        # self.default_parameters = self.config['default_city_list_search']
         self.default_parameters = {
             'name': '',
             'id': '',
@@ -58,11 +56,16 @@ class SetupWeatherman:
                 contents = yaml.load(ymlconfig, Loader=yaml.FullLoader)
                 return contents['Weather_Key']
         except FileNotFoundError:
-            # return None
             print('unable to load key file')
             pass
-            # self.key = self.config['default_key_contents']
-        # return key
+
+    def create_key_file(self):
+        """
+        Writing the key file
+        """
+        key_file_list = [f"Weather_Key: {self.key}"]
+        with open(self.config['key_path'], 'w') as filehandle:
+            filehandle.writelines("%s\n" % place for place in key_file_list)
 
 
     # Locations
@@ -106,9 +109,17 @@ class SetupWeatherman:
         except FileNotFoundError:
             print('unable to load locations file')
             pass
-            # self.locations = self.config['default_private_config_contents']
-        # return self.locations
 
+    def create_locations_file(self):
+        """
+        Writing the locations file
+        """
+        locations_file_list = ['locations:']
+        indent = self.config['yaml_indent']
+        for key, value in self.locations.items():
+            locations_file_list.append(f"{indent}{key}: {value}")
+        with open(self.config['private_config_path'], 'w') as filehandle:
+            filehandle.writelines("%s\n" % place for place in locations_file_list)
 
     # Parameters
     @property
@@ -116,7 +127,6 @@ class SetupWeatherman:
         """Parameters property"""
         print(f"returning parameters it is {self._parameters}")
         if self._parameters == None:
-            # return self.config['default_city_list_search']
             print(self.config['default_city_list_search'])
             return self.config['default_city_list_search']
         return self._parameters
@@ -144,19 +154,13 @@ class SetupWeatherman:
         if self._results == None:
             return []
         return self._results
-        # return self.search_city_dict(self.parameters)
 
     def search_city_dict(self, parameters):
         """
         Searching the list of values based on the parameters
         """
         print('received dct', json.dumps(parameters, indent=4))
-        # self.parameters = parameters
         list_of_cities = []
-        # if not any([True for v in parameters.values() if v != '']):
-        #     return list_of_cities
-        # if self.city_list_dict == None:
-        #     self.city_list_dict = self.gzip_city_list()
         for location in self.city_list_dict:
 
             if parameters['id'] != '':
@@ -186,9 +190,6 @@ class SetupWeatherman:
             list_of_cities.append(location)
 
         print(len(list_of_cities))
-        # self.results(list_of_cities)
-        # self.update_results(list_of_cities)
-        # return []
         return list_of_cities
 
     
@@ -212,12 +213,6 @@ class SetupWeatherman:
             'parameters': self.parameters,
             'results': self.results
         }
-        # return {
-        #     'key': self.key,
-        #     'locations': self.locations,
-        #     'parameters': self.parameters,
-        #     'results': self.results
-        # }
 
 
     # Setting up directories
@@ -236,30 +231,43 @@ class SetupWeatherman:
         """
         Download the list of cities supported by OWMA
         """
+        print('Grabbing gz file from OWM')
         r = requests.get(self.config['city_list_url'])
         print(r)
         print(r.json)
         open(self.config['city_list_gz_location'], 'wb').write(r.content)
+        return r.content
 
     def gzip_city_list(self):
         """
         Unzip the gz file into the city list json
         """
+        print('unziping gz')
+        if not os.path.isfile(self.config['city_list_gz_location']):
+            self.download_city_list()
         f = gzip.open(self.config['city_list_gz_location'], 'rb')
         file_content = f.read()
         f.close()
         city_list_dict = json.loads(file_content)
-        # {
-        #     "id": 833,
-        #     "name": "\u1e28e\u015f\u0101r-e Sef\u012bd",
-        #     "state": "",
-        #     "country": "IR",
-        #     "coord": {
-        #         "lon": 47.159401,
-        #         "lat": 34.330502
-        #     }
-        # }
         return city_list_dict
+
+    def cleanup_setup_files(self):
+        """
+        Deleting the files used to generate the lists of available locations
+        """
+        print('Cleaning up setup files')
+        try:
+             os.remove(self.config['city_list_gz_location'])
+             print(f"deleting {self.config['city_list_gz_location']}")
+        except OSError:
+            pass
+
+        try:
+             os.remove(self.config['city_list_json_location'])
+             print(f"deleting {self.config['city_list_json_location']}")
+        except OSError:
+            pass
+
 
 
 

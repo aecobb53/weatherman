@@ -1087,11 +1087,14 @@ async def setup(
     #     ]
     # }
 
-    # if action == 'refresh':
-    #     print('refreshing')
-    # elif action == 'setup':
-    #     print('settingup')
-    #     SW.verify_directories()
+    if action == 'refresh':
+        print('refreshing')
+    elif action == 'setup':
+        print('settingup')
+        SW.verify_directories()
+        SW.create_key_file()
+        SW.create_locations_file()
+        # SW.cleanup_setup_files()
 
 
     print(f"html dict: {json.dumps(SW.setup_dct(), indent=4)}")

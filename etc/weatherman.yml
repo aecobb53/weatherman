@@ -162,10 +162,11 @@ default_city_list_search:
     lat: '##.#'
     lon: '##.#'
 verify_directories:
-    db/
-    db/archive/
-    out/
-    out/archive/
-    logs/
-    logs/archive/
-    logs/behave/old
+    - db/
+    - db/archive/
+    - out/
+    - out/archive/
+    - logs/
+    - logs/archive/
+    - logs/behave/old/
+yaml_indent: '    '
