@@ -13,6 +13,11 @@
     font-weight: bold;
     margin: 0 10px 0;
 }
+/* .submit{
+    width: 20em;
+    height: 2em;
+    font-size: 3em;
+} */
 .inline-search {
     display: inline-block;
 }

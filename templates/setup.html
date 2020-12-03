@@ -30,6 +30,12 @@
                     <div class="locations">
                         <h2>Locations</h2>
                         <p>Current list of locations:</p>
+                        <p>
+                            The user defined name of the location is displayed to the left of the city ID. 
+                            The cityId is how the app knows which cities to grab so you cant change it. 
+                            There is a delete check box so you can remove extra locations. 
+                            If you type a new name in the box on the right it will udpate the user defined name when you refresh or setup. 
+                        </p>
                         {% for key, value in dict.locations.items() %}
                             <p>
                                 <label for="delete:{{value}}">{{key}}: {{value}}</label>
@@ -38,15 +44,15 @@
 
                                 <label class="locations-check" for="newname">New name</label>
                                 <input type="text" name="newname" placeholder="New city name">
-                                <!-- <input type="text" name="newname" value="{{key}}" placeholder="New city name"> -->
                             </p>
                         {% endfor %}
                     </div>
-                    <div class="submit">
-                        <input type="submit" id="set-it-up" value="setup" name="action">
+                    <div>
+                        <input class="submit" type="submit" id="set-it-up" value="setup" name="action">
                         <label class="submitter" for="Set-it-up">Submit the updates and run setup</label>
-                        <input type="submit" id="refresh" value="refresh" name="action" autofocus>
+                        <input class="submit" type="submit" id="refresh" value="refresh" name="action" autofocus>
                         <label class="submitter" for="Set-it-up">Refresh page before submitting</label>
+                        <p>Note: when refreshing it can take a while. It has to download a large file, unzip and then sorth through the data</p>
                     </div>
                     <div>
                         <h2>Location searcher</h2>

@@ -72,6 +72,7 @@ class WeatherMan:
                 self.config['key_path']
             )
         except FileNotFoundError:
+            logit.warning('setup files not found. Need to set up to use')
             self.setup = True
 
         self.state = self.config['starting_state']
@@ -80,7 +81,10 @@ class WeatherMan:
                 self.config.update(yaml.load(configfile, Loader=yaml.FullLoader))
             self.state['cities'] = self.config['locations']
         except FileNotFoundError:
+            logit.warning('setup files not found. Need to set up to use')
             self.setup = True
+
+        self.state['setup_needed'] = self.setup
 
         # Setup and more state setting
         import sql_butler
@@ -426,13 +430,6 @@ actually run
 app = FastAPI()
 global WM
 WM = WeatherMan()
-# try:
-#     WM = WeatherMan()
-#     setup = False
-# except FileNotFoundError:
-#     setup = True
-#     logit.warning('app not set up yet! setting setup flag to {setup}')
-print(f"setup is {WM.setup}")
 validator = data_validator.DataValidator()
 SW = setup_weatherman.SetupWeatherman()
 
@@ -922,7 +919,6 @@ async def run_setup(
         SW.update_parameters('lon', lon)
 
     # Modifying to list
-    # location_lst = [(k,v) for k,v in SW.locations.items()]
     ## Updating
     location_lst = [(k,v) for k,v in SW.locations.items()]
     for index, element in enumerate(newname):
@@ -949,33 +945,15 @@ async def run_setup(
         try:
             WM.__init__()
             WM.setup = False
+            WM.state['setup_needed'] = WM.setup
             try:
-                # SW.cleanup_setup_files()
-                print('')
+                SW.cleanup_setup_files()
             except:
                 pass
+            response = RedirectResponse(url='/')
+            return response
         except FileNotFoundError:
             WM.setup = True
             logit.warning('app not set up yet! setting setup flag to {setup}')
-        print(WM.setup)
 
-
-    # print(f"html dict: {json.dumps(SW.setup_dct(), indent=4)}")
     return templates.TemplateResponse("setup.html", {"request": request, 'dict':SW.setup_dct()})
-
-
-
-
-
-
-
-
-
-
-
-# fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
-
-
-# @app.get("/items/")
-# async def read_item(q: List[str] = Query(['one','two'])):
-#     return q
