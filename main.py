@@ -15,6 +15,8 @@ from typing import Optional, List
 
 import weather_butler
 import data_validator
+import setup_weatherman
+
 
 # Logging
 import logger
@@ -62,15 +64,23 @@ class WeatherMan:
         self.name = self.config['name']
         self.private_config_path = self.config['private_config_path']
         self.db_name = self.config['db_name'] # The type will be appended in the db
-        self.weather_butler = weather_butler.WeatherButler(
-            self.config['private_config_path'],
-            self.config['owma_url'],
-            self.config['key_path']
-        )
+        self.setup = False
+        try:
+            self.weather_butler = weather_butler.WeatherButler(
+                self.config['private_config_path'],
+                self.config['owma_url'],
+                self.config['key_path']
+            )
+        except FileNotFoundError:
+            self.setup = True
+
         self.state = self.config['starting_state']
-        with open(self.private_config_path) as configfile:
-            self.config.update(yaml.load(configfile, Loader=yaml.FullLoader))
-        self.state['cities'] = self.config['locations']
+        try:
+            with open(self.private_config_path) as configfile:
+                self.config.update(yaml.load(configfile, Loader=yaml.FullLoader))
+            self.state['cities'] = self.config['locations']
+        except FileNotFoundError:
+            self.setup = True
 
         # Setup and more state setting
         import sql_butler
@@ -414,8 +424,17 @@ Spin up the app using fastapp and uvicorn. See the docker-compose file for whats
 actually run
 """
 app = FastAPI()
+global WM
 WM = WeatherMan()
+# try:
+#     WM = WeatherMan()
+#     setup = False
+# except FileNotFoundError:
+#     setup = True
+#     logit.warning('app not set up yet! setting setup flag to {setup}')
+print(f"setup is {WM.setup}")
 validator = data_validator.DataValidator()
+SW = setup_weatherman.SetupWeatherman()
 
 templates = Jinja2Templates(directory="templates/")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -465,6 +484,11 @@ async def return_args(request: Request):
     """
     logit.debug('state endpoint hit')
     state_list = []
+    logit.warning(f"Setup is {WM.setup}")
+    if WM.setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
     for i,j in WM.state.items():
         if i == 'cities':
             state_list.append(i + ':')
@@ -495,6 +519,10 @@ async def poll_data(request: Request):
     Poll OWMA for new weather data.
     """
     logit.debug('about to poll data')
+    if WM.setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
     WM.manage_polling()
     timestamp = datetime.datetime.strftime(WM.last_poll, WM.config['datetime_str'])
     return templates.TemplateResponse("poll.html", {"request": request, "last_poll":timestamp})
@@ -506,6 +534,10 @@ async def data_dump(request: Request):
     This returns the html to load the results from the database dump.
     """
     logit.debug('dump endpoint hit')
+    if WM.setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
     data = WM.dump_list
     WM.clear_search()
     return templates.TemplateResponse("dump.html", {"request": request, 'list':data})
@@ -539,6 +571,11 @@ def read_items(
     logit.debug(f"exact_list: {exact_list}")
     logit.debug(f"start_time: {start_time}")
     logit.debug(f"end_time: {end_time}")
+
+    if WM.setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
 
     if thunderstorm:
         for num in WM.config['accepted_owma_codes']['thunderstorm']:
@@ -640,6 +677,11 @@ async def read_items(
     logit.debug(f"event_time: {event_time}")
     logit.debug(f"description: {description}")
 
+    if WM.setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
+
     entry_time = datetime.datetime.strftime(
             datetime.datetime.now(tz=datetime.timezone.utc),
             WM.config['datetime_str']
@@ -706,6 +748,10 @@ async def report(request: Request):
     Eventually it may return the report but i dont have that working yet.
     """
     logit.debug('report endpoint hit')
+    if WM.setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
     data = WM.report
     WM.clear_search()
     return templates.TemplateResponse("report.html", {"request": request, 'dict':data})
@@ -738,6 +784,11 @@ def report_items(
     logit.debug(f"exact_list: {exact_list}")
     logit.debug(f"start_time: {start_time}")
     logit.debug(f"end_time: {end_time}")
+
+    if WM.setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
 
     if thunderstorm:
         for num in WM.config['accepted_owma_codes']['thunderstorm']:
@@ -814,3 +865,117 @@ def report_items(
     response = RedirectResponse(url='/report')
     return response
 
+@app.get("/api/setup", response_class=HTMLResponse)
+async def report(request: Request):
+    return "Dont forget to build this out. should run the setup stuff"
+
+@app.get("/setup", response_class=HTMLResponse)
+# async def report(request: Request):
+async def run_setup(
+    request: Request,
+    action: str = None,
+
+    key: str = None,
+
+    delete: List[str] = Query([]),
+    newname: List[str] = Query([]),
+    city: List[str] = Query([]),
+
+    citySearch: str = None,
+    cityId: str = None,
+    stateAbbr: str = None,
+    countryAbbr: str = None,
+    lat: str = None,
+    lon: str = None
+
+    ):
+
+    logit.debug(f"action: {action}")
+    logit.debug(f"key: {key}")
+    logit.debug(f"delete: {delete}")
+    logit.debug(f"newname: {newname}")
+    logit.debug(f"city: {city}")
+    logit.debug(f"citySearch: {citySearch}")
+    logit.debug(f"cityId: {cityId}")
+    logit.debug(f"stateAbbr: {stateAbbr}")
+    logit.debug(f"countryAbbr: {countryAbbr}")
+    logit.debug(f"lat: {lat}")
+    logit.debug(f"lon: {lon}")
+
+
+    # Key
+    if key != None and key != '':
+        SW.key = key
+
+    # Search parameterse
+    if citySearch != None and citySearch != '':
+        SW.update_parameters('name', citySearch)
+    if cityId != None and cityId != '':
+        SW.update_parameters('id', cityId)
+    if stateAbbr != None and stateAbbr != '':
+        SW.update_parameters('state', stateAbbr)
+    if countryAbbr != None and countryAbbr != '':
+        SW.update_parameters('country', countryAbbr)
+    if lat != None and lat != '':
+        SW.update_parameters('lat', lat)
+    if lon != None and lon != '':
+        SW.update_parameters('lon', lon)
+
+    # Modifying to list
+    # location_lst = [(k,v) for k,v in SW.locations.items()]
+    ## Updating
+    location_lst = [(k,v) for k,v in SW.locations.items()]
+    for index, element in enumerate(newname):
+        if element != '':
+            SW.update_locations(location_lst[index][0], element)
+    ## Removing
+    location_lst = [(k,v) for k,v in SW.locations.items()]
+    if delete != ['']:
+        for tup in location_lst:
+            if tup[1] in delete:
+                SW.remove_location(tup[0])
+    ## Adding
+    for element in city:
+        element_info = element.split('=')
+        SW.add_locations(element_info[0], element_info[1])
+
+    if action == 'refresh':
+        print('Refreshing ')
+    elif action == 'setup':
+        print('Setting up app')
+        SW.verify_directories()
+        SW.create_key_file()
+        SW.create_locations_file()
+        try:
+            WM.__init__()
+            WM.setup = False
+            try:
+                # SW.cleanup_setup_files()
+                print('')
+            except:
+                pass
+        except FileNotFoundError:
+            WM.setup = True
+            logit.warning('app not set up yet! setting setup flag to {setup}')
+        print(WM.setup)
+
+
+    # print(f"html dict: {json.dumps(SW.setup_dct(), indent=4)}")
+    return templates.TemplateResponse("setup.html", {"request": request, 'dict':SW.setup_dct()})
+
+
+
+
+
+
+
+
+
+
+
+# fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
+
+
+# @app.get("/items/")
+# async def read_item(q: List[str] = Query(['one','two'])):
+#     return q

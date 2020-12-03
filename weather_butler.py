@@ -12,6 +12,7 @@ class WeatherButler:
     def __init__(self, private_config_path, owma_url, key_path):
         """Load configs"""
         self.config = {}
+        self.key = {}
         
         with open(private_config_path) as private_config:
             private_conf = yaml.load(private_config, Loader=yaml.FullLoader)

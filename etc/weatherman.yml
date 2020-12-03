@@ -148,3 +148,25 @@ weather_reports_dir: out/
 storm_difference_time: 35
 storm_difference_itteration: 10
 single_storm_event_flag: True
+default_private_config_contents: 
+    example-city: 123456
+default_key_contents: ENTER-YOUR-KEY-HERE
+city_list_url: http://bulk.openweathermap.org/sample/city.list.json.gz
+city_list_gz_location: etc/city_list.gz
+city_list_json_location: etc/city_list.json
+default_city_list_search: 
+    name: 'Cty name'
+    id: 00000
+    state: 'XX'
+    country: 'XX'
+    lat: '##.#'
+    lon: '##.#'
+verify_directories:
+    - db/
+    - db/archive/
+    - out/
+    - out/archive/
+    - logs/
+    - logs/archive/
+    - logs/behave/old/
+yaml_indent: '    '
