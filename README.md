@@ -39,18 +39,13 @@ Try it out and let me know.
 
 1. Install Docker. 
 2. Clone this repo. 
-3. Run `build setup` to create the needed directories and config files. 
-    - Update the etc/key.yml with your OWMA key
-    - Update the etc/weather_api_private.yml to the locations you want to get weather data from. 
-    If you dont know the locations you want you can find them on their website. 
-    Download the large city zip file, unzip and find it. 
-4. To spin up the server you need to use `build run`. 
-    - For the first time I recommend using `docker-compose up --build weather`. This way you can see the output and see errors easier. 
-    - `--build` will build a new image every time. Unless the code changed this is useless. 
-    - `-d` spins up the server as a headless instance. It is set to reload if it is stopped. 
-    - If you need to get a readout after it was started headless run `docker logs <container id>`. 
-    - If you need to follow the output run `docker logs <container id> --follow`. 
-5. Now that it is spun up and working you can verify the frontend by going to `localhost:8000`. 
+3. Start the container
+    - If you are using Linux or MacOS run `./spinup_server.sh`.
+    - If you are in Windows run `spinup_server_for_windows.bat`.
+    - Headless (Linux/MacOS only) `./build setup reset-all` for setup and `./build run` to spin up the container.
+    - Note: When you try to grab city locations for the first time it can take a while because the server needs to download a large file and parse it. 
+4. Once your container is up you can connect to it with any webgui by going to `localhost:8000`
+    - Go to Setup at the top right of the window or the app will direct you if you try to go to a location and it has not been set up yet. 
 
 You will know the backend is spun up if you see these two lines
 ```
