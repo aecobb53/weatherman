@@ -64,15 +64,23 @@ class WeatherMan:
         self.name = self.config['name']
         self.private_config_path = self.config['private_config_path']
         self.db_name = self.config['db_name'] # The type will be appended in the db
-        self.weather_butler = weather_butler.WeatherButler(
-            self.config['private_config_path'],
-            self.config['owma_url'],
-            self.config['key_path']
-        )
+        self.setup = False
+        try:
+            self.weather_butler = weather_butler.WeatherButler(
+                self.config['private_config_path'],
+                self.config['owma_url'],
+                self.config['key_path']
+            )
+        except FileNotFoundError:
+            self.setup = True
+
         self.state = self.config['starting_state']
-        with open(self.private_config_path) as configfile:
-            self.config.update(yaml.load(configfile, Loader=yaml.FullLoader))
-        self.state['cities'] = self.config['locations']
+        try:
+            with open(self.private_config_path) as configfile:
+                self.config.update(yaml.load(configfile, Loader=yaml.FullLoader))
+            self.state['cities'] = self.config['locations']
+        except FileNotFoundError:
+            self.setup = True
 
         # Setup and more state setting
         import sql_butler
@@ -416,13 +424,15 @@ Spin up the app using fastapp and uvicorn. See the docker-compose file for whats
 actually run
 """
 app = FastAPI()
-setup = True
-try:
-    WM = WeatherMan()
-    setup = False
-except FileNotFoundError:
-    setup = True
-    logit.warning('app not set up yet! setting setup flag to {setup}')
+global WM
+WM = WeatherMan()
+# try:
+#     WM = WeatherMan()
+#     setup = False
+# except FileNotFoundError:
+#     setup = True
+#     logit.warning('app not set up yet! setting setup flag to {setup}')
+print(f"setup is {WM.setup}")
 validator = data_validator.DataValidator()
 SW = setup_weatherman.SetupWeatherman()
 
@@ -474,7 +484,8 @@ async def return_args(request: Request):
     """
     logit.debug('state endpoint hit')
     state_list = []
-    if setup:
+    logit.warning(f"Setup is {WM.setup}")
+    if WM.setup:
         logit.warning('app not set up, redirecting to setup')
         response = RedirectResponse(url='/setup')
         return response
@@ -508,7 +519,7 @@ async def poll_data(request: Request):
     Poll OWMA for new weather data.
     """
     logit.debug('about to poll data')
-    if setup:
+    if WM.setup:
         logit.warning('app not set up, redirecting to setup')
         response = RedirectResponse(url='/setup')
         return response
@@ -523,7 +534,7 @@ async def data_dump(request: Request):
     This returns the html to load the results from the database dump.
     """
     logit.debug('dump endpoint hit')
-    if setup:
+    if WM.setup:
         logit.warning('app not set up, redirecting to setup')
         response = RedirectResponse(url='/setup')
         return response
@@ -561,12 +572,8 @@ def read_items(
     logit.debug(f"start_time: {start_time}")
     logit.debug(f"end_time: {end_time}")
 
-    if setup:
+    if WM.setup:
         logit.warning('app not set up, redirecting to setup')
-        response = RedirectResponse(url='/setup')
-        return response
-
-    if setup:
         response = RedirectResponse(url='/setup')
         return response
 
@@ -670,7 +677,7 @@ async def read_items(
     logit.debug(f"event_time: {event_time}")
     logit.debug(f"description: {description}")
 
-    if setup:
+    if WM.setup:
         logit.warning('app not set up, redirecting to setup')
         response = RedirectResponse(url='/setup')
         return response
@@ -741,7 +748,7 @@ async def report(request: Request):
     Eventually it may return the report but i dont have that working yet.
     """
     logit.debug('report endpoint hit')
-    if setup:
+    if WM.setup:
         logit.warning('app not set up, redirecting to setup')
         response = RedirectResponse(url='/setup')
         return response
@@ -778,7 +785,7 @@ def report_items(
     logit.debug(f"start_time: {start_time}")
     logit.debug(f"end_time: {end_time}")
 
-    if setup:
+    if WM.setup:
         logit.warning('app not set up, redirecting to setup')
         response = RedirectResponse(url='/setup')
         return response
@@ -862,58 +869,14 @@ def report_items(
 async def report(request: Request):
     return "Dont forget to build this out. should run the setup stuff"
 
-# @app.get("/setup", response_class=HTMLResponse)
-# async def report(request: Request):
-#     setup_dct= {
-#         'key':'ENTER-YOUR-KEY-HERE',
-#         'locations':{
-#             'one':123456,
-#             'two':789123,
-#             'three':456789
-#         },
-#         'results':[
-#             {
-#                 "id":14256,
-#                 "name": "Āzādshahr",
-#                 "state": "",
-#                 "country": "IR",
-#                 "coord": {
-#                     "lon": 48.570728,
-#                     "lat": 34.790878
-#                 }
-#             },
-#             {
-#                 "id": 12795,
-#                 "name": "Aş Şūrah aş Şaghīrah",
-#                 "state": "",
-#                 "country": "SY",
-#                 "coord": {
-#                     "lon": 36.573872,
-#                     "lat": 33.032669
-#                 }
-#             },
-#             {
-#                 "id": 30689,
-#                 "name": "Dawran",
-#                 "state": "",
-#                 "country": "YE",
-#                 "coord": {
-#                     "lon": 44.441959,
-#                     "lat": 13.77436
-#                 }
-#             }
-#         ]
-#     }
-#     return templates.TemplateResponse("setup.html", {"request": request, 'dict':setup_dct})
-
 @app.get("/setup", response_class=HTMLResponse)
 # async def report(request: Request):
-async def setup(
-    request: Request, 
+async def run_setup(
+    request: Request,
     action: str = None,
 
     key: str = None,
-    
+
     delete: List[str] = Query([]),
     newname: List[str] = Query([]),
     city: List[str] = Query([]),
@@ -957,7 +920,7 @@ async def setup(
         SW.update_parameters('lat', lat)
     if lon != None and lon != '':
         SW.update_parameters('lon', lon)
-    
+
     # Modifying to list
     # location_lst = [(k,v) for k,v in SW.locations.items()]
     ## Updating
@@ -969,7 +932,6 @@ async def setup(
     location_lst = [(k,v) for k,v in SW.locations.items()]
     if delete != ['']:
         for tup in location_lst:
-            print(tup)
             if tup[1] in delete:
                 SW.remove_location(tup[0])
     ## Adding
@@ -977,129 +939,28 @@ async def setup(
         element_info = element.split('=')
         SW.add_locations(element_info[0], element_info[1])
 
-
-
-    # SW.read_key()
-    # SW.read_locations()
-    # # print(SW.key)
-    # # print(SW.locations)
-    # # SW.create_key_file()
-    # # SW.create_locations_file()
-
-
-    # # Key
-    # SW.update_key(key)
-
-    # # Manage Cities
-    # parameters = {}
-    # parameters = SW.update_parameters('name', citySearch)
-    # SW.search_city_dict(parameters)
-
-
-
-    # # SW.download_city_list()
-    # SW.gzip_city_list()
-    # # parameters = {}
-    # # parameters = SW.update_parameters('name', citySearch)
-
-    # location_lst = [(k,v) for k,v in SW.locations.items()]
-    # for index, element in enumerate(newname):
-    #     if element != '':
-    #         SW.udpate_location_name(location_lst[index][0], element)
-
-    # location_lst = [(k,v) for k,v in SW.locations.items()]
-    # if delete != ['']:
-    #     for tup in location_lst:
-    #         print(tup)
-    #         if tup[1] in delete:
-    #             SW.remove_location(tup[0])
-
-    # for element in city:
-    #     element_info = element.split('=')
-    #     SW.add_location(element_info[0], element_info[1])
-    # # for locations in newname:
-    # #     location_info = locations.split('=')
-    # #     if len(location_info) == 2:
-    # #         print(location_info)
-    # #     # SW.add_location(location_info[0], location_info[1])
-    # # parameters['id'] = cityId if cityId != SW.default_perameters['cityId'] else ''
-    # # parameters['name'] = citySearch if citySearch != SW.default_perameters['citySearch'] else ''
-    # # parameters['state'] = stateAbbr if stateAbbr != SW.default_perameters['stateAbbr'] else ''
-    # # paraparametersmeparametersters['country'] = countryAbbr if countryAbbr != SW.default_perameters['countryAbbr'] else ''
-    # # parameters['lon'] = lon if lon != SW.default_perameters['lon'] else ''
-    # # parameters['lat'] = lat if lat != SW.default_perameters['lat'] else ''
-
-    # #     'id': cityId,
-    # #     'name': citySearch,
-    # #     'state': stateAbbr,
-    # #     'country': countryAbbr,
-    # #     'lon': lon,
-    # #     'lat': lat,
-    # # }
-    # # newlist = []
-    # # newlist = SW.search_city_dict(parameters)
-    # setup_dct= {
-    #     'key':'ENTER-YOUR-KEY-HERE',
-    #     'locations':{
-    #         'one':123456,
-    #         'two':789123,
-    #         'three':456789
-    #     },
-    #     'parameters':{
-    #         'citySearch':'City name',
-    #         'cityId': 'city ID',
-    #         'stateAbbr': 'XX',
-    #         'countryAbbr': 'XX',
-    #         'lat': '##.#',
-    #         'lon': '##.#',
-    #     },
-    #     'results':[
-    #         {
-    #             "id":14256,
-    #             "name": "Āzādshahr",
-    #             "state": "",
-    #             "country": "IR",
-    #             "coord": {
-    #                 "lon": 48.570728,
-    #                 "lat": 34.790878
-    #             }
-    #         },
-    #         {
-    #             "id": 12795,
-    #             "name": "Aş Şūrah aş Şaghīrah",
-    #             "state": "",
-    #             "country": "SY",
-    #             "coord": {
-    #                 "lon": 36.573872,
-    #                 "lat": 33.032669
-    #             }
-    #         },
-    #         {
-    #             "id": 30689,
-    #             "name": "Dawran",
-    #             "state": "",
-    #             "country": "YE",
-    #             "coord": {
-    #                 "lon": 44.441959,
-    #                 "lat": 13.77436
-    #             }
-    #         }
-    #     ]
-    # }
-
     if action == 'refresh':
-        print('refreshing')
+        print('Refreshing ')
     elif action == 'setup':
-        print('settingup')
+        print('Setting up app')
         SW.verify_directories()
         SW.create_key_file()
         SW.create_locations_file()
-        # SW.cleanup_setup_files()
+        try:
+            WM.__init__()
+            WM.setup = False
+            try:
+                # SW.cleanup_setup_files()
+                print('')
+            except:
+                pass
+        except FileNotFoundError:
+            WM.setup = True
+            logit.warning('app not set up yet! setting setup flag to {setup}')
+        print(WM.setup)
 
 
-    print(f"html dict: {json.dumps(SW.setup_dct(), indent=4)}")
-    # setup_dct['results'] = newlist
-    # return templates.TemplateResponse("setup.html", {"request": request, 'dict':setup_dct})
+    # print(f"html dict: {json.dumps(SW.setup_dct(), indent=4)}")
     return templates.TemplateResponse("setup.html", {"request": request, 'dict':SW.setup_dct()})
 
 
