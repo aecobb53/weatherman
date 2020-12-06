@@ -48,7 +48,7 @@ stop () {
 
     echo "Stopping all weatherman containers"
 
-    docker ps --filter name=weatherman* -aq | xargs docker stop
+    docker stop $(docker ps --filter name=weatherman* -aq)
 }
 
 clense () {
@@ -56,19 +56,21 @@ clense () {
 
     echo "About to stop/rm all weatherman containers. If one is running in terminal this cmd will wait"
 
-    docker ps --filter name=weatherman* -aq | xargs docker stop | xargs docker rm
+    docker stop $(docker ps --filter name=weatherman* -aq)
+    docker rm $(docker ps --filter name=weatherman* -aq)
+    # docker ps --filter name=weatherman* -aq | xargs docker stop | xargs docker rm
 }
 
 
 unit () {
     # Run the unit tests. 
     # This includes flake and lenting
-    docker-compose up unit-test
+    docker-compose run --rm unit-test
 }
 
 functional () {
     # Run the functional tests. 
-    docker-compose up test
+    docker-compose run --rm test
 }
 
 tests () {
@@ -145,6 +147,10 @@ case "$1" in
 
     # Help
     help)
+        about
+        ;;
+
+    *)
         about
         ;;
 esac
