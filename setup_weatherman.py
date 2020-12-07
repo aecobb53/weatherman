@@ -207,7 +207,6 @@ class SetupWeatherman:
         """
         Returen the current dict of active selections and results
         """
-        print('------------------returning dct')
         return {
             'key': self.key,
             'locations': self.locations,

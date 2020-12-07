@@ -689,8 +689,9 @@ def execute_setup(
 def is_api_setup():
     if WM.setup:
         logit.warning('app not set up, redirecting to setup')
-        response = RedirectResponse(url='/api/setup')
-        return response
+        return 'App is not set up yet! run the setup endpoint to finish setup'
+        # response = RedirectResponse(url='/api/setup')
+        # return response
     else:
         return False
 
@@ -811,7 +812,7 @@ def read_items(
     Takes a query and tells the app to grab data.
     """
 
-    logit.debug(f"dump/search endpoint hit")
+    logit.debug(f"api dump/search endpoint hit")
     logit.debug(f"thunderstorm: {thunderstorm}")
     logit.debug(f"drizzle: {drizzle}")
     logit.debug(f"rain: {rain}")
@@ -905,7 +906,6 @@ def read_items(
         start_time,
         end_time,
     )
-    print(parameters)
     WM.weather_dump(parameters)
     response = RedirectResponse(url='/dump')
     return response
@@ -933,6 +933,7 @@ async def read_items(
     Receive bug-report.
     """
 
+    logit.debug(f"api bug-report endpoint hit")
     logit.debug(f"prod: {prod}")
     logit.debug(f"dev: {dev}")
     logit.debug(f"test: {test}")
@@ -1002,6 +1003,7 @@ async def read_items(
     Receive bug-report.
     """
 
+    logit.debug(f"bug-report endpoint hit")
     logit.debug(f"prod: {prod}")
     logit.debug(f"dev: {dev}")
     logit.debug(f"test: {test}")
@@ -1063,7 +1065,7 @@ def report_items(
     Takes a query and tells the app to grab data.
     """
 
-    logit.debug(f"report/search endpoint hit")
+    logit.debug(f"api report/search endpoint hit")
     logit.debug(f"thunderstorm: {thunderstorm}")
     logit.debug(f"drizzle: {drizzle}")
     logit.debug(f"rain: {rain}")
@@ -1102,10 +1104,9 @@ async def report(request: Request):
     Eventually it may return the report but i dont have that working yet.
     """
     logit.debug('report endpoint hit')
-    if WM.setup:
-        logit.warning('app not set up, redirecting to setup')
-        response = RedirectResponse(url='/setup')
-        return response
+    resp = is_setup()
+    if resp:
+        return resp
     data = WM.report
     WM.clear_search()
     return templates.TemplateResponse("report.html", {"request": request, 'dict':data})
@@ -1177,6 +1178,7 @@ async def report(
     lon: str = None
     ):
 
+    logit.debug(f"api /setup endpoint hit")
     logit.debug(f"action: {action}")
     logit.debug(f"key: {key}")
     logit.debug(f"delete: {delete}")
@@ -1205,7 +1207,6 @@ async def report(
     return SW.setup_dct()
 
 @app.get("/setup", response_class=HTMLResponse)
-# async def report(request: Request):
 async def run_setup(
     request: Request,
     action: str = None,
@@ -1224,6 +1225,7 @@ async def run_setup(
     lon: str = None
     ):
 
+    logit.debug(f"/setup endpoint hit")
     logit.debug(f"action: {action}")
     logit.debug(f"key: {key}")
     logit.debug(f"delete: {delete}")
@@ -1235,63 +1237,6 @@ async def run_setup(
     logit.debug(f"countryAbbr: {countryAbbr}")
     logit.debug(f"lat: {lat}")
     logit.debug(f"lon: {lon}")
-
-
-    # # Key
-    # if key != None and key != '':
-    #     SW.key = key
-
-    # # Search parameterse
-    # if citySearch != None and citySearch != '':
-    #     SW.update_parameters('name', citySearch)
-    # if cityId != None and cityId != '':
-    #     SW.update_parameters('id', cityId)
-    # if stateAbbr != None and stateAbbr != '':
-    #     SW.update_parameters('state', stateAbbr)
-    # if countryAbbr != None and countryAbbr != '':
-    #     SW.update_parameters('country', countryAbbr)
-    # if lat != None and lat != '':
-    #     SW.update_parameters('lat', lat)
-    # if lon != None and lon != '':
-    #     SW.update_parameters('lon', lon)
-
-    # # Modifying to list
-    # ## Updating
-    # location_lst = [(k,v) for k,v in SW.locations.items()]
-    # for index, element in enumerate(newname):
-    #     if element != '':
-    #         SW.update_locations(location_lst[index][0], element)
-    # ## Removing
-    # location_lst = [(k,v) for k,v in SW.locations.items()]
-    # if delete != ['']:
-    #     for tup in location_lst:
-    #         if tup[1] in delete:
-    #             SW.remove_location(tup[0])
-    # ## Adding
-    # for element in city:
-    #     element_info = element.split('=')
-    #     SW.add_locations(element_info[0], element_info[1])
-
-    # if action == 'refresh':
-    #     print('Refreshing ')
-    # elif action == 'setup':
-    #     print('Setting up app')
-    #     SW.verify_directories()
-    #     SW.create_key_file()
-    #     SW.create_locations_file()
-    #     try:
-    #         WM.__init__()
-    #         WM.setup = False
-    #         WM.state['setup_needed'] = WM.setup
-    #         try:
-    #             SW.cleanup_setup_files()
-    #         except:
-    #             pass
-    #         response = RedirectResponse(url='/')
-    #         return response
-    #     except FileNotFoundError:
-    #         WM.setup = True
-    #         logit.warning('app not set up yet! setting setup flag to {setup}')
 
     if execute_setup(
         action,
