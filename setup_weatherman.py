@@ -207,6 +207,7 @@ class SetupWeatherman:
         """
         Returen the current dict of active selections and results
         """
+        print('------------------returning dct')
         return {
             'key': self.key,
             'locations': self.locations,
@@ -243,6 +244,7 @@ class SetupWeatherman:
         Unzip the gz file into the city list json
         """
         print('unziping gz')
+        print(os.path.isfile(self.config['city_list_gz_location']))
         if not os.path.isfile(self.config['city_list_gz_location']):
             self.download_city_list()
         f = gzip.open(self.config['city_list_gz_location'], 'rb')

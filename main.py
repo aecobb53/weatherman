@@ -428,21 +428,7 @@ Spin up the app using fastapp and uvicorn. See the docker-compose file for whats
 actually run
 """
 
-def return_state():
-    state_list = []
-    for i,j in WM.state.items():
-        if i == 'cities':
-            state_list.append(i + ':')
-            for x,y in j.items():
-                state_list.append('-' + x + ' : ' + str(y))
-        elif i == 'fh_logging':
-            state_list.append('file_logging' + ' : ' + j)
-        elif i == 'ch_logging':
-            state_list.append('consol_logging' + ' : ' + j)
-        else:
-            state_list.append(i + ' : ' + str(j))
-        logit.info(f"{i} : {j}")
-    return state_list
+
 
 app = FastAPI()
 global WM
@@ -462,68 +448,8 @@ app.add_middleware(
 )
 
 
-@app.get('/')
-async def root(request: Request):
-    """
-    The home page has some explanation of what each tab does.
-    Eventually it would be great to have picutres of the tabs here as well.
-    """
-    logit.debug('home endpoint hit')
-    return templates.TemplateResponse("main.html", {"request": request})
-
-
-@app.get("/about-weatherman", response_class=HTMLResponse)
-async def about_weatherman(request: Request):
-    """
-    If people had more questions I wanted to have a place to answer some of them.
-    """
-    logit.debug('about-weatherman endpoint hit')
-    return templates.TemplateResponse("about_weatherman.html", {"request": request})
-
-
-@app.get('/api/state')
-async def return_api_args(request: Request):
-    """
-    The api endpoint for state.
-    """
-    logit.debug('api state endpoint hit')
-    state_list = []
-    logit.warning(f"Setup is {WM.setup}")
-    # if WM.setup:
-    #     logit.warning('app not set up, redirecting to setup')
-    #     response = RedirectResponse(url='/setup')
-    #     return response
-    # for i,j in WM.state.items():
-    #     if i == 'cities':
-    #         state_list.append(i + ':')
-    #         for x,y in j.items():
-    #             state_list.append('-' + x + ' : ' + str(y))
-    #     elif i == 'fh_logging':
-    #         state_list.append('file_logging' + ' : ' + j)
-    #     elif i == 'ch_logging':
-    #         state_list.append('consol_logging' + ' : ' + j)
-    #     else:
-    #         state_list.append(i + ' : ' + str(j))
-    #     logit.info(f"{i} : {j}")
-    state_list = return_state()
-    # return {'hello':'world!'}
-    return state_list
-    # return WM.state
-
-
-@app.get('/state')
-async def return_args(request: Request):
-    """
-    This returns the state of the app.
-    Useful for some debugging.
-    """
-    logit.debug('state endpoint hit')
+def return_state():
     # state_list = []
-    logit.warning(f"Setup is {WM.setup}")
-    if WM.setup:
-        logit.warning('app not set up, redirecting to setup')
-        response = RedirectResponse(url='/setup')
-        return response
     # for i,j in WM.state.items():
     #     if i == 'cities':
     #         state_list.append(i + ':')
@@ -536,96 +462,10 @@ async def return_args(request: Request):
     #     else:
     #         state_list.append(i + ' : ' + str(j))
     #     logit.info(f"{i} : {j}")
-    state_list = []
-    # response = RedirectResponse(url='/api/state')
-    # url = app.url_path_for('return_api_args')
-    # response = RedirectResponse(url=url)
-    # print(response)
-    # print(response.__dict__.keys())
-    # print(response.txt)
-    # print(response.json())
-    # print(response.body)
-    # print(response.__dict__.keys())
-    # print(response)
-    # return response
+    return WM.state.items()
+    # return state_list
 
-    # response = RedirectResponse(url='/api/state')
-    # print(response)
-    # print(response.json())
-
-    state_list = return_state()
-    return templates.TemplateResponse("state.html", {"request": request, 'list':state_list})
-
-# @app.get('/state')
-# async def return_args(request: Request):
-#     """
-#     This returns the state of the app.
-#     Useful for some debugging.
-#     """
-#     logit.debug('state endpoint hit')
-#     state_list = []
-#     logit.warning(f"Setup is {WM.setup}")
-#     if WM.setup:
-#         logit.warning('app not set up, redirecting to setup')
-#         response = RedirectResponse(url='/setup')
-#         return response
-#     for i,j in WM.state.items():
-#         if i == 'cities':
-#             state_list.append(i + ':')
-#             for x,y in j.items():
-#                 state_list.append('-' + x + ' : ' + str(y))
-#         elif i == 'fh_logging':
-#             state_list.append('file_logging' + ' : ' + j)
-#         elif i == 'ch_logging':
-#             state_list.append('consol_logging' + ' : ' + j)
-#         else:
-#             state_list.append(i + ' : ' + str(j))
-#         logit.info(f"{i} : {j}")
-#     return templates.TemplateResponse("state.html", {"request": request, 'list':state_list})
-
-
-@app.get('/api/poll')
-async def poll_api_data(request: Request):
-    """
-    This fires off a poll to the app.
-    """
-    logit.debug('api poll endpoint hit')
-    WM.manage_polling()
-
-
-@app.get('/poll')
-async def poll_data(request: Request):
-    """
-    Poll OWMA for new weather data.
-    """
-    logit.debug('about to poll data')
-    if WM.setup:
-        logit.warning('app not set up, redirecting to setup')
-        response = RedirectResponse(url='/setup')
-        return response
-    WM.manage_polling()
-    timestamp = datetime.datetime.strftime(WM.last_poll, WM.config['datetime_str'])
-    return templates.TemplateResponse("poll.html", {"request": request, "last_poll":timestamp})
-
-
-@app.get('/dump')
-async def data_dump(request: Request):
-    """
-    This returns the html to load the results from the database dump.
-    """
-    logit.debug('dump endpoint hit')
-    if WM.setup:
-        logit.warning('app not set up, redirecting to setup')
-        response = RedirectResponse(url='/setup')
-        return response
-    data = WM.dump_list
-    WM.clear_search()
-    return templates.TemplateResponse("dump.html", {"request": request, 'list':data})
-
-
-@app.get('/dump/search/')
-def read_items(
-    request: Request,
+def generage_parameters(
     thunderstorm=False,
     drizzle=False,
     rain=False,
@@ -635,27 +475,15 @@ def read_items(
     clear=False,
     exact_list=None,
     start_time=None,
-    end_time=None):
-    """
-    Takes a query and tells the app to grab data.
-    """
+    end_time=None
+):
 
-    logit.debug(f"dump/search endpoint hit")
-    logit.debug(f"thunderstorm: {thunderstorm}")
-    logit.debug(f"drizzle: {drizzle}")
-    logit.debug(f"rain: {rain}")
-    logit.debug(f"snow: {snow}")
-    logit.debug(f"atmosphere: {atmosphere}")
-    logit.debug(f"clouds: {clouds}")
-    logit.debug(f"clear: {clear}")
-    logit.debug(f"exact_list: {exact_list}")
-    logit.debug(f"start_time: {start_time}")
-    logit.debug(f"end_time: {end_time}")
-
-    if WM.setup:
-        logit.warning('app not set up, redirecting to setup')
-        response = RedirectResponse(url='/setup')
-        return response
+    if exact_list == None:
+        exact_list = ''
+    if start_time == None:
+        start_time = ''
+    if end_time == None:
+        end_time = ''
 
     if thunderstorm:
         for num in WM.config['accepted_owma_codes']['thunderstorm']:
@@ -689,19 +517,19 @@ def read_items(
     try:
         logit.debug(f"validating exact_list")
         exact_list = validator.is_exact_list(exact_list)
-    except ValueError:
+    except:
         exact_list = None
 
     try:
         logit.debug(f"validating start_time")
         start_time = validator.is_datetime(start_time)
-    except ValueError:
+    except:
         start_time = None
 
     try:
         logit.debug(f"validating wnd_time")
         end_time = validator.is_datetime(end_time)
-    except ValueError:
+    except:
         end_time = None
 
     parameters = {
@@ -709,19 +537,9 @@ def read_items(
         'start_time': start_time,
         'end_time': end_time,
     }
-    WM.weather_dump(parameters)
-    response = RedirectResponse(url='/dump')
-    return response
+    return parameters
 
-
-@app.get("/bug-report", response_class=HTMLResponse)
-async def submit_bug_report(request: Request):
-    return templates.TemplateResponse("bug_report.html", {"request": request})
-
-
-@app.get("/bug-report/entry", response_class=HTMLResponse)
-async def read_items(
-    request: Request,
+def submit_bug(
     prod=None,
     dev=None,
     test=None,
@@ -736,36 +554,12 @@ async def read_items(
     about=None,
     report=None,
     event_time=None,
-    description=None):
-    """
-    Receive bug-report.
-    """
-
-    logit.debug(f"prod: {prod}")
-    logit.debug(f"dev: {dev}")
-    logit.debug(f"test: {test}")
-    logit.debug(f"unit-test: {unit_test}")
-    logit.debug(f"website: {website}")
-    logit.debug(f"home: {home}")
-    logit.debug(f"reports: {reports}")
-    logit.debug(f"dump: {dump}")
-    logit.debug(f"realtime: {realtime}")
-    logit.debug(f"state: {state}")
-    logit.debug(f"poll: {poll}")
-    logit.debug(f"about: {about}")
-    logit.debug(f"report: {report}")
-    logit.debug(f"event_time: {event_time}")
-    logit.debug(f"description: {description}")
-
-    if WM.setup:
-        logit.warning('app not set up, redirecting to setup')
-        response = RedirectResponse(url='/setup')
-        return response
-
+    description=None
+):
     entry_time = datetime.datetime.strftime(
-            datetime.datetime.now(tz=datetime.timezone.utc),
-            WM.config['datetime_str']
-        )
+        datetime.datetime.now(tz=datetime.timezone.utc),
+        WM.config['datetime_str']
+    )
 
     valid = False
     none_list = [prod, dev, test, unit_test, website, home, reports, dump, realtime, state, poll, about, report]
@@ -815,173 +609,24 @@ async def read_items(
         filename = 'bug_report_' + entry_time + '.json'
         with open(WM.config['bug_report_dir'] + filename, 'w') as br:
             json.dump(bug_info, br, indent=4)
+        return True
     else:
         logit.info(f"Invalid entry, skipping")
-    response = RedirectResponse(url='/')
-    return response
+        return False
 
-
-@app.get("/report", response_class=HTMLResponse)
-async def report(request: Request):
-    """
-    Saves a report to the out/ direcotry.
-    Eventually it may return the report but i dont have that working yet.
-    """
-    logit.debug('report endpoint hit')
-    if WM.setup:
-        logit.warning('app not set up, redirecting to setup')
-        response = RedirectResponse(url='/setup')
-        return response
-    data = WM.report
-    WM.clear_search()
-    return templates.TemplateResponse("report.html", {"request": request, 'dict':data})
-
-@app.get('/report/search/')
-def report_items(
-    request: Request,
-    thunderstorm=False,
-    drizzle=False,
-    rain=False,
-    snow=False,
-    atmosphere=False,
-    clouds=False,
-    clear=False,
-    exact_list=None,
-    start_time=None,
-    end_time=None):
-    """
-    Takes a query and tells the app to grab data.
-    """
-
-    logit.debug(f"report/search endpoint hit")
-    logit.debug(f"thunderstorm: {thunderstorm}")
-    logit.debug(f"drizzle: {drizzle}")
-    logit.debug(f"rain: {rain}")
-    logit.debug(f"snow: {snow}")
-    logit.debug(f"atmosphere: {atmosphere}")
-    logit.debug(f"clouds: {clouds}")
-    logit.debug(f"clear: {clear}")
-    logit.debug(f"exact_list: {exact_list}")
-    logit.debug(f"start_time: {start_time}")
-    logit.debug(f"end_time: {end_time}")
-
-    if WM.setup:
-        logit.warning('app not set up, redirecting to setup')
-        response = RedirectResponse(url='/setup')
-        return response
-
-    if thunderstorm:
-        for num in WM.config['accepted_owma_codes']['thunderstorm']:
-            exact_list += f",{str(num)}"
-
-    if drizzle:
-        for num in WM.config['accepted_owma_codes']['drizzle']:
-            exact_list += f",{str(num)}"
-
-    if rain:
-        for num in WM.config['accepted_owma_codes']['rain']:
-            exact_list += f",{str(num)}"
-
-    if snow:
-        for num in WM.config['accepted_owma_codes']['snow']:
-            exact_list += f",{str(num)}"
-
-    if atmosphere:
-        for num in WM.config['accepted_owma_codes']['atmosphere']:
-            exact_list += f",{str(num)}"
-
-    if clouds:
-        for num in WM.config['accepted_owma_codes']['clouds']:
-            exact_list += f",{str(num)}"
-
-    if clear:
-        for num in WM.config['accepted_owma_codes']['clear']:
-            exact_list += f",{str(num)}"
-
-
-    try:
-        logit.debug(f"validating exact_list")
-        exact_list = validator.is_exact_list(exact_list)
-    except ValueError:
-        exact_list = None
-
-    # If there are no dates provided, set them to one week starting on Monday
-    now = datetime.datetime.now(tz=datetime.timezone.utc)
-    while now.weekday() != 0:
-        now = now - datetime.timedelta(days=1)
-    end = now
-    start = now - datetime.timedelta(days=7)
-
-    new_start_time = validator.is_datetime(
-        datetime.datetime.strftime(start, '%Y-%m-%d')
-        )
-    new_end_time = validator.is_datetime(
-        datetime.datetime.strftime(end, '%Y-%m-%d')
-        )
-
-    try:
-        logit.debug(f"validating start_time")
-        start_time = validator.is_datetime(start_time)
-        if start_time is None:
-            raise ValueError
-    except ValueError:
-        start_time = new_start_time
-
-    try:
-        logit.debug(f"validating wnd_time")
-        end_time = validator.is_datetime(end_time)
-        if end_time is None:
-            raise ValueError
-    except ValueError:
-        end_time = new_end_time
-
-    parameters = {
-        'exact_list': exact_list,
-        'start_time': start_time,
-        'end_time': end_time,
-    }
-    report = WM.weather_report(WM.weather_dump(parameters))
-    WM.write_report(report)
-    response = RedirectResponse(url='/report')
-    return response
-
-@app.get("/api/setup", response_class=HTMLResponse)
-async def report(request: Request):
-    return "Dont forget to build this out. should run the setup stuff"
-
-@app.get("/setup", response_class=HTMLResponse)
-# async def report(request: Request):
-async def run_setup(
-    request: Request,
+def execute_setup(
     action: str = None,
-
     key: str = None,
-
     delete: List[str] = Query([]),
     newname: List[str] = Query([]),
     city: List[str] = Query([]),
-
     citySearch: str = None,
     cityId: str = None,
     stateAbbr: str = None,
     countryAbbr: str = None,
     lat: str = None,
     lon: str = None
-
-    ):
-
-    logit.debug(f"action: {action}")
-    logit.debug(f"key: {key}")
-    logit.debug(f"delete: {delete}")
-    logit.debug(f"newname: {newname}")
-    logit.debug(f"city: {city}")
-    logit.debug(f"citySearch: {citySearch}")
-    logit.debug(f"cityId: {cityId}")
-    logit.debug(f"stateAbbr: {stateAbbr}")
-    logit.debug(f"countryAbbr: {countryAbbr}")
-    logit.debug(f"lat: {lat}")
-    logit.debug(f"lon: {lon}")
-
+):
 
     # Key
     if key != None and key != '':
@@ -1033,10 +678,635 @@ async def run_setup(
                 SW.cleanup_setup_files()
             except:
                 pass
-            response = RedirectResponse(url='/')
-            return response
+            return True
         except FileNotFoundError:
             WM.setup = True
             logit.warning('app not set up yet! setting setup flag to {setup}')
+            return False
+
+# WM.setup = True
+
+def is_api_setup():
+    if WM.setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/api/setup')
+        return response
+    else:
+        return False
+
+def is_setup():
+    if WM.setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
+    else:
+        return False
+
+
+
+# Root
+@app.get('/')
+async def root(request: Request):
+    """
+    The home page has some explanation of what each tab does.
+    Eventually it would be great to have picutres of the tabs here as well.
+    """
+    logit.debug('home endpoint hit')
+    return templates.TemplateResponse("main.html", {"request": request})
+
+
+# About
+@app.get("/about-weatherman", response_class=HTMLResponse)
+async def about_weatherman(request: Request):
+    """
+    If people had more questions I wanted to have a place to answer some of them.
+    """
+    logit.debug('about-weatherman endpoint hit')
+    return templates.TemplateResponse("about_weatherman.html", {"request": request})
+
+
+# State
+@app.get('/api/state')
+async def return_api_args(request: Request):
+    """
+    The api endpoint for state.
+    """
+    logit.debug('api state endpoint hit')
+    logit.warning(f"Setup is {WM.setup}")
+    resp = is_api_setup()
+    if resp:
+        return resp
+    state_response = return_state()
+    return state_response
+
+
+@app.get('/state')
+async def return_args(request: Request):
+    """
+    This returns the state of the app.
+    Useful for some debugging.
+    """
+    logit.debug('state endpoint hit')
+    state_list = []
+    logit.warning(f"Setup is {WM.setup}")
+    resp = is_setup()
+    if resp:
+        return resp
+    for i,j in return_state():
+        if i == 'cities':
+            state_list.append(i + ':')
+            for x,y in j.items():
+                state_list.append('-' + x + ' : ' + str(y))
+        elif i == 'fh_logging':
+            state_list.append('file_logging' + ' : ' + j)
+        elif i == 'ch_logging':
+            state_list.append('consol_logging' + ' : ' + j)
+        else:
+            state_list.append(i + ' : ' + str(j))
+        logit.info(f"{i} : {j}")
+    return templates.TemplateResponse("state.html", {"request": request, 'list':state_list})
+
+
+# Poll
+@app.get('/api/poll')
+async def poll_api_data(request: Request):
+    """
+    This fires off a poll to the app.
+    """
+    logit.debug('api poll endpoint hit')
+    resp = is_api_setup()
+    if resp:
+        return resp
+    WM.manage_polling()
+
+
+@app.get('/poll')
+async def poll_data(request: Request):
+    """
+    Poll OWMA for new weather data.
+    """
+    logit.debug('about to poll data')
+    resp = is_setup()
+    if resp:
+        return resp
+    WM.manage_polling()
+    timestamp = datetime.datetime.strftime(WM.last_poll, WM.config['datetime_str'])
+    return templates.TemplateResponse("poll.html", {"request": request, "last_poll":timestamp})
+
+
+# Dump
+@app.get('/api/dump/search')
+def read_items(
+    thunderstorm=False,
+    drizzle=False,
+    rain=False,
+    snow=False,
+    atmosphere=False,
+    clouds=False,
+    clear=False,
+    exact_list=None,
+    start_time=None,
+    end_time=None):
+    """
+    Takes a query and tells the app to grab data.
+    """
+
+    logit.debug(f"dump/search endpoint hit")
+    logit.debug(f"thunderstorm: {thunderstorm}")
+    logit.debug(f"drizzle: {drizzle}")
+    logit.debug(f"rain: {rain}")
+    logit.debug(f"snow: {snow}")
+    logit.debug(f"atmosphere: {atmosphere}")
+    logit.debug(f"clouds: {clouds}")
+    logit.debug(f"clear: {clear}")
+    logit.debug(f"exact_list: {exact_list}")
+    logit.debug(f"start_time: {start_time}")
+    logit.debug(f"end_time: {end_time}")
+
+    resp = is_api_setup()
+    if resp:
+        return resp
+
+    parameters = generage_parameters(
+        thunderstorm,
+        drizzle,
+        rain,
+        snow,
+        atmosphere,
+        clouds,
+        clear,
+        exact_list,
+        start_time,
+        end_time,
+    )
+    WM.weather_dump(parameters)
+    data = WM.dump_list
+    WM.clear_search()
+    return data
+
+
+@app.get('/dump')
+async def data_dump(request: Request):
+    """
+    This returns the html to load the results from the database dump.
+    """
+    logit.debug('dump endpoint hit')
+    if WM.setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
+    data = WM.dump_list
+    WM.clear_search()
+    return templates.TemplateResponse("dump.html", {"request": request, 'list':data})
+
+
+@app.get('/dump/search/')
+def read_items(
+    request: Request,
+    thunderstorm=False,
+    drizzle=False,
+    rain=False,
+    snow=False,
+    atmosphere=False,
+    clouds=False,
+    clear=False,
+    exact_list=None,
+    start_time=None,
+    end_time=None):
+    """
+    Takes a query and tells the app to grab data.
+    """
+
+    logit.debug(f"dump/search endpoint hit")
+    logit.debug(f"thunderstorm: {thunderstorm}")
+    logit.debug(f"drizzle: {drizzle}")
+    logit.debug(f"rain: {rain}")
+    logit.debug(f"snow: {snow}")
+    logit.debug(f"atmosphere: {atmosphere}")
+    logit.debug(f"clouds: {clouds}")
+    logit.debug(f"clear: {clear}")
+    logit.debug(f"exact_list: {exact_list}")
+    logit.debug(f"start_time: {start_time}")
+    logit.debug(f"end_time: {end_time}")
+
+    resp = is_setup()
+    if resp:
+        return resp
+
+    parameters = generage_parameters(
+        thunderstorm,
+        drizzle,
+        rain,
+        snow,
+        atmosphere,
+        clouds,
+        clear,
+        exact_list,
+        start_time,
+        end_time,
+    )
+    print(parameters)
+    WM.weather_dump(parameters)
+    response = RedirectResponse(url='/dump')
+    return response
+
+
+# Bug
+@app.get("/api/bug-report/entry", response_class=HTMLResponse)
+async def read_items(
+    prod=None,
+    dev=None,
+    test=None,
+    unit_test=None,
+    website=None,
+    home=None,
+    reports=None,
+    dump=None,
+    realtime=None,
+    state=None,
+    poll=None,
+    about=None,
+    report=None,
+    event_time=None,
+    description=None):
+    """
+    Receive bug-report.
+    """
+
+    logit.debug(f"prod: {prod}")
+    logit.debug(f"dev: {dev}")
+    logit.debug(f"test: {test}")
+    logit.debug(f"unit-test: {unit_test}")
+    logit.debug(f"website: {website}")
+    logit.debug(f"home: {home}")
+    logit.debug(f"reports: {reports}")
+    logit.debug(f"dump: {dump}")
+    logit.debug(f"realtime: {realtime}")
+    logit.debug(f"state: {state}")
+    logit.debug(f"poll: {poll}")
+    logit.debug(f"about: {about}")
+    logit.debug(f"report: {report}")
+    logit.debug(f"event_time: {event_time}")
+    logit.debug(f"description: {description}")
+
+    resp = is_api_setup()
+    if resp:
+        return resp
+
+    if submit_bug(
+        prod,
+        dev,
+        test,
+        unit_test,
+        website,
+        home,
+        reports,
+        dump,
+        realtime,
+        state,
+        poll,
+        about,
+        report,
+        event_time,
+        description,
+    ):
+        return 'Successful'
+    else:
+        return 'Failed'
+
+
+@app.get("/bug-report", response_class=HTMLResponse)
+async def submit_bug_report(request: Request):
+    return templates.TemplateResponse("bug_report.html", {"request": request})
+
+
+@app.get("/bug-report/entry", response_class=HTMLResponse)
+async def read_items(
+    request: Request,
+    prod=None,
+    dev=None,
+    test=None,
+    unit_test=None,
+    website=None,
+    home=None,
+    reports=None,
+    dump=None,
+    realtime=None,
+    state=None,
+    poll=None,
+    about=None,
+    report=None,
+    event_time=None,
+    description=None):
+    """
+    Receive bug-report.
+    """
+
+    logit.debug(f"prod: {prod}")
+    logit.debug(f"dev: {dev}")
+    logit.debug(f"test: {test}")
+    logit.debug(f"unit-test: {unit_test}")
+    logit.debug(f"website: {website}")
+    logit.debug(f"home: {home}")
+    logit.debug(f"reports: {reports}")
+    logit.debug(f"dump: {dump}")
+    logit.debug(f"realtime: {realtime}")
+    logit.debug(f"state: {state}")
+    logit.debug(f"poll: {poll}")
+    logit.debug(f"about: {about}")
+    logit.debug(f"report: {report}")
+    logit.debug(f"event_time: {event_time}")
+    logit.debug(f"description: {description}")
+
+    resp = is_setup()
+    if resp:
+        return resp
+
+    if submit_bug(
+        prod,
+        dev,
+        test,
+        unit_test,
+        website,
+        home,
+        reports,
+        dump,
+        realtime,
+        state,
+        poll,
+        about,
+        report,
+        event_time,
+        description,
+    ):
+        response = RedirectResponse(url='/')
+        return response
+    else:
+        response = RedirectResponse(url='/bug-report')
+        return response
+
+
+# Report
+@app.get('/api/report/search/')
+def report_items(
+    thunderstorm=False,
+    drizzle=False,
+    rain=False,
+    snow=False,
+    atmosphere=False,
+    clouds=False,
+    clear=False,
+    exact_list=None,
+    start_time=None,
+    end_time=None):
+    """
+    Takes a query and tells the app to grab data.
+    """
+
+    logit.debug(f"report/search endpoint hit")
+    logit.debug(f"thunderstorm: {thunderstorm}")
+    logit.debug(f"drizzle: {drizzle}")
+    logit.debug(f"rain: {rain}")
+    logit.debug(f"snow: {snow}")
+    logit.debug(f"atmosphere: {atmosphere}")
+    logit.debug(f"clouds: {clouds}")
+    logit.debug(f"clear: {clear}")
+    logit.debug(f"exact_list: {exact_list}")
+    logit.debug(f"start_time: {start_time}")
+    logit.debug(f"end_time: {end_time}")
+
+    resp = is_api_setup()
+    if resp:
+        return resp
+
+    parameters = generage_parameters(
+        thunderstorm,
+        drizzle,
+        rain,
+        snow,
+        atmosphere,
+        clouds,
+        clear,
+        exact_list,
+        start_time,
+        end_time,
+    )
+    report = WM.weather_report(WM.weather_dump(parameters))
+    WM.clear_search()
+    return report
+
+@app.get("/report", response_class=HTMLResponse)
+async def report(request: Request):
+    """
+    Saves a report to the out/ direcotry.
+    Eventually it may return the report but i dont have that working yet.
+    """
+    logit.debug('report endpoint hit')
+    if WM.setup:
+        logit.warning('app not set up, redirecting to setup')
+        response = RedirectResponse(url='/setup')
+        return response
+    data = WM.report
+    WM.clear_search()
+    return templates.TemplateResponse("report.html", {"request": request, 'dict':data})
+
+@app.get('/report/search/')
+def report_items(
+    request: Request,
+    thunderstorm=False,
+    drizzle=False,
+    rain=False,
+    snow=False,
+    atmosphere=False,
+    clouds=False,
+    clear=False,
+    exact_list=None,
+    start_time=None,
+    end_time=None):
+    """
+    Takes a query and tells the app to grab data.
+    """
+
+    logit.debug(f"report/search endpoint hit")
+    logit.debug(f"thunderstorm: {thunderstorm}")
+    logit.debug(f"drizzle: {drizzle}")
+    logit.debug(f"rain: {rain}")
+    logit.debug(f"snow: {snow}")
+    logit.debug(f"atmosphere: {atmosphere}")
+    logit.debug(f"clouds: {clouds}")
+    logit.debug(f"clear: {clear}")
+    logit.debug(f"exact_list: {exact_list}")
+    logit.debug(f"start_time: {start_time}")
+    logit.debug(f"end_time: {end_time}")
+
+    resp = is_setup()
+    if resp:
+        return resp
+
+    parameters = generage_parameters(
+        thunderstorm,
+        drizzle,
+        rain,
+        snow,
+        atmosphere,
+        clouds,
+        clear,
+        exact_list,
+        start_time,
+        end_time,
+    )
+    report = WM.weather_report(WM.weather_dump(parameters))
+    WM.write_report(report)
+    response = RedirectResponse(url='/report')
+    return response
+
+
+# Setup
+@app.get("/api/setup")
+async def report(
+    action: str = None,
+    key: str = None,
+    delete: List[str] = Query([]),
+    newname: List[str] = Query([]),
+    city: List[str] = Query([]),
+    citySearch: str = None,
+    cityId: str = None,
+    stateAbbr: str = None,
+    countryAbbr: str = None,
+    lat: str = None,
+    lon: str = None
+    ):
+
+    logit.debug(f"action: {action}")
+    logit.debug(f"key: {key}")
+    logit.debug(f"delete: {delete}")
+    logit.debug(f"newname: {newname}")
+    logit.debug(f"city: {city}")
+    logit.debug(f"citySearch: {citySearch}")
+    logit.debug(f"cityId: {cityId}")
+    logit.debug(f"stateAbbr: {stateAbbr}")
+    logit.debug(f"countryAbbr: {countryAbbr}")
+    logit.debug(f"lat: {lat}")
+    logit.debug(f"lon: {lon}")
+
+    execute_setup(
+        action,
+        key,
+        delete,
+        newname,
+        city,
+        citySearch,
+        cityId,
+        stateAbbr,
+        countryAbbr,
+        lat,
+        lon,
+    )
+    return SW.setup_dct()
+
+@app.get("/setup", response_class=HTMLResponse)
+# async def report(request: Request):
+async def run_setup(
+    request: Request,
+    action: str = None,
+
+    key: str = None,
+
+    delete: List[str] = Query([]),
+    newname: List[str] = Query([]),
+    city: List[str] = Query([]),
+
+    citySearch: str = None,
+    cityId: str = None,
+    stateAbbr: str = None,
+    countryAbbr: str = None,
+    lat: str = None,
+    lon: str = None
+    ):
+
+    logit.debug(f"action: {action}")
+    logit.debug(f"key: {key}")
+    logit.debug(f"delete: {delete}")
+    logit.debug(f"newname: {newname}")
+    logit.debug(f"city: {city}")
+    logit.debug(f"citySearch: {citySearch}")
+    logit.debug(f"cityId: {cityId}")
+    logit.debug(f"stateAbbr: {stateAbbr}")
+    logit.debug(f"countryAbbr: {countryAbbr}")
+    logit.debug(f"lat: {lat}")
+    logit.debug(f"lon: {lon}")
+
+
+    # # Key
+    # if key != None and key != '':
+    #     SW.key = key
+
+    # # Search parameterse
+    # if citySearch != None and citySearch != '':
+    #     SW.update_parameters('name', citySearch)
+    # if cityId != None and cityId != '':
+    #     SW.update_parameters('id', cityId)
+    # if stateAbbr != None and stateAbbr != '':
+    #     SW.update_parameters('state', stateAbbr)
+    # if countryAbbr != None and countryAbbr != '':
+    #     SW.update_parameters('country', countryAbbr)
+    # if lat != None and lat != '':
+    #     SW.update_parameters('lat', lat)
+    # if lon != None and lon != '':
+    #     SW.update_parameters('lon', lon)
+
+    # # Modifying to list
+    # ## Updating
+    # location_lst = [(k,v) for k,v in SW.locations.items()]
+    # for index, element in enumerate(newname):
+    #     if element != '':
+    #         SW.update_locations(location_lst[index][0], element)
+    # ## Removing
+    # location_lst = [(k,v) for k,v in SW.locations.items()]
+    # if delete != ['']:
+    #     for tup in location_lst:
+    #         if tup[1] in delete:
+    #             SW.remove_location(tup[0])
+    # ## Adding
+    # for element in city:
+    #     element_info = element.split('=')
+    #     SW.add_locations(element_info[0], element_info[1])
+
+    # if action == 'refresh':
+    #     print('Refreshing ')
+    # elif action == 'setup':
+    #     print('Setting up app')
+    #     SW.verify_directories()
+    #     SW.create_key_file()
+    #     SW.create_locations_file()
+    #     try:
+    #         WM.__init__()
+    #         WM.setup = False
+    #         WM.state['setup_needed'] = WM.setup
+    #         try:
+    #             SW.cleanup_setup_files()
+    #         except:
+    #             pass
+    #         response = RedirectResponse(url='/')
+    #         return response
+    #     except FileNotFoundError:
+    #         WM.setup = True
+    #         logit.warning('app not set up yet! setting setup flag to {setup}')
+
+    if execute_setup(
+        action,
+        key,
+        delete,
+        newname,
+        city,
+        citySearch,
+        cityId,
+        stateAbbr,
+        countryAbbr,
+        lat,
+        lon,
+    ):
+        response = RedirectResponse(url='/')
+        return response
 
     return templates.TemplateResponse("setup.html", {"request": request, 'dict':SW.setup_dct()})

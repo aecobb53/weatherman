@@ -104,7 +104,7 @@ It was mostly for myself but I figured if im writing it down for myself I might 
     - [Unit](docs/testing.md#unit)
 - [Open Weather Map API](docs/open_weather_map_api.md)
 - [Catchall](docs/catchall.md)
-    - [TODO](docs/catchall.md#todo)
+    - [TODO](https://github.com/aecobb53/weatherman/issues)
     - [Links](docs/catchall.md#links)
     - [Resources](docs/catchall.md#resources)
 
