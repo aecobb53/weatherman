@@ -427,6 +427,23 @@ class WeatherMan:
 Spin up the app using fastapp and uvicorn. See the docker-compose file for whats
 actually run
 """
+
+def return_state():
+    state_list = []
+    for i,j in WM.state.items():
+        if i == 'cities':
+            state_list.append(i + ':')
+            for x,y in j.items():
+                state_list.append('-' + x + ' : ' + str(y))
+        elif i == 'fh_logging':
+            state_list.append('file_logging' + ' : ' + j)
+        elif i == 'ch_logging':
+            state_list.append('consol_logging' + ' : ' + j)
+        else:
+            state_list.append(i + ' : ' + str(j))
+        logit.info(f"{i} : {j}")
+    return state_list
+
 app = FastAPI()
 global WM
 WM = WeatherMan()
@@ -470,7 +487,28 @@ async def return_api_args(request: Request):
     The api endpoint for state.
     """
     logit.debug('api state endpoint hit')
-    return WM.state
+    state_list = []
+    logit.warning(f"Setup is {WM.setup}")
+    # if WM.setup:
+    #     logit.warning('app not set up, redirecting to setup')
+    #     response = RedirectResponse(url='/setup')
+    #     return response
+    # for i,j in WM.state.items():
+    #     if i == 'cities':
+    #         state_list.append(i + ':')
+    #         for x,y in j.items():
+    #             state_list.append('-' + x + ' : ' + str(y))
+    #     elif i == 'fh_logging':
+    #         state_list.append('file_logging' + ' : ' + j)
+    #     elif i == 'ch_logging':
+    #         state_list.append('consol_logging' + ' : ' + j)
+    #     else:
+    #         state_list.append(i + ' : ' + str(j))
+    #     logit.info(f"{i} : {j}")
+    state_list = return_state()
+    # return {'hello':'world!'}
+    return state_list
+    # return WM.state
 
 
 @app.get('/state')
@@ -480,25 +518,70 @@ async def return_args(request: Request):
     Useful for some debugging.
     """
     logit.debug('state endpoint hit')
-    state_list = []
+    # state_list = []
     logit.warning(f"Setup is {WM.setup}")
     if WM.setup:
         logit.warning('app not set up, redirecting to setup')
         response = RedirectResponse(url='/setup')
         return response
-    for i,j in WM.state.items():
-        if i == 'cities':
-            state_list.append(i + ':')
-            for x,y in j.items():
-                state_list.append('-' + x + ' : ' + str(y))
-        elif i == 'fh_logging':
-            state_list.append('file_logging' + ' : ' + j)
-        elif i == 'ch_logging':
-            state_list.append('consol_logging' + ' : ' + j)
-        else:
-            state_list.append(i + ' : ' + str(j))
-        logit.info(f"{i} : {j}")
+    # for i,j in WM.state.items():
+    #     if i == 'cities':
+    #         state_list.append(i + ':')
+    #         for x,y in j.items():
+    #             state_list.append('-' + x + ' : ' + str(y))
+    #     elif i == 'fh_logging':
+    #         state_list.append('file_logging' + ' : ' + j)
+    #     elif i == 'ch_logging':
+    #         state_list.append('consol_logging' + ' : ' + j)
+    #     else:
+    #         state_list.append(i + ' : ' + str(j))
+    #     logit.info(f"{i} : {j}")
+    state_list = []
+    # response = RedirectResponse(url='/api/state')
+    # url = app.url_path_for('return_api_args')
+    # response = RedirectResponse(url=url)
+    # print(response)
+    # print(response.__dict__.keys())
+    # print(response.txt)
+    # print(response.json())
+    # print(response.body)
+    # print(response.__dict__.keys())
+    # print(response)
+    # return response
+
+    # response = RedirectResponse(url='/api/state')
+    # print(response)
+    # print(response.json())
+
+    state_list = return_state()
     return templates.TemplateResponse("state.html", {"request": request, 'list':state_list})
+
+# @app.get('/state')
+# async def return_args(request: Request):
+#     """
+#     This returns the state of the app.
+#     Useful for some debugging.
+#     """
+#     logit.debug('state endpoint hit')
+#     state_list = []
+#     logit.warning(f"Setup is {WM.setup}")
+#     if WM.setup:
+#         logit.warning('app not set up, redirecting to setup')
+#         response = RedirectResponse(url='/setup')
+#         return response
+#     for i,j in WM.state.items():
+#         if i == 'cities':
+#             state_list.append(i + ':')
+#             for x,y in j.items():
+#                 state_list.append('-' + x + ' : ' + str(y))
+#         elif i == 'fh_logging':
+#             state_list.append('file_logging' + ' : ' + j)
+#         elif i == 'ch_logging':
+#             state_list.append('consol_logging' + ' : ' + j)
+#         else:
+#             state_list.append(i + ' : ' + str(j))
+#         logit.info(f"{i} : {j}")
+#     return templates.TemplateResponse("state.html", {"request": request, 'list':state_list})
 
 
 @app.get('/api/poll')
