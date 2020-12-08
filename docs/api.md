@@ -4,11 +4,11 @@ All api endpoints start with an `/api` tag in the endpoint.
 So `http://localhost:/api/state` for example. 
 
 - [/state](#state)
-- [/poll](#\/poll)
-- [/dump/search](#/dump/search)
-- [/report/search](#/report/search)
-- [/bug](#/bug)
-- [/setup](#/setup)
+- [/poll](#poll)
+- [/dump/search](#dump/search)
+- [/report/search](#report/search)
+- [/bug](#bug)
+- [/setup](#setup)
 - [Web API](#web-api)
 
 
