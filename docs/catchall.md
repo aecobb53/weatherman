@@ -2,25 +2,9 @@
 
 ## Table of contents
 
-- [TODO](#todo)
+- [TODO](https://github.com/aecobb53/weatherman/issues)
 - [Links](#links)
 - [Resources](#resources)
-
-## TODO
-
-- ~~db structure in the readme.~~
-- log rotating.
-- ~~Add to report the worst conditions of a storm.~~
-- Condensed sql db. As in a report database for longer term trending. 
-- ~~Set import versions in the requirements file~~
-- Transition off a crontab
-- If i have different docker-compose &| Dockerfiles change the requirements.txt file to only include the testing for tests.
-- Update the readme api
-- Enable dump and reports for specific locations.
-    - temperature
-    - winds
-- Try to move the dump and report guts to another function so it can be called easier
-- Add `build` explanation to the readme files.
 
 ## Links
 

@@ -23,10 +23,24 @@ clean () {
         fi
 
     }
+
+    remove_file () {
+        PAUSETIMER=5
+        if [ -f ${1} ]; then
+            echo ''
+            echo "About to delete file '${1}'. Pausing for ${PAUSETIMER} to silently confirm consent."
+            sleep ${PAUSETIMER}
+            rm -f ${1}
+        fi
+        echo 'Delete successful, continuing'
+    }
+
     DATE=$(date '+%Y%m%d%H%M%S')
     move_file "logs/" "weatherman.log" "logs/archive/" "${DATE}_"
     move_file "logs/" "weatherman_startup.log" "logs/archive/" "${DATE}_"
     move_file "logs/" "weatherman_dev.log" "logs/archive/" "${DATE}_"
+
+    remove_file "etc/city_list.gz"
 
     echo "Done!"
 }

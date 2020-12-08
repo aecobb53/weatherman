@@ -22,7 +22,7 @@ url = config['owma_url']
 
 
 # Argparse
-aparse = argparse.ArgumentParser(description='Task Warrior TMUX wrapper')
+aparse = argparse.ArgumentParser(description='weather butler tool')
 aparse.add_argument('-get_response',                action='store_true', help="url, args")
 aparse.add_argument('-format_request_city_id_list', action='store_true', help="url, city_id_list, key")
 aparse.add_argument('-format_response',             action='store_true', help="data")
