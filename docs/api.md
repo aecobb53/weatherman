@@ -6,7 +6,7 @@ So `http://localhost:/api/state` for example.
 - [/state](#state)
 - [/poll](#poll)
 - [/dump/search](#dumpsearch)
-- [/report/search](#report-search)
+- [/report/search](#reportsearch)
 - [/bug](#bug)
 - [/setup](#setup)
 - [Web API](#web-api)
