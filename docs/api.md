@@ -223,6 +223,9 @@ I look through the results and want to use `Denver City` and `Denver County`.
 I will add `{"city":["Denver=5520110", "DenverCounty=5419396"]}` to the arguments. 
 If I refresh I will see them in the list of locations. 
 These two locations have different names but if i grabbed locations that share the same name I would see "*" appear after the city name. 
+To update the names of the citynames I would run `newname` with a list of all the new names. 
+There should be a line of text in the terminal that shows what the list of locations was to make it easier toupdate it. 
+I would use `newname=['den','Denver county']` to update the two city names. 
 To delete an element of the list provide the city id as seen here `{"delete":"5419396"}`. 
 The biggest difference between the web gui and the API is the rename ability. 
 I have been unable to add it to the API so I reccomend selecting the name of the city when you pick the city. 

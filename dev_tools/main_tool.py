@@ -245,6 +245,11 @@ if args.setup:
                 arg_dct['delete'].append(value)
             if key == 'newname':
                 print('renaming is currently turned off')
+                # value = list(value)
+                value = value[1:-1].split(',')
+                print(type(value))
+                print(str(value))
+                arg_dct['newname'] = value
                 # if 'newname' not in arg_dct.keys():
                 #     arg_dct['newname'] = []
                 # print(data['locations'])
@@ -281,6 +286,12 @@ if args.setup:
             print(f"{tab}results:")
             for thing in values:
                 print(f"{tab*2}{thing}")
+
+    print('')
+    print('Here is the list of elements to replace to make copy/paste/replace easier if you need to')
+    newstr = "'" + "','".join([item for item in data['locations'].keys()]) + "'"
+    print(f"newname=[{newstr}]")
+    
     print('')
     print("To rename a city from the locations list above add newname=<ID>")
     print("To remove a city from the locations list above add delete=<ID>")
