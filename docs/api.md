@@ -27,6 +27,8 @@ Currently the information is similar to this json:
         {"example-city": 123456}
     ],
     "setup_needed": false,
+    "timing_intervul": 5,
+    "auto_polling":true,
     "fh_logging": "DEBUG",
     "ch_logging": "DEBUG"
 }
