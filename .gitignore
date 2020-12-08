@@ -2,8 +2,8 @@
 db/*
 etc/weather_api_private.json
 etc/weather_api_private.yml
-etc/key.json
-etc/key.yml
+etc/*key.json
+etc/*key.yml
 out/*
 logs/*
 
