@@ -163,13 +163,10 @@ if args.report:
         run_setup()
     for city, storms in data.items():
         print('')
-        # print(city)
         for index, storm in enumerate(storms):
             print(f"{tab}{city} storm:{index}")
             for line in storm:
                 print(tab*2 + str(line))
-            # print(len(line))
-            # print(tab + str(line))
 
 def print_setup_help():
     print('Args for setup:')
@@ -244,22 +241,8 @@ if args.setup:
                     arg_dct['delete'] = []
                 arg_dct['delete'].append(value)
             if key == 'newname':
-                print('renaming is currently turned off')
-                # value = list(value)
                 value = value[1:-1].split(',')
-                print(type(value))
-                print(str(value))
                 arg_dct['newname'] = value
-                # if 'newname' not in arg_dct.keys():
-                #     arg_dct['newname'] = []
-                # print(data['locations'])
-                # for name, number in data['locations'].items():
-                #     print(name, number)
-                #     if value == name:
-                #         print(f'names match {value} {name}')
-                #     else:
-                #         print(f'names dont match {value} {name}')
-                # # arg_dct['newname'].append(value)
             if key == 'city':
                 if 'city' not in arg_dct.keys():
                     arg_dct['city'] = []
@@ -278,9 +261,6 @@ if args.setup:
 
         if category == 'parameters':
             pass
-            # print(f"{tab}Search parameters used:")
-            # for k, v in values.items():
-            #     print(f"{tab*2}{k}: {v}")
 
         if category == 'results':
             print(f"{tab}results:")
