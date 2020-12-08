@@ -106,11 +106,11 @@ class WeatherMan:
         self.db_name += self.config['environments'][environment]['db_addition']
         self.db = sql_butler.SQLButler(self.db_name)
         self.db.create_database()
-        self.timing_intervul = self.set_timing_intervul()
         if os.environ.get('AUTOPULLING') == 'True':
             self.auto_polling = True
         else:
             self.auto_polling = False
+        self.timing_intervul = self.set_timing_intervul()
 
         self.state['env'] = environment
         self.state['testing'] = self.config['environments'][environment]['testing_flag']
@@ -129,8 +129,8 @@ class WeatherMan:
         self.state['db_name'] += '.sql'
         self.state['working_directory'] = self.config['environments'][environment]['docker_working_dir']
         self.state['in_docker'] = True
-        self.state['timing_intervul'] = self.timing_intervul
         self.state['auto_polling'] = self.auto_polling
+        self.state['timing_intervul'] = self.timing_intervul
 
         logit.info(f"Starting in {environment}")
         logit.info(f"logging levels set to fh:{self.state['fh_logging']} ch:{self.state['ch_logging']} testing:{self.testing}")
@@ -435,13 +435,18 @@ class WeatherMan:
         If it is auto, it will calculate the minimum number of minutes between polls and take the largest value
         between that and the minimum poll timer in the config.
         """
-        if intervul == 'auto':
-            calls_made = len(self.state['cities'].keys())
-            month_minute_converion = 60 * 24 * self.config['estemated_days_per_month']
-            minimum_intervul = month_minute_converion / self.config['max_calls_per_month'] * calls_made
-            intervul = minimum_intervul
-        self.timing_intervul = max(intervul, self.config['minimum_poll_time'])
-        self.state['timing_intervul'] = self.timing_intervul
+        try:
+            if intervul == 'auto':
+                calls_made = len(self.state['cities'].keys())
+                month_minute_converion = 60 * 24 * self.config['estemated_days_per_month']
+                minimum_intervul = month_minute_converion / self.config['max_calls_per_month'] * calls_made
+                intervul = minimum_intervul
+            self.timing_intervul = max(intervul, self.config['minimum_poll_time'])
+            self.state['timing_intervul'] = self.timing_intervul
+        except:
+            self.timing_intervul = self.config['minimum_poll_time']
+            self.auto_polling = False
+        self.state['auto_polling'] = self.auto_polling
         return self.timing_intervul
 
 
@@ -732,9 +737,13 @@ def timing_of_app(time_to_poll=WM.timing_intervul):
     """
     If auto polling is active it will poll on the designated time interul.
     """
+    print(WM.auto_polling)
     while True:
-        if WM.auto_polling:
-            WM.manage_polling()
+        try:
+            if WM.auto_polling:
+                WM.manage_polling()
+        except:
+            pass
         time.sleep(time_to_poll * 60)
 auto_poller = threading.Thread(target=timing_of_app)
 auto_poller.daemon = True
