@@ -170,3 +170,6 @@ verify_directories:
     - logs/archive/
     - logs/behave/old/
 yaml_indent: '    '
+max_calls_per_month: 1000000
+estemated_days_per_month: 31
+minimum_poll_time: 5
