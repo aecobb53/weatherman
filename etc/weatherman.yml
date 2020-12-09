@@ -29,18 +29,19 @@ environments:
         db_addition: '_dev'
         docker_working_dir: /usr/src/
         log_parameters:
-            log_suffix: 'dev'
-            # f_level: null
-            # c_level: null
-            # log_rolling: null
-            # log_directory: null
-            # log_prefix: null
-            # log_suffix: null
-            # app_name_in_file: null
-            # date_in_file: null
-            # time_in_file: null
-            # utc_in_file: null
-            # short_datetime: null
+            f_level: DEBUG
+            c_level: DEBUG
+            log_rolling: size
+            maxBytes: 100
+            backupCount: 5
+            log_directory: logs
+            log_prefix: None
+            log_suffix: dev
+            app_name_in_file: True
+            date_in_file: False
+            time_in_file: False
+            utc_in_file: False
+            short_datetime: False
     testing:
         env: test
         file_handler_level: DEBUG

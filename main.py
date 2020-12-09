@@ -100,6 +100,20 @@ class WeatherMan:
 
         logger.update_file_level(self.config['environments'][environment]['file_handler_level'])
         logger.update_consol_level(self.config['environments'][environment]['consol_handler_level'])
+        print(self.config['environments'][environment]['log_parameters'])
+        testdct = {
+            'log_rolling': self.config['environments'][environment]['log_parameters']['log_rolling'],
+            'maxBytes': self.config['environments'][environment]['log_parameters']['maxBytes'],
+            'backupCount': self.config['environments'][environment]['log_parameters']['backupCount'],
+
+            'when': self.config['environments'][environment]['log_parameters']['when'],
+            'interval': self.config['environments'][environment]['log_parameters']['interval'],
+            'utc': self.config['environments'][environment]['log_parameters']['utc']
+        }
+        print(testdct)
+        logger.add_rotation(testdct)
+        testdct['log_rolling']='time'
+        logger.add_rotation(testdct)
         self.environment = environment
         self.testing = self.config['environments'][environment]['testing_flag']
         self.working_directory = self.config['environments'][environment]['docker_working_dir']
@@ -117,15 +131,58 @@ class WeatherMan:
         self.state['db_name'] += self.config['environments'][environment]['db_addition']
         self.state['fh_logging'] = self.config['environments'][environment]['file_handler_level']
         self.state['ch_logging'] = self.config['environments'][environment]['consol_handler_level']
-        if self.config['environments'][environment]['log_parameters']['log_suffix'] == 'None':
-            log_suffix = None
-        else:
-            log_suffix = self.config['environments'][environment]['log_parameters']['log_suffix']
+
+        # logfile
+        log_dct = {'appname':self.name}
+        for k, v in self.config['environments'][environment]['log_parameters'].items():
+            if v == 'None':
+                log_dct[k] = None
+            else:
+                log_dct[k] = v
+        print(log_dct)
+        # logger = logger.Logger(
+        #     log_dct['appname'],
+        #     f_level=log_dct['f_level'],
+        #     c_level=log_dct['c_level'],
+        #     log_rolling=log_dct['log_rolling'],
+        #     maxBytes=log_dct['maxBytes'],
+        #     backupCount=log_dct['backupCount'],
+        #     log_directory=log_dct['log_directory'],
+        #     log_prefix=log_dct['log_prefix'],
+        #     log_suffix=log_dct['log_suffix'],
+        #     app_name_in_file=log_dct['app_name_in_file'],
+        #     date_in_file=log_dct['date_in_file'],
+        #     time_in_file=log_dct['time_in_file'],
+        #     utc_in_file=log_dct['utc_in_file'],
+        #     short_datetime=log_dct['short_datetime']
+        # )
+        # logit = logger.return_logit()
+        # default_log_file = logger.log_file
         self.state['log_file'] = logger.update_file(
-            self.name,
-            app_name_in_file=True,
-            log_suffix=log_suffix
+            log_dct['appname'],
+            f_level=log_dct['f_level'],
+            c_level=log_dct['c_level'],
+            log_rolling=log_dct['log_rolling'],
+            maxBytes=log_dct['maxBytes'],
+            backupCount=log_dct['backupCount'],
+            log_directory=log_dct['log_directory'],
+            log_prefix=log_dct['log_prefix'],
+            log_suffix=log_dct['log_suffix'],
+            app_name_in_file=log_dct['app_name_in_file'],
+            date_in_file=log_dct['date_in_file'],
+            time_in_file=log_dct['time_in_file'],
+            utc_in_file=log_dct['utc_in_file'],
+            short_datetime=log_dct['short_datetime']
         )
+        # if self.config['environments'][environment]['log_parameters']['log_suffix'] == 'None':
+        #     log_suffix = None
+        # else:
+        #     log_suffix = self.config['environments'][environment]['log_parameters']['log_suffix']
+        # self.state['log_file'] = logger.update_file(
+        #     self.name,
+        #     app_name_in_file=True,
+        #     log_suffix=log_suffix
+        # )
         self.state['db_name'] += '.sql'
         self.state['working_directory'] = self.config['environments'][environment]['docker_working_dir']
         self.state['in_docker'] = True

@@ -177,12 +177,14 @@ The **kwargs as displayed below.
 Half the list is provided strings to use directly the other needs boolean. 
 The boolean is explicit so `True/False` or `1/0`.
 `'False'` is considered a string and returns `True`. 
+In the table there are two sections but all are kwargs. 
+The top section are the main ones and the ones after the break only apply to the `log_rolling` feature. 
 
 | kwarg | What it does | input type |
 | --- | --- | --- |
 | `f_level`          | Update the file logging level                | string |
 | `c_level`          | Update the command line logging level        | string |
-| `log_rolling`      | Set log rotating (not working yet)           | string |
+| `log_rolling`      | Set log rotating (`size` or `time`)          | string |
 | `log_directory`    | Set a logging directory (default is `logs/`) | string |
 | `log_prefix`       | Set a prefix in the log file name            | string |
 | `log_suffix`       | Set a suffix in the log file name            | string |
@@ -191,16 +193,22 @@ The boolean is explicit so `True/False` or `1/0`.
 | `time_in_file`     | Add the tiem to the log file name            | boolean |
 | `utc_in_file`      | Switch the file name timestamps to utc       | boolean |
 | `short_datetime`   | Shorten the dates                            | boolean |
+| ---                | ---                                          | --- |
+| `maxBytes`         | Max size the file gets in bytes (`size`)     | string |
+| `backupCount`      | Number of backups kept (`size` and `time`)   | string |
+| `when`             | Time type of rollover (`time`)               | string |
+| `interval`         | Intervul of rollover (`time`)                | string |
+| `utc`              | Timestamp in utc (`time`)                    | boolean |
 
 An example of how to set up the logfile in the init phase:
 
 ```python
-logger = Logger('<app_name>',\
-    app_name_in_file=True,\
-    date_in_file=True,\
-    time_in_file=True,\
-    utc_in_file=True,\
-    short_datetime=True,\
+logger = Logger('<app_name>',
+    app_name_in_file=True,
+    date_in_file=True,
+    time_in_file=True,
+    utc_in_file=True,
+    short_datetime=True,
     log_prefix='dev')
 ```
 
@@ -225,6 +233,12 @@ logger = logger.Logger('weatherman', app_name_in_file=True)
 logit = logger.return_logit()
 logit.debug('logger and logit are set up')
 ```
+
+**Rolling**
+If you decide to use log rolling there are two types file size and on a timer. 
+Either can be specified by setting the `log_rolling` kwarg to either `size` or `time`. 
+The size then needs both `maxBytes` and `backupCount` set.
+Time needs `when`, `backupCount`, `interval`, and `utc`. 
 
 ---
 
