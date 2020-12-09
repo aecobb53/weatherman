@@ -32,8 +32,16 @@ class Logger(Borg):
             'utc_in_file':None,
             'short_datetime':None
         }
-
-        # Update teh state form the kwargs
+        self.rotating_values = {
+            'maxBytes':None,
+            'backupCount':None,
+            'when':None,
+            'interval':None,
+            'backupCount':None,
+            'utc':None
+        }
+    
+        # Update the state form the kwargs
         self.set_state(kwargs)
 
         # creating the logging object
@@ -65,20 +73,10 @@ class Logger(Borg):
         else:
             self._update_consol_level(self.state['c_level'])
 
-        
 
         # create formatter and add it to the handlers
         # Move into if statement based on kwargs?
         self.formatter = logging.Formatter('%(asctime)s %(levelname)s %(module)s %(funcName)s - %(message)s', '%Y-%m-%dT%H:%M:%SZ')
-
-
-        # create sublogger stuff
-
-
-        # Log rotating
-        # Move into if statement based on kwargs
-        #fh = logging.handlers.TimedRotatingFileHandler('logs/testlog.log', when='midnight',interval=1,backupCount=30)
-
         
         # Adds the formatter to the logging object
         self.fh.setFormatter(self.formatter)
@@ -88,6 +86,14 @@ class Logger(Borg):
         # Add the handlers to the logging object
         self.logger.addHandler(self.fh)
         self.logger.addHandler(self.ch)
+
+        # create sublogger stuff
+
+
+        # Log rotating
+        if self.state['log_rolling'] != None:
+            self.add_rotation()
+
 
     def set_state(self, kwargs):
         """
@@ -145,6 +151,26 @@ class Logger(Borg):
                     self.state['short_datetime'] = True
                 else:
                     self.state['short_datetime'] = False
+
+            """set rotator values"""
+            if k == 'maxBytes':
+                self.rotating_values['maxBytes'] = v
+
+            if k == 'backupCount':
+                self.rotating_values['backupCount'] = v
+
+            if k == 'when':
+                self.rotating_values['when'] = v
+
+            if k == 'interval':
+                self.rotating_values['interval'] = v
+
+            if k == 'backupCount':
+                self.rotating_values['backupCount'] = v
+
+            if k == 'utc':
+                self.rotating_values['utc'] = v
+
         return self.state
 
     def set_file(self, app_name):
@@ -291,7 +317,55 @@ class Logger(Borg):
         self._update_consol_level(new_level)
         self.logger.addHandler(self.ch)
 
+    def _size_rotation(self, maxBytes, backupCount):
+        """
+        Create a size rotation
+        """
+        size_rotator = logging.handlers.RotatingFileHandler(
+            self.log_file,
+            maxBytes=maxBytes,
+            backupCount=backupCount
+        )
+        self.logger.addHandler(size_rotator)
+        return self.logger
 
+    def _time_rotation(self, when, interval, backupCount, utc):
+        """
+        Create a time rotation
+        """
+        if when not in ['S', 'M', 'H', 'D', 'W0', 'W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'midnight']:
+            when = 'midnight'
+        if utc == None:
+            utc = True
+
+        time_rotator = logging.handlers.TimedRotatingFileHandler(
+            self.log_file,
+            when=when,
+            interval=interval,
+            backupCount=backupCount,
+            utc=utc
+        )
+        self.logger.addHandler(time_rotator)
+        return self.logger
+
+    def add_rotation(self, value_dct={}):
+        """
+        Add a rotation to an existing logger
+        """
+        self.set_state(value_dct)
+        if self.state['log_rolling'] == 'size':
+            self._size_rotation(
+                self.rotating_values['maxBytes'],
+                self.rotating_values['backupCount']
+            )
+        if self.state['log_rolling'] == 'time':
+            self._time_rotation(
+                self.rotating_values['when'],
+                self.rotating_values['interval'],
+                self.rotating_values['backupCount'],
+                self.rotating_values['utc']
+            )
+        return self.logger
 
 
 # logger = Logger('the_tester',\
