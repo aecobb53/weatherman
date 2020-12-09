@@ -17,11 +17,14 @@ from typing import Optional, List
 import weather_butler
 import data_validator
 import setup_weatherman
+import sql_butler # This was in the main init... why?
 
+appname = 'weatherman'
+master_config_path = 'etc/weatherman.yml'
 
 # Logging
 import logger
-logger = logger.Logger('weatherman', app_name_in_file=True, log_suffix='startup')
+logger = logger.Logger(appname, app_name_in_file=True, log_suffix='startup')
 logit = logger.return_logit()
 default_log_file = logger.log_file
 
@@ -32,40 +35,45 @@ class WeatherMan:
     Historic weather data is hard to comeby. There is Weatherunderground but it would just
     be easier to gather the data and generate our own reports.
     I gather my weather data from https://openweathermap.org.
-    Its free but you need to have an account an API key which i chose not to upload.
-
-    Another useful link https://openweathermap.org/weather-conditions.
-    It has all the weather codes and descriptions.
-    2XX Thunderstorm
-    3XX Drizzle
-    5XX Rain
-    6XX Snow
-    7XX Atmosphere
-    800 Clear
-    80X Clouds
-    Yep Rain and Drizzle are different... and after 399 comes 500... logic.
-
-    There is not a good way to archive things right now. I am considering adding a cron
-    to archve the databases and stop/start the container to reset everyting...I havnt tested
-    what happens if you just move the database after the script thinks its spun up...
-    Maybe I should add a try loop... << Note to self
     """
 
 
     def __init__(self):
 
-        # Load config file and set some parameters
-        self.master_config = 'etc/weatherman.yml'
-        with open(self.master_config) as ycf:
+        # ENV
+        environment = os.environ.get('ENVIRONMENT')
+        testing = os.environ.get('TESTING')
+        autopolling = os.environ.get('AUTOPOLLING')
+
+        # Config
+        with open(master_config_path) as ycf:
             self.config = yaml.load(ycf, Loader=yaml.FullLoader)
-
-        logit.info(f"lines of the config")
-        logit.info(f"Yml config {json.dumps(self.config)}")
-
-        self.name = self.config['name']
-        self.private_config_path = self.config['private_config_path']
-        self.db_name = self.config['db_name'] # The type will be appended in the db
         self.setup = False
+
+        # Logging
+        logging_dct = self.config['environments'][environment]['log_parameters']
+        for k,v in logging_dct:
+            if v == 'None':
+                logging_dct[k] = None
+        logger.update_file(
+            appname,
+            f_level=logging_dct['f_level'],
+            c_level=logging_dct['c_level'],
+            log_rolling=logging_dct['log_rolling'],
+            maxBytes=logging_dct['maxBytes'],
+            backupCount=logging_dct['backupCount'],
+            log_directory=logging_dct['log_directory'],
+            log_prefix=logging_dct['log_prefix'],
+            log_suffix=logging_dct['log_suffix'],
+            app_name_in_file=logging_dct['app_name_in_file'],
+            date_in_file=logging_dct['date_in_file'],
+            time_in_file=logging_dct['time_in_file'],
+            utc_in_file=logging_dct['utc_in_file'],
+            short_datetime=logging_dct['short_datetime']
+        )
+        logger.add_rotation()
+
+        # Variables
         try:
             self.weather_butler = weather_butler.WeatherButler(
                 self.config['private_config_path'],
@@ -73,39 +81,98 @@ class WeatherMan:
                 self.config['key_path']
             )
         except FileNotFoundError:
-            logit.warning('setup files not found. Need to set up to use')
             self.setup = True
-
-        self.state = self.config['starting_state']
+        
         try:
             with open(self.private_config_path) as configfile:
                 self.config.update(yaml.load(configfile, Loader=yaml.FullLoader))
-            self.state['cities'] = self.config['locations']
+            # self.state['cities'] = self.config['locations']
         except FileNotFoundError:
-            logit.warning('setup files not found. Need to set up to use')
             self.setup = True
+        self.db = sql_butler.SQLButler(self.db_name)
+        self.db.create_database()
 
-        self.state['setup_needed'] = self.setup
+        # State
+        # self.state = self.config['starting_state']
 
-        # Setup and more state setting
-        import sql_butler
-        if os.environ.get('ENVIRONMENT') == 'prod':
-            environment = 'prod'
-        elif os.environ.get('ENVIRONMENT') == 'dev':
-            environment = 'dev'
-        elif os.environ.get('ENVIRONMENT') == 'test':
-            environment = 'test'
-        else:
-            raise TypeError('The environment is not recognized. App closing')
 
-        logger.update_file_level(self.config['environments'][environment]['file_handler_level'])
-        logger.update_consol_level(self.config['environments'][environment]['consol_handler_level'])
-        testdct = {
-            'log_rolling': self.config['environments'][environment]['log_parameters']['log_rolling'],
-            'maxBytes': self.config['environments'][environment]['log_parameters']['maxBytes'],
-            'backupCount': self.config['environments'][environment]['log_parameters']['backupCount'],
-        }
-        logger.add_rotation(testdct)
+        env
+        config
+        logging
+        variables
+
+
+        state
+        db_name
+        env
+        cities
+        setup_needed
+        timing intervul
+        auto_polling
+        file_logging
+        consol_logging
+        
+        log_file
+        working_directory
+        
+
+
+
+
+
+
+        # # Load config file and set some parameters
+        # self.master_config = 'etc/weatherman.yml'
+        # with open(self.master_config) as ycf:
+        #     self.config = yaml.load(ycf, Loader=yaml.FullLoader)
+
+        # logit.info(f"lines of the config")
+        # logit.info(f"Yml config {json.dumps(self.config)}")
+
+        # self.name = self.config['name']
+        # self.private_config_path = self.config['private_config_path']
+        # self.db_name = self.config['db_name'] # The type will be appended in the db
+        # self.setup = False
+        # try:
+        #     self.weather_butler = weather_butler.WeatherButler(
+        #         self.config['private_config_path'],
+        #         self.config['owma_url'],
+        #         self.config['key_path']
+        #     )
+        # except FileNotFoundError:
+        #     logit.warning('setup files not found. Need to set up to use')
+        #     self.setup = True
+
+        # self.state = self.config['starting_state']
+        # try:
+        #     with open(self.private_config_path) as configfile:
+        #         self.config.update(yaml.load(configfile, Loader=yaml.FullLoader))
+        #     self.state['cities'] = self.config['locations']
+        # except FileNotFoundError:
+        #     logit.warning('setup files not found. Need to set up to use')
+        #     self.setup = True
+
+        # self.state['setup_needed'] = self.setup
+
+        # # Setup and more state setting
+        # import sql_butler
+        # if os.environ.get('ENVIRONMENT') == 'prod':
+        #     environment = 'prod'
+        # elif os.environ.get('ENVIRONMENT') == 'dev':
+        #     environment = 'dev'
+        # elif os.environ.get('ENVIRONMENT') == 'test':
+        #     environment = 'test'
+        # else:
+        #     raise TypeError('The environment is not recognized. App closing')
+
+        # logger.update_file_level(self.config['environments'][environment]['file_handler_level'])
+        # logger.update_consol_level(self.config['environments'][environment]['consol_handler_level'])
+        # testdct = {
+        #     'log_rolling': self.config['environments'][environment]['log_parameters']['log_rolling'],
+        #     'maxBytes': self.config['environments'][environment]['log_parameters']['maxBytes'],
+        #     'backupCount': self.config['environments'][environment]['log_parameters']['backupCount'],
+        # }
+        # logger.add_rotation(testdct)
         self.environment = environment
         self.testing = self.config['environments'][environment]['testing_flag']
         self.working_directory = self.config['environments'][environment]['docker_working_dir']
