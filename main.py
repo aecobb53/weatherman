@@ -100,19 +100,11 @@ class WeatherMan:
 
         logger.update_file_level(self.config['environments'][environment]['file_handler_level'])
         logger.update_consol_level(self.config['environments'][environment]['consol_handler_level'])
-        print(self.config['environments'][environment]['log_parameters'])
         testdct = {
             'log_rolling': self.config['environments'][environment]['log_parameters']['log_rolling'],
             'maxBytes': self.config['environments'][environment]['log_parameters']['maxBytes'],
             'backupCount': self.config['environments'][environment]['log_parameters']['backupCount'],
-
-            'when': self.config['environments'][environment]['log_parameters']['when'],
-            'interval': self.config['environments'][environment]['log_parameters']['interval'],
-            'utc': self.config['environments'][environment]['log_parameters']['utc']
         }
-        print(testdct)
-        logger.add_rotation(testdct)
-        testdct['log_rolling']='time'
         logger.add_rotation(testdct)
         self.environment = environment
         self.testing = self.config['environments'][environment]['testing_flag']
