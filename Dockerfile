@@ -8,7 +8,6 @@ COPY . .
 # set environment varibles for python
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV IS_IN_DOCKER=True
 
 # All internal ports are 8000
 EXPOSE 8000

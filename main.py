@@ -1,4 +1,3 @@
-import argparse
 import datetime
 import time
 import json
@@ -17,11 +16,18 @@ from typing import Optional, List
 import weather_butler
 import data_validator
 import setup_weatherman
+import sql_butler
 
+appname = 'weatherman'
+master_config_path = 'etc/weatherman.yml'
 
 # Logging
+"""
+I init the logger so i can use it for the api calls. 
+Because i dont want it to log to the main log i use a startup log that should forever be empy
+"""
 import logger
-logger = logger.Logger('weatherman', app_name_in_file=True, log_suffix='startup')
+logger = logger.Logger(appname, app_name_in_file=True, log_suffix='startup')
 logit = logger.return_logit()
 default_log_file = logger.log_file
 
@@ -32,164 +38,250 @@ class WeatherMan:
     Historic weather data is hard to comeby. There is Weatherunderground but it would just
     be easier to gather the data and generate our own reports.
     I gather my weather data from https://openweathermap.org.
-    Its free but you need to have an account an API key which i chose not to upload.
-
-    Another useful link https://openweathermap.org/weather-conditions.
-    It has all the weather codes and descriptions.
-    2XX Thunderstorm
-    3XX Drizzle
-    5XX Rain
-    6XX Snow
-    7XX Atmosphere
-    800 Clear
-    80X Clouds
-    Yep Rain and Drizzle are different... and after 399 comes 500... logic.
-
-    There is not a good way to archive things right now. I am considering adding a cron
-    to archve the databases and stop/start the container to reset everyting...I havnt tested
-    what happens if you just move the database after the script thinks its spun up...
-    Maybe I should add a try loop... << Note to self
     """
 
 
     def __init__(self):
 
-        # Load config file and set some parameters
-        self.master_config = 'etc/weatherman.yml'
-        with open(self.master_config) as ycf:
-            self.config = yaml.load(ycf, Loader=yaml.FullLoader)
+        # Variables
+        self.environment = None
+        self.testing = None
+        self.autopolling = None
+        self.config = None
+        self._state = None
+        self._setup = None
+        self._auto_polling = None
+        self._dump_list = None
+        self._report = None
+        self._last_poll = None
+        self._timing_intervul = None
+        self._db_name = None
 
-        logit.info(f"lines of the config")
-        logit.info(f"Yml config {json.dumps(self.config)}")
 
-        self.name = self.config['name']
-        self.private_config_path = self.config['private_config_path']
-        self.db_name = self.config['db_name'] # The type will be appended in the db
+        # ENV
+        self.environment = os.environ.get('ENVIRONMENT')
+
+        if os.environ.get('TESTING').upper() == 'TRUE':
+            self.testing = True
+        elif os.environ.get('TESTING').upper() == 'FALSE':
+            self.testing = False
+        else:
+            raise ValueError('TESTING variable not set')
+
+        if os.environ.get('AUTOPOLLING').upper() == 'TRUE':
+            self.auto_polling = True
+        elif os.environ.get('AUTOPOLLING').upper() == 'FALSE':
+            self.auto_polling = False
+        else:
+            raise ValueError('AUTOPOLLING variable not set')
+
+
+        # Config
+        self.load_config()
         self.setup = False
+
+
+        # Logging
+        self.set_logging()
+        logger.update_file_level(self.config['environments'][self.environment]['log_parameters']['f_level'])
+        logger.update_consol_level(self.config['environments'][self.environment]['log_parameters']['c_level'])
+
+
+        # Variables
         try:
             self.weather_butler = weather_butler.WeatherButler(
                 self.config['private_config_path'],
                 self.config['owma_url'],
                 self.config['key_path']
             )
+            self.config['locations'] = self.weather_butler.config['locations']
+            self.update_state(self.config['locations'])
         except FileNotFoundError:
-            logit.warning('setup files not found. Need to set up to use')
             self.setup = True
 
-        self.state = self.config['starting_state']
-        try:
-            with open(self.private_config_path) as configfile:
-                self.config.update(yaml.load(configfile, Loader=yaml.FullLoader))
-            self.state['cities'] = self.config['locations']
-        except FileNotFoundError:
-            logit.warning('setup files not found. Need to set up to use')
-            self.setup = True
-
-        self.state['setup_needed'] = self.setup
-
-        # Setup and more state setting
-        import sql_butler
-        if os.environ.get('ENVIRONMENT') == 'prod':
-            environment = 'prod'
-        elif os.environ.get('ENVIRONMENT') == 'dev':
-            environment = 'dev'
-        elif os.environ.get('ENVIRONMENT') == 'test':
-            environment = 'test'
-        else:
-            raise TypeError('The environment is not recognized. App closing')
-
-        logger.update_file_level(self.config['environments'][environment]['file_handler_level'])
-        logger.update_consol_level(self.config['environments'][environment]['consol_handler_level'])
-        testdct = {
-            'log_rolling': self.config['environments'][environment]['log_parameters']['log_rolling'],
-            'maxBytes': self.config['environments'][environment]['log_parameters']['maxBytes'],
-            'backupCount': self.config['environments'][environment]['log_parameters']['backupCount'],
-        }
-        logger.add_rotation(testdct)
-        self.environment = environment
-        self.testing = self.config['environments'][environment]['testing_flag']
-        self.working_directory = self.config['environments'][environment]['docker_working_dir']
-        self.db_name += self.config['environments'][environment]['db_addition']
+        self.db_name = self.config['db_name'] + self.config['environments'][self.environment]['db_addition']
         self.db = sql_butler.SQLButler(self.db_name)
         self.db.create_database()
-        if os.environ.get('AUTOPULLING') == 'True':
-            self.auto_polling = True
-        else:
-            self.auto_polling = False
-        self.timing_intervul = self.set_timing_intervul()
 
-        self.state['env'] = environment
-        self.state['testing'] = self.config['environments'][environment]['testing_flag']
-        self.state['db_name'] += self.config['environments'][environment]['db_addition']
-        self.state['fh_logging'] = self.config['environments'][environment]['file_handler_level']
-        self.state['ch_logging'] = self.config['environments'][environment]['consol_handler_level']
+        self.update_state({'env':self.environment})
+        self.update_state({'db_name':self.db_name})
+        self.update_state({'setup_needed':self.setup})
+        self.update_state({'timing_intervul':self.setup})
+        self.update_state({'testing':self.testing})
+        self.update_state({'db_name':self.db_name})
+        self.update_state({'working_directory':os.getcwd()})
 
-        # logfile
-        log_dct = {'appname':self.name}
-        for k, v in self.config['environments'][environment]['log_parameters'].items():
-            if v == 'None':
-                log_dct[k] = None
-            else:
-                log_dct[k] = v
-        print(log_dct)
-        # logger = logger.Logger(
-        #     log_dct['appname'],
-        #     f_level=log_dct['f_level'],
-        #     c_level=log_dct['c_level'],
-        #     log_rolling=log_dct['log_rolling'],
-        #     maxBytes=log_dct['maxBytes'],
-        #     backupCount=log_dct['backupCount'],
-        #     log_directory=log_dct['log_directory'],
-        #     log_prefix=log_dct['log_prefix'],
-        #     log_suffix=log_dct['log_suffix'],
-        #     app_name_in_file=log_dct['app_name_in_file'],
-        #     date_in_file=log_dct['date_in_file'],
-        #     time_in_file=log_dct['time_in_file'],
-        #     utc_in_file=log_dct['utc_in_file'],
-        #     short_datetime=log_dct['short_datetime']
-        # )
-        # logit = logger.return_logit()
-        # default_log_file = logger.log_file
-        self.state['log_file'] = logger.update_file(
-            log_dct['appname'],
-            f_level=log_dct['f_level'],
-            c_level=log_dct['c_level'],
-            log_rolling=log_dct['log_rolling'],
-            maxBytes=log_dct['maxBytes'],
-            backupCount=log_dct['backupCount'],
-            log_directory=log_dct['log_directory'],
-            log_prefix=log_dct['log_prefix'],
-            log_suffix=log_dct['log_suffix'],
-            app_name_in_file=log_dct['app_name_in_file'],
-            date_in_file=log_dct['date_in_file'],
-            time_in_file=log_dct['time_in_file'],
-            utc_in_file=log_dct['utc_in_file'],
-            short_datetime=log_dct['short_datetime']
-        )
-        # if self.config['environments'][environment]['log_parameters']['log_suffix'] == 'None':
-        #     log_suffix = None
-        # else:
-        #     log_suffix = self.config['environments'][environment]['log_parameters']['log_suffix']
-        # self.state['log_file'] = logger.update_file(
-        #     self.name,
-        #     app_name_in_file=True,
-        #     log_suffix=log_suffix
-        # )
-        self.state['db_name'] += '.sql'
-        self.state['working_directory'] = self.config['environments'][environment]['docker_working_dir']
-        self.state['in_docker'] = True
-        self.state['auto_polling'] = self.auto_polling
-        self.state['timing_intervul'] = self.timing_intervul
-
-        logit.info(f"Starting in {environment}")
-        logit.info(f"logging levels set to fh:{self.state['fh_logging']} ch:{self.state['ch_logging']} testing:{self.testing}")
+        # Wrapping up
+        logit.info(f"Starting in {self.environment}")
+        logit.info(f"logging levels set to fh:{self.state['f_level']} ch:{self.state['c_level']} testing:{self.testing}")
         logit.debug(f'State: {self.state}')
 
-        # Data holders
-        self.dump_list = []
-        self.report = {}
-        self.last_poll = None
 
+
+    # Getters/Setters
+    # Setup
+    @property
+    def setup(self):
+        if self._setup == None:
+            return False
+        return self._setup
+
+    @setup.setter
+    def setup(self, value):
+        self._setup = value
+        self.update_state({'setup':self.setup})
+
+
+    # Auto Polling
+    @property
+    def auto_polling(self):
+        if self._auto_polling == None:
+            return False
+        return self._auto_polling
+
+    @auto_polling.setter
+    def auto_polling(self, value):
+        self._auto_polling = value
+        self.update_state({'auto_polling':self.auto_polling})
+
+
+    # Timing Intervul
+    @property
+    def timing_intervul(self):
+        if self._timing_intervul == None:
+            return self.set_timing_intervul()
+        return self._timing_intervul
+
+    @timing_intervul.setter
+    def timing_intervul(self, value):
+        self._timing_intervul = value
+        self.update_state({'timing_intervul':self.timing_intervul})
+
+
+    # Last Poll
+    @property
+    def last_poll(self):
+        if self._last_poll == None:
+            return datetime.datetime.strftime(self.db.get_first_and_last()[-1], self.config['datetime_str'])
+        return self._last_poll
+
+    @last_poll.setter
+    def last_poll(self, value):
+        self._last_poll = value
+        self.update_state({'last_poll':self.last_poll})
+
+    # DB Name
+    @property
+    def db_name(self):
+        if self._db_name == None:
+            return self.config['db_name']
+        return self._db_name
+
+    @db_name.setter
+    def db_name(self, value):
+        self._db_name = value
+        self.update_state({'db_name':self.db_name})
+
+
+
+    # Dump List
+    @property
+    def dump_list(self):
+        if self._dump_list == None:
+            return []
+        return self._dump_list
+
+    def append_dump_list(self, values):
+        if not isinstance(values, list):
+            values = [values]
+        if self._dump_list == None:
+            self._dump_list = []
+        for value in values:
+            self._dump_list.append(value)
+
+    def clear_dump_list(self):
+        self._dump_list = None
+
+
+    # Report
+    @property
+    def report(self):
+        if self._report == None:
+            return {}
+        return self._report
+
+    def update_report(self, dct):
+        if self._report == None:
+            self._report = {}
+        for key, value in dct.items():
+            self._report[key] = value
+
+    def clear_report(self):
+        self._report = None
+
+
+    # State
+    @property
+    def state(self):
+        if self._state == None:
+            return {}
+        return self._state
+
+    def update_state(self, dct):
+        if self._state == None:
+            self._state = {}
+        for key, value in dct.items():
+            self._state[key] = value
+
+
+    # Config
+    def load_config(self, path=master_config_path):
+        with open(path) as ycf:
+            self.config = yaml.load(ycf, Loader=yaml.FullLoader)
+        try:
+            self.config['locations'] = self.weather_butler.config['locations']
+            self.update_state({'locations':self.config['locations']})
+        except:
+            pass
+        return self.config
+
+
+
+    def set_logging(self, logging_dct=None):
+        """
+        Set or reset the logging parameters. 
+        """
+        if logging_dct == None:
+            logging_dct = self.config['environments'][self.environment]['log_parameters']
+        for k,v in logging_dct.items():
+            if v == 'None':
+                logging_dct[k] = None
+        logger.update_file(
+            appname,
+            f_level=logging_dct['f_level'],
+            c_level=logging_dct['c_level'],
+            log_rolling=logging_dct['log_rolling'],
+            maxBytes=logging_dct['maxBytes'],
+            backupCount=logging_dct['backupCount'],
+            log_directory=logging_dct['log_directory'],
+            log_prefix=logging_dct['log_prefix'],
+            log_suffix=logging_dct['log_suffix'],
+            app_name_in_file=logging_dct['app_name_in_file'],
+            date_in_file=logging_dct['date_in_file'],
+            time_in_file=logging_dct['time_in_file'],
+            utc_in_file=logging_dct['utc_in_file'],
+            short_datetime=logging_dct['short_datetime']
+        )
+        if logger.state['log_rolling'] != None:
+            logger.add_rotation()
+        self.update_state({
+            'f_level': logging_dct['f_level'],
+            'c_level': logging_dct['c_level'],
+            'log_rolling': logging_dct['log_rolling'],
+            'maxBytes': logging_dct['maxBytes'],
+            'backupCount': logging_dct['backupCount'],
+            'log_file': logger.log_file,
+        })
 
     def poll_weather(self):
         """
@@ -207,128 +299,12 @@ class WeatherMan:
         I used to have a use case for needing two functions to do this...
         now i just have two functions...
         """
+        logit.debug('managing polling?')
         data = self.poll_weather()
         self.db.multi_add(data)
         logit.debug('data added to db')
 
 
-    def update_logging(self, log, terminal):
-        """
-        If i ever need to update the logging once the services is spun up I can run this
-        function to do so. There should be endpoints to achieve this eventually.
-        """
-        logit.info(f'Updating logging levels to: {log},{terminal}')
-        if log.upper() in ['DEBUG', '0']:
-            fh.setLevel(logging.DEBUG)
-        elif log.upper() in ['INFO', '1']:
-            fh.setLevel(logging.INFO)
-        elif log.upper() in ['WARN', 'WARNING', '2']:
-            fh.setLevel(logging.WARNING)
-
-        if terminal.upper() in ['DEBUG', '0']:
-            ch.setLevel(logging.DEBUG)
-        elif terminal.upper() in ['INFO', '1']:
-            ch.setLevel(logging.INFO)
-        elif terminal.upper() in ['WARN', 'WARNING', '2']:
-            ch.setLevel(logging.WARNING)
-        logit.info(f'Updated logging levels to: {log},{terminal}')
-
-
-    def next_time(self, new_hours, new_minutes, new_seconds):
-        """
-        If an internal timer is needed this will set intervuls to run.
-        For example if you give it (0,15,0) it will take time=now and add one
-        minute at a time until the minutes are 15m intervuls so 0,15,30,45.
-        you can do the same for hours or seconds.
-        Im not sure why you would but you can set all three and get some weird time
-        offsets...
-        """
-        now = datetime.datetime.now()
-        later = datetime.datetime.now()
-
-        """
-        These if loops try to null out info not provided.
-        For example, if you give (5,0,0) but run it at 06:23:45 it should grab the time
-        10:00:00 not 10:23:45.
-        """
-        if new_minutes != 0 and new_seconds == 0:
-            later = later.replace(second=self.config['time_increment']['replace_seconds'])
-        if new_hours != 0 and new_minutes == 0 and new_seconds == 0:
-            later = later.replace(minute=self.config['time_increment']['replace_minutes'])
-
-        if new_hours == 0:
-            pass
-        else:
-            inch = datetime.timedelta(hours=self.config['time_increment']['hours'])
-            later = later + inch
-            while later.hour not in [i for i in range(24) if i % new_hours == 0]:
-                later = later + inch
-
-        if new_minutes == 0:
-            pass
-        else:
-            incm = datetime.timedelta(minutes=self.config['time_increment']['minutes'])
-            later = later + incm
-            while later.minute not in [i for i in range(60) if i % new_minutes == 0]:
-                later = later + incm
-
-        if new_seconds == 0:
-            pass
-        else:
-            incs = datetime.timedelta(seconds=self.config['time_increment']['seconds'])
-            later = later + incs
-            while later.second not in [i for i in range(60) if i % new_seconds == 0]:
-                later = later + incs
-        return later
-
-
-    def run(self):
-        """
-        If the script polls on its own this does that. There is a while loop that
-        runs and sleeps until it needs to run again. It does a long and a short
-        timer depending on how far away the timer is. If the timer is set to every
-        15 minutes, the major sleep will wait 12 minutes and then sleep 1 minute
-        at a time until the next timer is hit.
-        """
-
-        """
-        It works but does not cut down on the processor time quite like i wanted so
-        it is currently not used.
-        """
-
-        timer = self.next_time(
-            self.config['timer']['default_hours'],
-            self.config['timer']['default_minutes'],
-            self.config['timer']['default_seconds']
-        )
-        timer_intervul = self.config['timer']['intervul']
-        timer_delta = int(timer_intervul * self.config['timer']['intervul_multiplier'])
-        logit.debug(f"Starting run loop with intervuls of {timer_intervul} and {timer_delta}")
-        while True:
-            logit.info(datetime.datetime.now())
-            if datetime.datetime.now() > timer:
-                timer = self.next_time(0,timer_intervul,0)
-                minortimer = timer - datetime.timedelta(minutes=timer_delta)
-                self.manage_polling()
-            if datetime.datetime.now() > minortimer:
-                sleeptime = self.config['timer']['sleep']
-            else:
-                sleeptime = minortimer * self.config['timer']['sleep']
-            time.sleep(sleeptime)
-
-
-    """
-    Dumps just return a list of the dicts from the database. Useful as an intermediate
-    step or if you just need the straight data.
-
-    Reports take the dump data and creates a list where each element is a list of the start
-    and the end of the storm. Each report takes the dump data and runs it through the
-    weather_report funciton and returns the result. This is intended to make things
-    easier... we will see if it actually works.
-
-    I may add even more specilty reports below but for now there is one for each of the
-    dump cases.
-    """
 
     def weather_dump(self, parameters):
         """
@@ -336,7 +312,6 @@ class WeatherMan:
         """
         logit.debug(f'weather dump based on parameters {parameters}')
         data = self.db.query_database(parameters)
-        self.dump_list = []
         for weatherdata in data:
             new_dct = {i:None for i in self.config['dump_webpage_list']}
             dct = dict(weatherdata)
@@ -350,25 +325,9 @@ class WeatherMan:
                             break
                 if i in self.config['dump_webpage_list']:
                     new_dct[i] = j
-            self.dump_list.append(new_dct)
+            self.append_dump_list(new_dct)
         return self.dump_list
 
-
-    def bad_weather_dump(self):
-        """
-        Bad weather dump grabs any weather between 200 and 899. 800+ is generally good
-        weather (800 being "clear").
-
-        This is being depreciated
-        """
-        data = self.db.get_bad_data()
-        logit.debug('Created bad weather dump')
-        return data
-
-
-    """
-    End of the dump secion and start of the report secion
-    """
 
 
     def weather_report(self, data):
@@ -469,14 +428,14 @@ class WeatherMan:
                 'Weather_report_' + \
                 datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%dT%H:%M:%SZ') + \
                 '.json'
-        self.report = json_report
+        self.update_report(json_report)
         with open(file_name, 'w') as new_report:
-            json.dump(json_report, new_report, indent=2)
+            json.dump(self.report, new_report, indent=2)
         logit.debug(f'Wrote a weatehr report to a file {file_name}')
 
     def clear_search(self):
-        self.dump_list = []
-        self.report = {}
+        self.clear_dump_list()
+        self.clear_report()
 
     def set_timing_intervul(self, intervul='auto'):
         """
@@ -504,7 +463,6 @@ class WeatherMan:
 Spin up the app using fastapp and uvicorn. See the docker-compose file for whats
 actually run
 """
-
 
 
 app = FastAPI()
@@ -895,6 +853,7 @@ async def poll_data(request: Request):
             WM.auto_polling = True
             WM.state['auto_polling'] = WM.auto_polling
 
+    logit.debug('passed the setup check')
     WM.manage_polling()
     timestamp = datetime.datetime.strftime(WM.last_poll, WM.config['datetime_str'])
     return templates.TemplateResponse("poll.html", {"request": request, "last_poll":timestamp})
@@ -957,10 +916,9 @@ async def data_dump(request: Request):
     This returns the html to load the results from the database dump.
     """
     logit.debug('dump endpoint hit')
-    if WM.setup:
-        logit.warning('app not set up, redirecting to setup')
-        response = RedirectResponse(url='/setup')
-        return response
+    resp = is_api_setup()
+    if resp:
+        return resp
     data = WM.dump_list
     WM.clear_search()
     return templates.TemplateResponse("dump.html", {"request": request, 'list':data})

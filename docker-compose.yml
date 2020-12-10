@@ -15,7 +15,7 @@ services:
         environment:
             - ENVIRONMENT=prod
             - TESTING=False
-            - AUTOPULLING=True
+            - AUTOPOLLING=True
 
     dev:
         build: .
@@ -28,7 +28,7 @@ services:
         environment:
             - ENVIRONMENT=dev
             - TESTING=False
-            - AUTOPULLING=False
+            - AUTOPOLLING=False
 
     test:
         build: .
@@ -44,7 +44,7 @@ services:
         environment:
             - ENVIRONMENT=test
             - TESTING=True
-            - AUTOPULLING=False
+            - AUTOPOLLING=False
 
     unit-test:
         build: .
@@ -57,4 +57,4 @@ services:
         environment:
             - ENVIRONMENT=test
             - TESTING=True
-            - AUTOPULLING=False
+            - AUTOPOLLING=False
