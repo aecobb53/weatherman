@@ -4,43 +4,42 @@ import os
 from logging.handlers import RotatingFileHandler
 
 
-
 class Borg:
 
     _shared_state = {}
+
     def __init__(self):
         self.__dict__ = self._shared_state
-
 
 
 class Logger(Borg):
 
     def __init__(self, app_name, **kwargs):
         Borg.__init__(self)
-        # Easy way to keep track of what is currently set or not. 
+        # Easy way to keep track of what is currently set or not.
         self.state = {
-            'f_level':None,
-            'c_level':None,
-            'log_rolling':None,
-            'log_directory':None,
-            'log_prefix':None,
-            'log_suffix':None,
+            'f_level': None,
+            'c_level': None,
+            'log_rolling': None,
+            'log_directory': None,
+            'log_prefix': None,
+            'log_suffix': None,
 
-            'app_name_in_file':None,
-            'date_in_file':None,
-            'time_in_file':None,
-            'utc_in_file':None,
-            'short_datetime':None
+            'app_name_in_file': None,
+            'date_in_file': None,
+            'time_in_file': None,
+            'utc_in_file': None,
+            'short_datetime': None
         }
         self.rotating_values = {
-            'maxBytes':None,
-            'backupCount':None,
-            'when':None,
-            'interval':None,
-            'backupCount':None,
-            'utc':None
+            'maxBytes': None,
+            'backupCount': None,
+            'when': None,
+            'interval': None,
+            'backupCount': None,
+            'utc': None
         }
-    
+
         # Update the state form the kwargs
         self.set_state(kwargs)
 
@@ -55,33 +54,31 @@ class Logger(Borg):
         self.fh = logging.FileHandler(self.log_file)
         self.ch = logging.StreamHandler()
 
-
         """
         Setting handler levels.
         The default is file:DEBUG commandline:INFO
         """
-        if self.state['f_level'] == None:
+        if self.state['f_level'] is None:
             self._update_file_level('DEBUG')
             self.state['f_level'] = 'DEBUG'
         else:
             self._update_file_level(self.state['f_level'])
 
         # Set time to use
-        if self.state['c_level'] == None:
+        if self.state['c_level'] is None:
             self._update_consol_level('INFO')
             self.state['c_level'] = 'INFO'
         else:
             self._update_consol_level(self.state['c_level'])
 
-
         # create formatter and add it to the handlers
         # Move into if statement based on kwargs?
-        self.formatter = logging.Formatter('%(asctime)s %(levelname)s %(module)s %(funcName)s - %(message)s', '%Y-%m-%dT%H:%M:%SZ')
-        
+        self.formatter = logging.Formatter('%(asctime)s %(levelname)s %(module)s %(funcName)s - \
+            %(message)s', '%Y-%m-%dT%H:%M:%SZ')
+
         # Adds the formatter to the logging object
         self.fh.setFormatter(self.formatter)
         self.ch.setFormatter(self.formatter)
-
 
         # Add the handlers to the logging object
         self.logger.addHandler(self.fh)
@@ -89,18 +86,16 @@ class Logger(Borg):
 
         # create sublogger stuff
 
-
         # Log rotating
-        if self.state['log_rolling'] != None:
+        if self.state['log_rolling'] is not None:
             self.add_rotation()
-
 
     def set_state(self, kwargs):
         """
-        Set items from kwargs. 
+        Set items from kwargs.
         If you need to un-set somethign set it equal to None
         """
-        for k,v in kwargs.items():
+        for k, v in kwargs.items():
             """set to values"""
             if k == 'f_level':
                 self.state['f_level'] = v
@@ -119,7 +114,7 @@ class Logger(Borg):
 
             if k == 'log_suffix':
                 self.state['log_suffix'] = v
-                
+
             """set to bool"""
 
             if k == 'app_name_in_file':
@@ -188,7 +183,7 @@ class Logger(Borg):
         it will end with '.log'
         """
         file_name = []
-        if self.state['log_directory'] == None:
+        if self.state['log_directory'] is None:
             file_name.append('logs/')
         else:
             if self.state['log_directory'][-1] != '/':
@@ -198,7 +193,7 @@ class Logger(Borg):
         if self.state['app_name_in_file']:
             file_name.append(app_name)
 
-        if self.state['log_prefix'] != None:
+        if self.state['log_prefix'] is not None:
             file_name.append(self.state['log_prefix'])
 
         if self.state['utc_in_file']:
@@ -227,13 +222,13 @@ class Logger(Borg):
                 datetime_string = datetime.datetime.strftime(now, '%dT%H:%M:%S.%f' + time_ext)
             file_name.append(datetime_string)
 
-        if self.state['log_suffix'] != None:
+        if self.state['log_suffix'] is not None:
             file_name.append(self.state['log_suffix'])
 
         file_name.append('.log')
 
         if len(file_name) == 2:
-            file_name.insert(1,'log')
+            file_name.insert(1, 'log')
 
         if len(file_name) == 3:
             file_name = ''.join(file_name)
@@ -250,12 +245,10 @@ class Logger(Borg):
         # print(log_file)
         return self.log_file
 
-
-
     def return_logit(self):
         """
-        Return the logger object so it can be set to something like logit in the script. 
-        Having logging, logger, and logit are confusing but allow a lot of flexability. 
+        Return the logger object so it can be set to something like logit in the script.
+        Having logging, logger, and logit are confusing but allow a lot of flexability.
         """
         return self.logger
 
@@ -335,7 +328,7 @@ class Logger(Borg):
         """
         if when not in ['S', 'M', 'H', 'D', 'W0', 'W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'midnight']:
             when = 'midnight'
-        if utc == None:
+        if utc is None:
             utc = True
 
         time_rotator = logging.handlers.TimedRotatingFileHandler(
@@ -366,18 +359,3 @@ class Logger(Borg):
                 self.rotating_values['utc']
             )
         return self.logger
-
-
-# logger = Logger('the_tester',\
-#     app_name_in_file=True,\
-#     # date_in_file=True,\
-#     # time_in_file=True,\
-#     log_prefix='dev',\
-#     log_suffix='behave',\
-#     log_directory='testlogs/')
-# logit = logger.return_logit()
-# logit.info('duplicate logging in both')
-# logger._update_file_level('DEBUG')
-# logit.info('duplicate logging in cmdline1')
-# logger.update_file('the_tester',log_suffix='testwo')
-# logit.info('duplicate logging in cmdline2')

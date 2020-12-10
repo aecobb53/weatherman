@@ -24,7 +24,8 @@ url = config['owma_url']
 # Argparse
 aparse = argparse.ArgumentParser(description='weather butler tool')
 aparse.add_argument('-get_response',                action='store_true', help="url, args")
-aparse.add_argument('-format_request_city_id_list', action='store_true', help="url, city_id_list, key")
+aparse.add_argument('-format_request_city_id_list', action='store_true', help="url, \
+    city_id_list, key")
 aparse.add_argument('-format_response',             action='store_true', help="data")
 aparse.add_argument('-poll',                        action='store_true', help="")
 aparse.add_argument('-versions',                    action='store_true', help="")
@@ -32,6 +33,7 @@ aparse.add_argument('args', nargs='*')
 
 args = aparse.parse_args()
 print(args)
+
 
 # Functions
 def str_sizer(string, length, add_char=' '):
@@ -41,13 +43,14 @@ def str_sizer(string, length, add_char=' '):
 
 # get_response
 
+
 if args.get_response:
     print(f"running get_response")
     # for arg in args.args:
     #     print(arg)
     url, arguments = WB.format_request_city_id_list(
-        WB.config['url'], 
-        WB.config['locations'].values(), 
+        WB.config['url'],
+        WB.config['locations'].values(),
         WB.key['Weather_Key']
     )
     response, response_list = WB.get_response(
@@ -65,8 +68,8 @@ if args.get_response:
 
 if args.format_request_city_id_list:
     url, arguments = WB.format_request_city_id_list(
-        WB.config['url'], 
-        WB.config['locations'].values(), 
+        WB.config['url'],
+        WB.config['locations'].values(),
         WB.key['Weather_Key']
     )
     print(url, arguments)
@@ -79,8 +82,8 @@ if args.poll:
     print(f"running poll")
     for arg in args.args:
         print(arg)
-    for k,v in WB.__dict__.items():
-        print(k,v)
+    for k, v in WB.__dict__.items():
+        print(k, v)
     weather_response = WB.poll()
     print(weather_response)
     # print(weather_response.json())
@@ -107,4 +110,3 @@ if args.versions:
         # pip search mod | grep mod
         # output = os.system(f'pip search {mod} | grep {mod}')
         # print(output)
-

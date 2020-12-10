@@ -12,7 +12,7 @@ class DataValidator:
 
     def is_datetime(self, datetime_str):
         """
-        Is the provided string a datetime object? 
+        Is the provided string a datetime object?
         """
         datetime_obj = None
         zulu = False
@@ -20,9 +20,9 @@ class DataValidator:
         if datetime_str == '':
             return datetime_obj
 
-        # If its a zulu or local time, strip and set the flag. 
+        # If its a zulu or local time, strip and set the flag.
         # I plan to use this eventually.
-        # If the data is local it should be offset for zulu for the app. 
+        # If the data is local it should be offset for zulu for the app.
         # This is important in case the frontend formats timestamps locally or something like that
         if datetime_str.upper().endswith('Z'):
             zulu = True
@@ -51,15 +51,14 @@ class DataValidator:
             datetime_obj = datetime.strptime(datetime_str, self.config['valid_datetimes']['day'])
         except ValueError:
             pass
-        if datetime_obj == None:
+        if datetime_obj is None:
             raise ValueError('No datetime matches')
         return datetime_obj
 
-
     def is_exact_list(self, exact_str):
         """
-        Returns a list of weather codes that are valid from the provided search. 
-        This takes ranges "###-###", lists "###,###,###" or a combination of both. 
+        Returns a list of weather codes that are valid from the provided search.
+        This takes ranges "###-###", lists "###,###,###" or a combination of both.
         """
         exact_list = []
         number_list = []

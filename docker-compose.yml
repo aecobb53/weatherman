@@ -32,7 +32,7 @@ services:
 
     functional:
         build: .
-        image: weather-dev:latest
+        image: weather-functional:latest
         # command: behave features/data_validator.feature
         # command: behave features/main.feature:6
         # command: behave --tags="@owma"
@@ -48,8 +48,23 @@ services:
 
     unit:
         build: .
-        image: weather-unit-test:latest
+        image: weather-unit:latest
         command: pytest
+        volumes:
+            - .:/usr/src
+        ports:
+            - 8030:8000
+        environment:
+            - ENVIRONMENT=test
+            - TESTING=True
+            - AUTOPOLLING=False
+
+    lint:
+        build: .
+        image: weather-lint:latest
+        command: pycodestyle --show-source
+        # command: pycodestyle dev_tools/main_tool.py --show-source
+        # command: pycodestyle dev_tools/main_tool.py --show-source --show-pep8
         volumes:
             - .:/usr/src
         ports:

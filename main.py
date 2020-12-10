@@ -17,20 +17,19 @@ import weather_butler
 import data_validator
 import setup_weatherman
 import sql_butler
+import logger
 
 appname = 'weatherman'
 master_config_path = 'etc/weatherman.yml'
 
 # Logging
 """
-I init the logger so i can use it for the api calls. 
+I init the logger so i can use it for the api calls.
 Because i dont want it to log to the main log i use a startup log that should forever be empy
 """
-import logger
 logger = logger.Logger(appname, app_name_in_file=True, log_suffix='startup')
 logit = logger.return_logit()
 default_log_file = logger.log_file
-
 
 
 class WeatherMan:
@@ -39,7 +38,6 @@ class WeatherMan:
     be easier to gather the data and generate our own reports.
     I gather my weather data from https://openweathermap.org.
     """
-
 
     def __init__(self):
 
@@ -56,7 +54,6 @@ class WeatherMan:
         self._last_poll = None
         self._timing_intervul = None
         self._db_name = None
-
 
         # ENV
         self.environment = os.environ.get('ENVIRONMENT')
@@ -75,17 +72,16 @@ class WeatherMan:
         else:
             raise ValueError('AUTOPOLLING variable not set')
 
-
         # Config
         self.load_config()
         self.setup = False
 
-
         # Logging
         self.set_logging()
-        logger.update_file_level(self.config['environments'][self.environment]['log_parameters']['f_level'])
-        logger.update_consol_level(self.config['environments'][self.environment]['log_parameters']['c_level'])
-
+        logger.update_file_level(
+            self.config['environments'][self.environment]['log_parameters']['f_level'])
+        logger.update_consol_level(
+            self.config['environments'][self.environment]['log_parameters']['c_level'])
 
         # Variables
         try:
@@ -99,102 +95,99 @@ class WeatherMan:
         except FileNotFoundError:
             self.setup = True
 
-        self.db_name = self.config['db_name'] + self.config['environments'][self.environment]['db_addition']
+        self.db_name = self.config['db_name'] + \
+            self.config['environments'][self.environment]['db_addition']
         self.db = sql_butler.SQLButler(self.db_name)
         self.db.create_database()
 
-        self.update_state({'env':self.environment})
-        self.update_state({'db_name':self.db_name})
-        self.update_state({'setup_needed':self.setup})
-        self.update_state({'timing_intervul':self.setup})
-        self.update_state({'testing':self.testing})
-        self.update_state({'db_name':self.db_name})
-        self.update_state({'working_directory':os.getcwd()})
+        self.update_state({'env': self.environment})
+        self.update_state({'db_name': self.db_name})
+        self.update_state({'setup_needed': self.setup})
+        self.update_state({'timing_intervul': self.setup})
+        self.update_state({'testing': self.testing})
+        self.update_state({'db_name': self.db_name})
+        self.update_state({'working_directory': os.getcwd()})
 
         # Wrapping up
         logit.info(f"Starting in {self.environment}")
-        logit.info(f"logging levels set to fh:{self.state['f_level']} ch:{self.state['c_level']} testing:{self.testing}")
+        logit.info(f"logging levels set to fh:{self.state['f_level']} \
+            ch:{self.state['c_level']} testing:{self.testing}")
         logit.debug(f'State: {self.state}')
-
-
 
     # Getters/Setters
     # Setup
     @property
     def setup(self):
-        if self._setup == None:
+        if self._setup is None:
             return False
         return self._setup
 
     @setup.setter
     def setup(self, value):
         self._setup = value
-        self.update_state({'setup':self.setup})
-
+        self.update_state({'setup': self.setup})
 
     # Auto Polling
     @property
     def auto_polling(self):
-        if self._auto_polling == None:
+        if self._auto_polling is None:
             return False
         return self._auto_polling
 
     @auto_polling.setter
     def auto_polling(self, value):
         self._auto_polling = value
-        self.update_state({'auto_polling':self.auto_polling})
-
+        self.update_state({'auto_polling': self.auto_polling})
 
     # Timing Intervul
     @property
     def timing_intervul(self):
-        if self._timing_intervul == None:
+        if self._timing_intervul is None:
             return self.set_timing_intervul()
         return self._timing_intervul
 
     @timing_intervul.setter
     def timing_intervul(self, value):
         self._timing_intervul = value
-        self.update_state({'timing_intervul':self.timing_intervul})
-
+        self.update_state({'timing_intervul': self.timing_intervul})
 
     # Last Poll
     @property
     def last_poll(self):
-        if self._last_poll == None:
-            return datetime.datetime.strftime(self.db.get_first_and_last()[-1], self.config['datetime_str'])
+        if self._last_poll is None:
+            return datetime.datetime.strftime(
+                self.db.get_first_and_last()[-1],
+                self.config['datetime_str'])
         return self._last_poll
 
     @last_poll.setter
     def last_poll(self, value):
         self._last_poll = value
-        self.update_state({'last_poll':self.last_poll})
+        self.update_state({'last_poll': self.last_poll})
 
     # DB Name
     @property
     def db_name(self):
-        if self._db_name == None:
+        if self._db_name is None:
             return self.config['db_name']
         return self._db_name
 
     @db_name.setter
     def db_name(self, value):
         self._db_name = value
-        self.update_state({'db_name':self.db_name})
-
-
+        self.update_state({'db_name': self.db_name})
 
     # Dump List
     @property
     def dump_list(self):
-        if self._dump_list == None:
+        if self._dump_list is None:
             return []
         return self._dump_list
 
     def append_dump_list(self, values):
         if not isinstance(values, list):
             values = [values]
-        if self._dump_list == None:
+        if self._dump_list is None:
             self._dump_list = []
         for value in values:
             self._dump_list.append(value)
@@ -202,16 +195,15 @@ class WeatherMan:
     def clear_dump_list(self):
         self._dump_list = None
 
-
     # Report
     @property
     def report(self):
-        if self._report == None:
+        if self._report is None:
             return {}
         return self._report
 
     def update_report(self, dct):
-        if self._report == None:
+        if self._report is None:
             self._report = {}
         for key, value in dct.items():
             self._report[key] = value
@@ -219,20 +211,18 @@ class WeatherMan:
     def clear_report(self):
         self._report = None
 
-
     # State
     @property
     def state(self):
-        if self._state == None:
+        if self._state is None:
             return {}
         return self._state
 
     def update_state(self, dct):
-        if self._state == None:
+        if self._state is None:
             self._state = {}
         for key, value in dct.items():
             self._state[key] = value
-
 
     # Config
     def load_config(self, path=master_config_path):
@@ -240,20 +230,18 @@ class WeatherMan:
             self.config = yaml.load(ycf, Loader=yaml.FullLoader)
         try:
             self.config['locations'] = self.weather_butler.config['locations']
-            self.update_state({'locations':self.config['locations']})
+            self.update_state({'locations': self.config['locations']})
         except:
             pass
         return self.config
 
-
-
     def set_logging(self, logging_dct=None):
         """
-        Set or reset the logging parameters. 
+        Set or reset the logging parameters.
         """
-        if logging_dct == None:
+        if logging_dct is None:
             logging_dct = self.config['environments'][self.environment]['log_parameters']
-        for k,v in logging_dct.items():
+        for k, v in logging_dct.items():
             if v == 'None':
                 logging_dct[k] = None
         logger.update_file(
@@ -272,7 +260,7 @@ class WeatherMan:
             utc_in_file=logging_dct['utc_in_file'],
             short_datetime=logging_dct['short_datetime']
         )
-        if logger.state['log_rolling'] != None:
+        if logger.state['log_rolling'] is not None:
             logger.add_rotation()
         self.update_state({
             'f_level': logging_dct['f_level'],
@@ -293,7 +281,6 @@ class WeatherMan:
         self.last_poll = datetime.datetime.now(tz=datetime.timezone.utc)
         return data
 
-
     def manage_polling(self):
         """
         I used to have a use case for needing two functions to do this...
@@ -304,8 +291,6 @@ class WeatherMan:
         self.db.multi_add(data)
         logit.debug('data added to db')
 
-
-
     def weather_dump(self, parameters):
         """
         Takes the parameters to filter out results from the database.
@@ -313,13 +298,13 @@ class WeatherMan:
         logit.debug(f'weather dump based on parameters {parameters}')
         data = self.db.query_database(parameters)
         for weatherdata in data:
-            new_dct = {i:None for i in self.config['dump_webpage_list']}
+            new_dct = {i: None for i in self.config['dump_webpage_list']}
             dct = dict(weatherdata)
-            for i,j in dct.items():
+            for i, j in dct.items():
                 if i == 'time':
                     dct[i] = datetime.datetime.strftime(j, self.config['datetime_str'])
                 if i == 'name':
-                    for x,y in self.config['locations'].items():
+                    for x, y in self.config['locations'].items():
                         if int(dct['city']) == int(y):
                             j = x
                             break
@@ -327,8 +312,6 @@ class WeatherMan:
                     new_dct[i] = j
             self.append_dump_list(new_dct)
         return self.dump_list
-
-
 
     def weather_report(self, data):
         """
@@ -356,14 +339,19 @@ class WeatherMan:
                 if line['name'] == name:
                     report1[name].append(line)
         for name, reports in report1.items():
-            # Itterates through the new lists of weather data and places similar times together in to storms
+            """
+            Itterates through the new lists of weather data and
+            places similar times together in to storms
+            """
             report2[name] = [[]]
             report_index = 0
             for index, line in enumerate(reports):
                 if index == 0:
                     report2[name][0].append(line)
                 else:
-                    if reports[index - 1]['time'] <= line['time'] - datetime.timedelta(minutes=int(self.config['storm_difference_time'])):
+                    if reports[index - 1]['time'] <= line['time'] - \
+                    datetime.timedelta(minutes=int(self.config['storm_difference_time'])):
+
                         report2[name].append([])
                         report_index += 1
                 report2[name][report_index].append(line)
@@ -380,16 +368,21 @@ class WeatherMan:
                 else:
                     report[name].append([event[0], event[-1]])
                     memory = {
-                        'sky_id':[]
+                        'sky_id': []
                     }
                     for itterate, line in enumerate(event):
                         if itterate in [0, len(event)-1]:
                             continue
-                        if not recursive_search(line['sky_id'], 'sky_id', itterate, event, self.config['storm_difference_itteration']):
+                        if not recursive_search(
+                            line['sky_id'],
+                            'sky_id',
+                            itterate,
+                            event,
+                        self.config['storm_difference_itteration']):
+
                             report[name][index].insert(-1, line)
         logit.debug('Created a weather report')
         return report
-
 
     def write_report(self, report, file_name=None):
         """
@@ -405,7 +398,10 @@ class WeatherMan:
                     new_end = storm[-1]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
                 else:
                     if self.config['single_storm_event_flag']:
-                        # If the single_storm_event_flag is true the single event storms will be added. else they will be skipped.
+                        """
+                        If the single_storm_event_flag is true the single event storms
+                        will be added. else they will be skipped.
+                        """
                         storm_durration = '0'
                         new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
                         new_end = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -413,17 +409,19 @@ class WeatherMan:
                         continue
                 for line in storm:
                     if not isinstance(line['time'], str):
-                        line['time'] = datetime.datetime.strftime(line['time'], self.config['datetime_str'])
+                        line['time'] = datetime.datetime.strftime(
+                            line['time'],
+                            self.config['datetime_str'])
                 entry = {
-                    'storm_start':storm[0]['time'],
-                    'storm_end':storm[-1]['time'],
-                    'storm_durration':storm_durration,
-                    'start_dct':storm[0],
-                    'end_dct':storm[-1],
-                    'storm_events':storm,
+                    'storm_start': storm[0]['time'],
+                    'storm_end': storm[-1]['time'],
+                    'storm_durration': storm_durration,
+                    'start_dct': storm[0],
+                    'end_dct': storm[-1],
+                    'storm_events': storm,
                 }
                 json_report[name].append(entry)
-        if file_name == None:
+        if file_name is None:
             file_name = self.config['weather_reports_dir'] + \
                 'Weather_report_' + \
                 datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%dT%H:%M:%SZ') + \
@@ -439,15 +437,17 @@ class WeatherMan:
 
     def set_timing_intervul(self, intervul='auto'):
         """
-        Set the amount of time between data pulls. 
-        If it is auto, it will calculate the minimum number of minutes between polls and take the largest value
+        Set the amount of time between data pulls.
+        If it is auto, it will calculate the minimum number of minutes
+        between polls and take the largest value
         between that and the minimum poll timer in the config.
         """
         try:
             if intervul == 'auto':
                 calls_made = len(self.state['cities'].keys())
                 month_minute_converion = 60 * 24 * self.config['estemated_days_per_month']
-                minimum_intervul = month_minute_converion / self.config['max_calls_per_month'] * calls_made
+                minimum_intervul = month_minute_converion / \
+                    self.config['max_calls_per_month'] * calls_made
                 intervul = minimum_intervul
             self.timing_intervul = max(intervul, self.config['minimum_poll_time'])
             self.state['timing_intervul'] = self.timing_intervul
@@ -456,7 +456,6 @@ class WeatherMan:
             self.auto_polling = False
         self.state['auto_polling'] = self.auto_polling
         return self.timing_intervul
-
 
 
 """
@@ -500,6 +499,7 @@ def return_state():
     return WM.state.items()
     # return state_list
 
+
 def generage_parameters(
     thunderstorm=False,
     drizzle=False,
@@ -513,11 +513,11 @@ def generage_parameters(
     end_time=None
 ):
 
-    if exact_list == None:
+    if exact_list is None:
         exact_list = ''
-    if start_time == None:
+    if start_time is None:
         start_time = ''
-    if end_time == None:
+    if end_time is None:
         end_time = ''
 
     if thunderstorm:
@@ -548,7 +548,6 @@ def generage_parameters(
         for num in WM.config['accepted_owma_codes']['clear']:
             exact_list += f",{str(num)}"
 
-
     try:
         logit.debug(f"validating exact_list")
         exact_list = validator.is_exact_list(exact_list)
@@ -574,6 +573,7 @@ def generage_parameters(
     }
     return parameters
 
+
 def submit_bug(
     prod=None,
     dev=None,
@@ -597,7 +597,20 @@ def submit_bug(
     )
 
     valid = False
-    none_list = [prod, dev, test, unit_test, website, home, reports, dump, realtime, state, poll, about, report]
+    none_list = [
+        prod,
+        dev,
+        test,
+        unit_test,
+        website,
+        home,
+        reports,
+        dump,
+        realtime,
+        state,
+        poll,
+        about,
+        report]
     if event_time == '' and description == '':
         for check in none_list:
             if check is not None:
@@ -607,10 +620,10 @@ def submit_bug(
         valid = True
 
     bug_info = {
-        'env':[],
-        'tab':[],
-        'datetime':[],
-        'description':'',
+        'env': [],
+        'tab': [],
+        'datetime': [],
+        'description': '',
     }
 
     bug_info['env'] += ['prod'] if prod is not None else []
@@ -649,6 +662,7 @@ def submit_bug(
         logit.info(f"Invalid entry, skipping")
         return False
 
+
 def execute_setup(
     action: str = None,
     key: str = None,
@@ -664,36 +678,36 @@ def execute_setup(
 ):
 
     # Key
-    if key != None and key != '':
+    if key is not None and key != '':
         SW.key = key
 
     # Search parameterse
-    if citySearch != None and citySearch != '':
+    if citySearch is not None and citySearch != '':
         SW.update_parameters('name', citySearch)
-    if cityId != None and cityId != '':
+    if cityId is not None and cityId != '':
         SW.update_parameters('id', cityId)
-    if stateAbbr != None and stateAbbr != '':
+    if stateAbbr is not None and stateAbbr != '':
         SW.update_parameters('state', stateAbbr)
-    if countryAbbr != None and countryAbbr != '':
+    if countryAbbr is not None and countryAbbr != '':
         SW.update_parameters('country', countryAbbr)
-    if lat != None and lat != '':
+    if lat is not None and lat != '':
         SW.update_parameters('lat', lat)
-    if lon != None and lon != '':
+    if lon is not None and lon != '':
         SW.update_parameters('lon', lon)
 
     # Modifying to list
-    ## Updating
-    location_lst = [(k,v) for k,v in SW.locations.items()]
+    # Updating
+    location_lst = [(k, v) for k, v in SW.locations.items()]
     for index, element in enumerate(newname):
         if element != '':
             SW.update_locations(location_lst[index][0], element)
-    ## Removing
-    location_lst = [(k,v) for k,v in SW.locations.items()]
+    # Removing
+    location_lst = [(k, v) for k, v in SW.locations.items()]
     if delete != ['']:
         for tup in location_lst:
             if tup[1] in delete:
                 SW.remove_location(tup[0])
-    ## Adding
+    # Adding
     for element in city:
         element_info = element.split('=')
         SW.add_locations(element_info[0], element_info[1])
@@ -721,6 +735,7 @@ def execute_setup(
 
 # WM.setup = True
 
+
 def is_api_setup():
     if WM.setup:
         logit.warning('app not set up, redirecting to setup')
@@ -729,6 +744,7 @@ def is_api_setup():
         # return response
     else:
         return False
+
 
 def is_setup():
     if WM.setup:
@@ -752,10 +768,11 @@ def timing_of_app(time_to_poll=WM.timing_intervul):
         except:
             pass
         time.sleep(time_to_poll * 60)
+
+
 auto_poller = threading.Thread(target=timing_of_app)
 auto_poller.daemon = True
 auto_poller.start()
-
 
 
 # Root
@@ -806,10 +823,10 @@ async def return_args(request: Request):
     resp = is_setup()
     if resp:
         return resp
-    for i,j in return_state():
+    for i, j in return_state():
         if i == 'cities':
             state_list.append(i + ':')
-            for x,y in j.items():
+            for x, y in j.items():
                 state_list.append('-' + x + ' : ' + str(y))
         elif i == 'fh_logging':
             state_list.append('file_logging' + ' : ' + j)
@@ -818,7 +835,7 @@ async def return_args(request: Request):
         else:
             state_list.append(i + ' : ' + str(j))
         logit.info(f"{i} : {j}")
-    return templates.TemplateResponse("state.html", {"request": request, 'list':state_list})
+    return templates.TemplateResponse("state.html", {"request": request, 'list': state_list})
 
 
 # Poll
@@ -845,7 +862,8 @@ async def poll_data(request: Request):
         return resp
 
     if WM.environment == 'dev':
-        logit.warning('While auto pulling is defaulted to off, running poll will toggle it for the tiem being')
+        logit.warning('While auto pulling is defaulted to off, \
+            running poll will toggle it for the tiem being')
         if WM.auto_polling:
             WM.auto_polling = False
             WM.state['auto_polling'] = WM.auto_polling
@@ -856,22 +874,22 @@ async def poll_data(request: Request):
     logit.debug('passed the setup check')
     WM.manage_polling()
     timestamp = datetime.datetime.strftime(WM.last_poll, WM.config['datetime_str'])
-    return templates.TemplateResponse("poll.html", {"request": request, "last_poll":timestamp})
+    return templates.TemplateResponse("poll.html", {"request": request, "last_poll": timestamp})
 
 
 # Dump
 @app.get('/api/dump/search')
 def read_items(
-    thunderstorm=False,
-    drizzle=False,
-    rain=False,
-    snow=False,
-    atmosphere=False,
-    clouds=False,
-    clear=False,
-    exact_list=None,
-    start_time=None,
-    end_time=None):
+        thunderstorm=False,
+        drizzle=False,
+        rain=False,
+        snow=False,
+        atmosphere=False,
+        clouds=False,
+        clear=False,
+        exact_list=None,
+        start_time=None,
+        end_time=None):
     """
     Takes a query and tells the app to grab data.
     """
@@ -921,22 +939,22 @@ async def data_dump(request: Request):
         return resp
     data = WM.dump_list
     WM.clear_search()
-    return templates.TemplateResponse("dump.html", {"request": request, 'list':data})
+    return templates.TemplateResponse("dump.html", {"request": request, 'list': data})
 
 
 @app.get('/dump/search/')
 def read_items(
-    request: Request,
-    thunderstorm=False,
-    drizzle=False,
-    rain=False,
-    snow=False,
-    atmosphere=False,
-    clouds=False,
-    clear=False,
-    exact_list=None,
-    start_time=None,
-    end_time=None):
+        request: Request,
+        thunderstorm=False,
+        drizzle=False,
+        rain=False,
+        snow=False,
+        atmosphere=False,
+        clouds=False,
+        clear=False,
+        exact_list=None,
+        start_time=None,
+        end_time=None):
     """
     Takes a query and tells the app to grab data.
     """
@@ -977,21 +995,21 @@ def read_items(
 # Bug
 @app.get("/api/bug-report/entry", response_class=HTMLResponse)
 async def read_items(
-    prod=None,
-    dev=None,
-    test=None,
-    unit_test=None,
-    website=None,
-    home=None,
-    reports=None,
-    dump=None,
-    realtime=None,
-    state=None,
-    poll=None,
-    about=None,
-    report=None,
-    event_time=None,
-    description=None):
+        prod=None,
+        dev=None,
+        test=None,
+        unit_test=None,
+        website=None,
+        home=None,
+        reports=None,
+        dump=None,
+        realtime=None,
+        state=None,
+        poll=None,
+        about=None,
+        report=None,
+        event_time=None,
+        description=None):
     """
     Receive bug-report.
     """
@@ -1046,22 +1064,22 @@ async def submit_bug_report(request: Request):
 
 @app.get("/bug-report/entry", response_class=HTMLResponse)
 async def read_items(
-    request: Request,
-    prod=None,
-    dev=None,
-    test=None,
-    unit_test=None,
-    website=None,
-    home=None,
-    reports=None,
-    dump=None,
-    realtime=None,
-    state=None,
-    poll=None,
-    about=None,
-    report=None,
-    event_time=None,
-    description=None):
+        request: Request,
+        prod=None,
+        dev=None,
+        test=None,
+        unit_test=None,
+        website=None,
+        home=None,
+        reports=None,
+        dump=None,
+        realtime=None,
+        state=None,
+        poll=None,
+        about=None,
+        report=None,
+        event_time=None,
+        description=None):
     """
     Receive bug-report.
     """
@@ -1114,16 +1132,16 @@ async def read_items(
 # Report
 @app.get('/api/report/search/')
 def report_items(
-    thunderstorm=False,
-    drizzle=False,
-    rain=False,
-    snow=False,
-    atmosphere=False,
-    clouds=False,
-    clear=False,
-    exact_list=None,
-    start_time=None,
-    end_time=None):
+        thunderstorm=False,
+        drizzle=False,
+        rain=False,
+        snow=False,
+        atmosphere=False,
+        clouds=False,
+        clear=False,
+        exact_list=None,
+        start_time=None,
+        end_time=None):
     """
     Takes a query and tells the app to grab data.
     """
@@ -1160,6 +1178,7 @@ def report_items(
     WM.clear_search()
     return report
 
+
 @app.get("/report", response_class=HTMLResponse)
 async def report(request: Request):
     """
@@ -1172,21 +1191,22 @@ async def report(request: Request):
         return resp
     data = WM.report
     WM.clear_search()
-    return templates.TemplateResponse("report.html", {"request": request, 'dict':data})
+    return templates.TemplateResponse("report.html", {"request": request, 'dict': data})
+
 
 @app.get('/report/search/')
 def report_items(
-    request: Request,
-    thunderstorm=False,
-    drizzle=False,
-    rain=False,
-    snow=False,
-    atmosphere=False,
-    clouds=False,
-    clear=False,
-    exact_list=None,
-    start_time=None,
-    end_time=None):
+        request: Request,
+        thunderstorm=False,
+        drizzle=False,
+        rain=False,
+        snow=False,
+        atmosphere=False,
+        clouds=False,
+        clear=False,
+        exact_list=None,
+        start_time=None,
+        end_time=None):
     """
     Takes a query and tells the app to grab data.
     """
@@ -1228,18 +1248,17 @@ def report_items(
 # Setup
 @app.get("/api/setup")
 async def report(
-    action: str = None,
-    key: str = None,
-    delete: List[str] = Query([]),
-    newname: List[str] = Query([]),
-    city: List[str] = Query([]),
-    citySearch: str = None,
-    cityId: str = None,
-    stateAbbr: str = None,
-    countryAbbr: str = None,
-    lat: str = None,
-    lon: str = None
-    ):
+        action: str = None,
+        key: str = None,
+        delete: List[str] = Query([]),
+        newname: List[str] = Query([]),
+        city: List[str] = Query([]),
+        citySearch: str = None,
+        cityId: str = None,
+        stateAbbr: str = None,
+        countryAbbr: str = None,
+        lat: str = None,
+        lon: str = None):
 
     logit.debug(f"api /setup endpoint hit")
     logit.debug(f"action: {action}")
@@ -1269,24 +1288,24 @@ async def report(
     )
     return SW.setup_dct()
 
+
 @app.get("/setup", response_class=HTMLResponse)
 async def run_setup(
-    request: Request,
-    action: str = None,
+        request: Request,
+        action: str = None,
 
-    key: str = None,
+        key: str = None,
 
-    delete: List[str] = Query([]),
-    newname: List[str] = Query([]),
-    city: List[str] = Query([]),
+        delete: List[str] = Query([]),
+        newname: List[str] = Query([]),
+        city: List[str] = Query([]),
 
-    citySearch: str = None,
-    cityId: str = None,
-    stateAbbr: str = None,
-    countryAbbr: str = None,
-    lat: str = None,
-    lon: str = None
-    ):
+        citySearch: str = None,
+        cityId: str = None,
+        stateAbbr: str = None,
+        countryAbbr: str = None,
+        lat: str = None,
+        lon: str = None):
 
     logit.debug(f"/setup endpoint hit")
     logit.debug(f"action: {action}")
@@ -1317,4 +1336,4 @@ async def run_setup(
         response = RedirectResponse(url='/')
         return response
 
-    return templates.TemplateResponse("setup.html", {"request": request, 'dict':SW.setup_dct()})
+    return templates.TemplateResponse("setup.html", {"request": request, 'dict': SW.setup_dct()})

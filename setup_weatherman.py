@@ -6,7 +6,6 @@ import gzip
 import re
 
 
-
 class SetupWeatherman:
 
     def __init__(self):
@@ -30,15 +29,14 @@ class SetupWeatherman:
             'lon': '',
         }
 
-
     # Key
     @property
     def key(self):
         """Key property"""
         # print(self._key)
-        if self._key == None:
+        if self._key is None:
             self._key = self.read_key()
-            if self._key == None:
+            if self._key is None:
                 self._key = self.config['default_key_contents']
         return self._key
 
@@ -67,25 +65,24 @@ class SetupWeatherman:
         with open(self.config['key_path'], 'w') as filehandle:
             filehandle.writelines("%s\n" % place for place in key_file_list)
 
-
     # Locations
     @property
     def locations(self):
         """Locations property"""
         # print('returning locations')
-        if self._locations == None:
+        if self._locations is None:
             self._locations = self.read_locations()
-            if self._locations == None:
+            if self._locations is None:
                 return self.config['default_private_config_contents']
         return self._locations
 
     def add_locations(self, key, value):
         # print(f"adding locations {key} {value}")
-        if self._locations == None:
+        if self._locations is None:
             self._locations = {}
         while key in self._locations.keys():
             key += '*'
-        self._locations.update({key:value})
+        self._locations.update({key: value})
 
     def update_locations(self, old, new):
         # print(f"Modifying locations {old} {new}")
@@ -126,14 +123,14 @@ class SetupWeatherman:
     def parameters(self):
         """Parameters property"""
         # print(f"returning parameters it is {self._parameters}")
-        if self._parameters == None:
+        if self._parameters is None:
             # print(self.config['default_city_list_search'])
             return self.config['default_city_list_search']
         return self._parameters
 
     def update_parameters(self, parameter, value):
         # print(f"Updating parameters to {parameter} {value}")
-        if self._parameters == None:
+        if self._parameters is None:
             self._parameters = self.default_parameters
         self._parameters[parameter] = value
 
@@ -141,17 +138,16 @@ class SetupWeatherman:
         # print('Resetting parameters')
         self._parameters = None
 
-
     # Results
     @property
     def results(self):
         """Results property"""
         # print(f"returning resluts, parameters is: {self._parameters} aka {self.parameters}")
-        if self._parameters == None:
+        if self._parameters is None:
             # If there are no parameters return an empty list
             return []
         self._results = self.search_city_dict(self.parameters)
-        if self._results == None:
+        if self._results is None:
             return []
         return self._results
 
@@ -192,13 +188,12 @@ class SetupWeatherman:
         # print(len(list_of_cities))
         return list_of_cities
 
-    
     # City list of dicts
     @property
     def city_list_dict(self):
         """List of cities from OWM"""
         # print(f"running city list dict thing, type before {type(self._city_list_dict)}")
-        if self._city_list_dict == None:
+        if self._city_list_dict is None:
             self._city_list_dict = self.gzip_city_list()
         return self._city_list_dict
 
@@ -214,7 +209,6 @@ class SetupWeatherman:
             'results': self.results
         }
 
-
     # Setting up directories
     def verify_directories(self):
         """
@@ -224,7 +218,6 @@ class SetupWeatherman:
             # print(directory)
             if not os.path.exists(directory):
                 os.makedirs(directory)
-
 
     # City list management
     def download_city_list(self):
@@ -258,13 +251,13 @@ class SetupWeatherman:
         """
         # print('Cleaning up setup files')
         try:
-             os.remove(self.config['city_list_gz_location'])
+            os.remove(self.config['city_list_gz_location'])
             #  print(f"deleting {self.config['city_list_gz_location']}")
         except OSError:
             pass
 
         try:
-             os.remove(self.config['city_list_json_location'])
+            os.remove(self.config['city_list_json_location'])
             #  print(f"deleting {self.config['city_list_json_location']}")
         except OSError:
             pass
