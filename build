@@ -97,7 +97,7 @@ tests () {
     # I have them seporated in case i want to grep for things in the test or save them to files. 
     lint
     unit
-    # functional
+    functional
 }
 
 about () {
