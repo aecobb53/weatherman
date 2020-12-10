@@ -30,7 +30,7 @@ services:
             - TESTING=False
             - AUTOPOLLING=False
 
-    test:
+    functional:
         build: .
         image: weather-dev:latest
         # command: behave features/data_validator.feature
@@ -46,7 +46,7 @@ services:
             - TESTING=True
             - AUTOPOLLING=False
 
-    unit-test:
+    unit:
         build: .
         image: weather-unit-test:latest
         command: pytest
