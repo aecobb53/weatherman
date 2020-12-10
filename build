@@ -79,12 +79,12 @@ clense () {
 unit () {
     # Run the unit tests. 
     # This includes flake and lenting
-    docker-compose run --rm unit-test
+    docker-compose run --rm unit
 }
 
 functional () {
     # Run the functional tests. 
-    docker-compose run --rm test
+    docker-compose run --rm functional
 }
 
 tests () {
