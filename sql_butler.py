@@ -12,7 +12,6 @@ class SQLButler:
     """
 
     def __init__(self, database_name):
-
         self.headers = {
             'time':'datetime',
             'city':'integer',
