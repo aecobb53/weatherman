@@ -24,10 +24,10 @@ class DataValidator:
         # If the data is local it should be offset for zulu for the app.
         # This is important in case the frontend formats timestamps locally or something like that
         if datetime_str.upper().endswith('Z'):
-            zulu = True # noqa
+            zulu = True  # noqa
             datetime_str = datetime_str[:-1]
         if datetime_str.upper().endswith('L'):
-            local = True # noqa
+            local = True  # noqa
             datetime_str = datetime_str[:-1]
 
         try:

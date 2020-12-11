@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import RedirectResponse
-from typing import Optional, List # noqa
+from typing import Optional, List  # noqa
 
 import weather_butler
 import data_validator
@@ -350,7 +350,10 @@ class WeatherMan:
                     report2[name][0].append(line)
                 else:
                     if reports[index - 1]['time'] <= line['time'] - \
-                    datetime.timedelta(minutes=int(self.config['storm_difference_time'])):
+                        datetime.timedelta(
+                            minutes=int(
+                                self.config['storm_difference_time']
+                            )):
 
                         report2[name].append([])
                         report_index += 1
@@ -371,14 +374,15 @@ class WeatherMan:
                     #     'sky_id': []
                     # }
                     for itterate, line in enumerate(event):
-                        if itterate in [0, len(event)-1]:
+                        if itterate in [0, len(event) - 1]:
                             continue
                         if not recursive_search(
                             line['sky_id'],
                             'sky_id',
                             itterate,
                             event,
-                        self.config['storm_difference_itteration']):
+                            self.config['storm_difference_itteration']
+                        ):
 
                             report[name][index].insert(-1, line)
         logit.debug('Created a weather report')
