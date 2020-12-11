@@ -261,4 +261,5 @@ class SQLButler:
         data = list(self.c.execute("""SELECT * FROM weather""").fetchall())
         dump.append(self.tuple_to_dict(data[0]))
         dump.append(self.tuple_to_dict(data[-1]))
+        print(dump)
         return dump

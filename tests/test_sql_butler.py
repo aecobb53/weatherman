@@ -5,17 +5,17 @@ import sqlite3
 import yaml
 import json
 import os
+import unittest
+mock = unittest.mock.Mock()
 
 master_copnfig = 'etc/weatherman.yml'
 with open(master_copnfig) as ycf:
     config = yaml.load(ycf, Loader=yaml.FullLoader)
 environment = os.environ.get('ENVIRONMENT')
-# db_name = config['db_name'] + config['environments'][environment]['db_addition']
 
 @pytest.fixture(scope="function")
 def setup_sqlb():
     sqlb = SQLButler('db/weatherman_unit')
-    # sqlb = SQLButler(db_name)
     return sqlb
 
 @pytest.fixture(scope="function")
@@ -222,20 +222,9 @@ def test_get_all_data(setup_sqlb):
     return_data = sqlb.get_all_data()
     assert isinstance(return_data, list)
 
-def test_get_first_and_last(setup_sqlb):
-    sqlb = setup_sqlb
-    mocker.patch('sql_butler.tuple_to_dict', return_value=[1, 2])
-    return_data = sqlb.get_first_and_last()
-    assert isinstance(return_data, list)
+# get_first_and_last
 
 
 
-def test_negative_set_up_sql():
-    with pytest.raises(TypeError) as exp:
-        SQLButler(123456)
-    assert str(exp.value) == 'The provided database name is not a string'
-
-
-
-# When building for main, use a parametrize ability for the getters/setters so it can test multiple cases quickly
-# If you are using the same functions or parameters you can set them in
+# # When building for main, use a parametrize ability for the getters/setters so it can test multiple cases quickly
+# # If you are using the same functions or parameters you can set them in

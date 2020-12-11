@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import RedirectResponse
-from typing import Optional, List
+from typing import Optional, List # noqa
 
 import weather_butler
 import data_validator
@@ -394,8 +394,8 @@ class WeatherMan:
             for storm in storms:
                 if len(storm) > 1:
                     storm_durration = str(storm[-1]['time'] - storm[0]['time'])
-                    new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
-                    new_end = storm[-1]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
+                    # new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
+                    # new_end = storm[-1]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
                 else:
                     if self.config['single_storm_event_flag']:
                         """
@@ -403,8 +403,8 @@ class WeatherMan:
                         will be added. else they will be skipped.
                         """
                         storm_durration = '0'
-                        new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
-                        new_end = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
+                        # new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
+                        # new_end = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
                     else:
                         continue
                 for line in storm:
@@ -1247,7 +1247,7 @@ def report_items(
 
 # Setup
 @app.get("/api/setup")
-async def report(
+async def api_setup(
         action: str = None,
         key: str = None,
         delete: List[str] = Query([]),
