@@ -5,12 +5,12 @@ import os
 import yaml
 import threading
 
-from fastapi import FastAPI, Request, Form, Query
+from fastapi import FastAPI, Request, Query
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from starlette.responses import PlainTextResponse, RedirectResponse
+from starlette.responses import RedirectResponse
 from typing import Optional, List
 
 import weather_butler
@@ -367,9 +367,9 @@ class WeatherMan:
                     report[name].append(event)
                 else:
                     report[name].append([event[0], event[-1]])
-                    memory = {
-                        'sky_id': []
-                    }
+                    # memory = {
+                    #     'sky_id': []
+                    # }
                     for itterate, line in enumerate(event):
                         if itterate in [0, len(event)-1]:
                             continue
@@ -549,19 +549,19 @@ def generage_parameters(
             exact_list += f",{str(num)}"
 
     try:
-        logit.debug(f"validating exact_list")
+        logit.debug('validating exact_list')
         exact_list = validator.is_exact_list(exact_list)
     except:
         exact_list = None
 
     try:
-        logit.debug(f"validating start_time")
+        logit.debug('validating start_time')
         start_time = validator.is_datetime(start_time)
     except:
         start_time = None
 
     try:
-        logit.debug(f"validating wnd_time")
+        logit.debug('validating wnd_time')
         end_time = validator.is_datetime(end_time)
     except:
         end_time = None
@@ -659,7 +659,7 @@ def submit_bug(
             json.dump(bug_info, br, indent=4)
         return True
     else:
-        logit.info(f"Invalid entry, skipping")
+        logit.info('Invalid entry, skipping')
         return False
 
 
@@ -894,7 +894,7 @@ def read_items(
     Takes a query and tells the app to grab data.
     """
 
-    logit.debug(f"api dump/search endpoint hit")
+    logit.debug('api dump/search endpoint hit')
     logit.debug(f"thunderstorm: {thunderstorm}")
     logit.debug(f"drizzle: {drizzle}")
     logit.debug(f"rain: {rain}")
@@ -943,7 +943,7 @@ async def data_dump(request: Request):
 
 
 @app.get('/dump/search/')
-def read_items(
+def read_items_search(
         request: Request,
         thunderstorm=False,
         drizzle=False,
@@ -959,7 +959,7 @@ def read_items(
     Takes a query and tells the app to grab data.
     """
 
-    logit.debug(f"dump/search endpoint hit")
+    logit.debug('dump/search endpoint hit')
     logit.debug(f"thunderstorm: {thunderstorm}")
     logit.debug(f"drizzle: {drizzle}")
     logit.debug(f"rain: {rain}")
@@ -994,7 +994,7 @@ def read_items(
 
 # Bug
 @app.get("/api/bug-report/entry", response_class=HTMLResponse)
-async def read_items(
+async def api_read_items(
         prod=None,
         dev=None,
         test=None,
@@ -1014,7 +1014,7 @@ async def read_items(
     Receive bug-report.
     """
 
-    logit.debug(f"api bug-report endpoint hit")
+    logit.debug('api bug-report endpoint hit')
     logit.debug(f"prod: {prod}")
     logit.debug(f"dev: {dev}")
     logit.debug(f"test: {test}")
@@ -1063,7 +1063,7 @@ async def submit_bug_report(request: Request):
 
 
 @app.get("/bug-report/entry", response_class=HTMLResponse)
-async def read_items(
+async def read_bug(
         request: Request,
         prod=None,
         dev=None,
@@ -1084,7 +1084,7 @@ async def read_items(
     Receive bug-report.
     """
 
-    logit.debug(f"bug-report endpoint hit")
+    logit.debug('bug-report endpoint hit')
     logit.debug(f"prod: {prod}")
     logit.debug(f"dev: {dev}")
     logit.debug(f"test: {test}")
@@ -1131,7 +1131,7 @@ async def read_items(
 
 # Report
 @app.get('/api/report/search/')
-def report_items(
+def api_report_items(
         thunderstorm=False,
         drizzle=False,
         rain=False,
@@ -1146,7 +1146,7 @@ def report_items(
     Takes a query and tells the app to grab data.
     """
 
-    logit.debug(f"api report/search endpoint hit")
+    logit.debug('api report/search endpoint hit')
     logit.debug(f"thunderstorm: {thunderstorm}")
     logit.debug(f"drizzle: {drizzle}")
     logit.debug(f"rain: {rain}")
@@ -1211,7 +1211,7 @@ def report_items(
     Takes a query and tells the app to grab data.
     """
 
-    logit.debug(f"report/search endpoint hit")
+    logit.debug('report/search endpoint hit')
     logit.debug(f"thunderstorm: {thunderstorm}")
     logit.debug(f"drizzle: {drizzle}")
     logit.debug(f"rain: {rain}")
@@ -1260,7 +1260,7 @@ async def report(
         lat: str = None,
         lon: str = None):
 
-    logit.debug(f"api /setup endpoint hit")
+    logit.debug('api /setup endpoint hit')
     logit.debug(f"action: {action}")
     logit.debug(f"key: {key}")
     logit.debug(f"delete: {delete}")
@@ -1307,7 +1307,7 @@ async def run_setup(
         lat: str = None,
         lon: str = None):
 
-    logit.debug(f"/setup endpoint hit")
+    logit.debug('/setup endpoint hit')
     logit.debug(f"action: {action}")
     logit.debug(f"key: {key}")
     logit.debug(f"delete: {delete}")

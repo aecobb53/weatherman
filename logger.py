@@ -1,7 +1,5 @@
 import logging
 import datetime
-import os
-from logging.handlers import RotatingFileHandler
 
 
 class Borg:

@@ -49,7 +49,9 @@ services:
     unit:
         build: .
         image: weather-unit:latest
-        command: pytest
+        # command: sh
+        command: pytest --cov=. tests/test_sql_butler.py
+        # command: pytest --cov=. .
         volumes:
             - .:/usr/src
         ports:

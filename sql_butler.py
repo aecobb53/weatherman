@@ -238,19 +238,19 @@ class SQLButler:
         dump = self.list_tuple_to_list_dict(data)
         return dump
 
-    def get_bad_data(self):
-        """
-        This gets all data that is not clear... more or less. See a better explanation of why
-        200 and 799 are important in the main module.
-        """
-        dump = []
-        self.c = self.create_database()
-        self.c.execute("""SELECT * FROM weather WHERE
-            sky_id BETWEEN 200 AND 799
-        """)
-        data = self.c.fetchall()
-        dump = self.list_tuple_to_list_dict(data)
-        return dump
+    # def get_bad_data(self):
+    #     """
+    #     This gets all data that is not clear... more or less. See a better explanation of why
+    #     200 and 799 are important in the main module.
+    #     """
+    #     dump = []
+    #     self.c = self.create_database()
+    #     self.c.execute("""SELECT * FROM weather WHERE
+    #         sky_id BETWEEN 200 AND 799
+    #     """)
+    #     data = self.c.fetchall()
+    #     dump = self.list_tuple_to_list_dict(data)
+    #     return dump
 
     def get_first_and_last(self):
         """

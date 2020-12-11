@@ -11,5 +11,6 @@ pytest-cov==2.10.1
 pytest-flakes==4.0.2
 pytest-pep8==1.0.6
 pytest-pythonpath==0.7.3
+pytest-mock==3.3.1
 pyyaml==5.3.1
 pycodestyle==2.6.0
