@@ -55,7 +55,7 @@ services:
         volumes:
             - .:/usr/src
         ports:
-            - 8030:8000
+            - 8021:8000
         environment:
             - ENVIRONMENT=test
             - TESTING=True
@@ -70,7 +70,7 @@ services:
         volumes:
             - .:/usr/src
         ports:
-            - 8030:8000
+            - 8022:8000
         environment:
             - ENVIRONMENT=test
             - TESTING=True

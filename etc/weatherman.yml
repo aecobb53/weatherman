@@ -21,7 +21,7 @@ environments:
             f_level: DEBUG
             c_level: WARNING
             log_rolling: size
-            maxBytes: 100
+            maxBytes: 10000000
             backupCount: 5
             log_directory: logs
             log_prefix: None
@@ -40,7 +40,7 @@ environments:
             f_level: DEBUG
             c_level: DEBUG
             log_rolling: size
-            maxBytes: 100
+            maxBytes: 10000000
             backupCount: 5
             log_directory: logs
             log_prefix: None
@@ -59,7 +59,7 @@ environments:
             f_level: DEBUG
             c_level: DEBUG
             log_rolling: size
-            maxBytes: 100
+            maxBytes: 10000000
             backupCount: 5
             log_directory: logs
             log_prefix: None
