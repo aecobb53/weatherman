@@ -1,4 +1,4 @@
-import logger
+from bin import logger
 
 logging_mod = logger
 

@@ -3,7 +3,7 @@ import datetime
 import json
 import yaml
 
-import weather_butler
+from weatherman import weather_butler
 
 # Logging
 import steps_logging

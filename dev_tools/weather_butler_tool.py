@@ -6,7 +6,7 @@ import sys
 import yaml
 
 sys.path.append("..")
-import weather_butler
+from dev import weather_butler
 
 master_config = '../etc/weatherman.yml'
 with open(master_config) as ycf:

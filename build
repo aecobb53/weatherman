@@ -8,8 +8,7 @@ grep_port () {
 }
 
 setup () {
-    # echo "${@}"
-    # ./setup.sh $@
+    echo 'This is depreciated. use dev_tools/main_tool.py -setup help'
 }
 
 clean () {

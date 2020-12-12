@@ -71,8 +71,9 @@ class Logger(Borg):
 
         # create formatter and add it to the handlers
         # Move into if statement based on kwargs?
-        self.formatter = logging.Formatter('%(asctime)s %(levelname)s %(module)s %(funcName)s - \
-            %(message)s', '%Y-%m-%dT%H:%M:%SZ')
+        self.formatter = logging.Formatter(
+            '%(asctime)s %(levelname)s %(module)s %(funcName)s - %(message)s', '%Y-%m-%dT%H:%M:%SZ'
+        )
 
         # Adds the formatter to the logging object
         self.fh.setFormatter(self.formatter)

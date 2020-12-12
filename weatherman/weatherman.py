@@ -1,21 +1,10 @@
 import datetime
-import time
+# import time
 import json
 import os
 import yaml
-import threading
-
-from fastapi import FastAPI, Request, Query
-from fastapi.templating import Jinja2Templates
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from starlette.responses import RedirectResponse
-from typing import Optional, List  # noqa
 
 from weatherman import weather_butler
-from weatherman import data_validator
-# from bin import setup
 from weatherman import sql_butler
 from bin import logger
 
@@ -370,9 +359,6 @@ class WeatherMan:
                     report[name].append(event)
                 else:
                     report[name].append([event[0], event[-1]])
-                    # memory = {
-                    #     'sky_id': []
-                    # }
                     for itterate, line in enumerate(event):
                         if itterate in [0, len(event) - 1]:
                             continue
@@ -398,8 +384,6 @@ class WeatherMan:
             for storm in storms:
                 if len(storm) > 1:
                     storm_durration = str(storm[-1]['time'] - storm[0]['time'])
-                    # new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
-                    # new_end = storm[-1]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
                 else:
                     if self.config['single_storm_event_flag']:
                         """
@@ -407,8 +391,6 @@ class WeatherMan:
                         will be added. else they will be skipped.
                         """
                         storm_durration = '0'
-                        # new_start = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
-                        # new_end = storm[0]['time'].strftime("%Y-%m-%dT%H:%M:%SZ")
                     else:
                         continue
                 for line in storm:

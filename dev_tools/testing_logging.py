@@ -1,7 +1,8 @@
 import time
 
 # Logging
-import logger
+from bin import logger
+
 logger = logger.Logger(
     'testing_logging',
     f_level='DEBUG',

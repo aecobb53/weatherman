@@ -3,7 +3,7 @@ import datetime
 import json
 import yaml
 
-import data_validator
+from weatherman import data_validator
 
 # Logging
 import steps_logging

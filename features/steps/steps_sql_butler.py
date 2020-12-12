@@ -3,8 +3,8 @@ import datetime
 import json
 import yaml
 
-import sql_butler
-import data_validator
+from weatherman import sql_butler
+from weatherman import data_validator
 validator = data_validator.DataValidator()
 
 

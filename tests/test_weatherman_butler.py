@@ -1,4 +1,4 @@
-from weather_butler import WeatherButler
+from weatherman import weather_butler
 import pytest
 import datetime # noqa
 import sqlite3 # noqa
@@ -15,7 +15,7 @@ environment = os.environ.get('ENVIRONMENT')
 
 @pytest.fixture(scope="function")
 def setup_wb():
-    wb = WeatherButler('db/weatherman_unit')
+    wb = weather_butler.WeatherButler('db/weatherman_unit')
     return wb
 
 # def test_get_response():
