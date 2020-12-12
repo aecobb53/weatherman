@@ -468,7 +468,7 @@ actually run
 """
 
 
-app = FastAPI()
+app = FastAPI()  # noqa
 global WM
 WM = WeatherMan()
 validator = data_validator.DataValidator()
