@@ -9,7 +9,7 @@ grep_port () {
 
 setup () {
     # echo "${@}"
-    ./setup.sh $@
+    # ./setup.sh $@
 }
 
 clean () {
