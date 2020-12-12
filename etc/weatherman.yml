@@ -69,6 +69,20 @@ environments:
             time_in_file: False
             utc_in_file: False
             short_datetime: False
+api_log_parameters:
+    f_level: DEBUG
+    c_level: DEBUG
+    log_rolling: size
+    maxBytes: 10000000
+    backupCount: 5
+    log_directory: logs
+    log_prefix: None
+    log_suffix: api
+    app_name_in_file: True
+    date_in_file: False
+    time_in_file: False
+    utc_in_file: False
+    short_datetime: False
 
 time_increment:
     replace_seconds: 0

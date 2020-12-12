@@ -16,9 +16,9 @@ master_config_path = 'etc/weatherman.yml'
 I init the logger so i can use it for the api calls.
 Because i dont want it to log to the main log i use a startup log that should forever be empy
 """
-# logger = logger.Logger(appname, app_name_in_file=True, log_suffix='startup')
-# logit = self.logger.return_self.logit()
-# default_log_file = self.logger.log_file
+logger = logger.Logger(appname, app_name_in_file=True, log_suffix='startup')
+logit = logger.return_logit()
+default_log_file = logger.log_file
 
 
 class WeatherMan:
@@ -28,7 +28,7 @@ class WeatherMan:
     I gather my weather data from https://openweathermap.org.
     """
 
-    def __init__(self, passed_logger=None, passed_logit=None):
+    def __init__(self):
 
         # Variables
         self.environment = None
@@ -66,19 +66,11 @@ class WeatherMan:
         self.setup = False
 
         # Logging
-        if passed_logit == None:
-            self.logger = logger.Logger(appname, app_name_in_file=True, log_suffix='startup')
-            self.logit = self.logger.return_logit()
-            default_log_file = self.logger.log_file
-        else:
-            self.logger = passed_logger
-            self.logit = passed_logit
-
-        # self.set_logging()
-        # self.logger.update_file_level(
-        #     self.config['environments'][self.environment]['log_parameters']['f_level'])
-        # self.logger.update_consol_level(
-        #     self.config['environments'][self.environment]['log_parameters']['c_level'])
+        self.set_logging()
+        logger.update_file_level(
+            self.config['environments'][self.environment]['log_parameters']['f_level'])
+        logger.update_consol_level(
+            self.config['environments'][self.environment]['log_parameters']['c_level'])
 
         # Variables
         try:
@@ -106,9 +98,10 @@ class WeatherMan:
         self.update_state({'working_directory': os.getcwd()})
 
         # Wrapping up
-        self.logit.info(f"Starting in {self.environment}")
-        # self.logit.info(f"logging levels set to fh:{self.state['f_level']} ch:{self.state['c_level']} testing:{self.testing}")
-        self.logit.debug(f'State: {self.state}')
+        logit.info(f"Starting in {self.environment}")
+        logit.info(f"logging levels set to fh:{self.state['f_level']} \
+            ch:{self.state['c_level']} testing:{self.testing}")
+        logit.debug(f'State: {self.state}')
 
     # Getters/Setters
     # Setup
@@ -240,7 +233,7 @@ class WeatherMan:
         for k, v in logging_dct.items():
             if v == 'None':
                 logging_dct[k] = None
-        self.logger.update_file(
+        logger.update_file(
             appname,
             f_level=logging_dct['f_level'],
             c_level=logging_dct['c_level'],
@@ -256,15 +249,15 @@ class WeatherMan:
             utc_in_file=logging_dct['utc_in_file'],
             short_datetime=logging_dct['short_datetime']
         )
-        if self.logger.state['log_rolling'] is not None:
-            self.logger.add_rotation()
+        if logger.state['log_rolling'] is not None:
+            logger.add_rotation()
         self.update_state({
             'f_level': logging_dct['f_level'],
             'c_level': logging_dct['c_level'],
             'log_rolling': logging_dct['log_rolling'],
             'maxBytes': logging_dct['maxBytes'],
             'backupCount': logging_dct['backupCount'],
-            'log_file': self.logger.log_file,
+            'log_file': logger.log_file,
         })
 
     def poll_weather(self):
@@ -272,8 +265,8 @@ class WeatherMan:
         Using the weather butler to grabb data from the weather website.
         """
         data = self.weather_butler.poll()
-        self.logit.debug(f"request: {self.weather_butler.request}")
-        self.logit.debug(f"request: {self.weather_butler.request.json()}")
+        logit.debug(f"request: {self.weather_butler.request}")
+        logit.debug(f"request: {self.weather_butler.request.json()}")
         self.last_poll = datetime.datetime.now(tz=datetime.timezone.utc)
         return data
 
@@ -282,16 +275,16 @@ class WeatherMan:
         I used to have a use case for needing two functions to do this...
         now i just have two functions...
         """
-        self.logit.debug('managing polling?')
+        logit.debug('managing polling?')
         data = self.poll_weather()
         self.db.multi_add(data)
-        self.logit.debug('data added to db')
+        logit.debug('data added to db')
 
     def weather_dump(self, parameters):
         """
         Takes the parameters to filter out results from the database.
         """
-        self.logit.debug(f'weather dump based on parameters {parameters}')
+        logit.debug(f'weather dump based on parameters {parameters}')
         data = self.db.query_database(parameters)
         for weatherdata in data:
             new_dct = {i: None for i in self.config['dump_webpage_list']}
@@ -378,7 +371,7 @@ class WeatherMan:
                         ):
 
                             report[name][index].insert(-1, line)
-        self.logit.debug('Created a weather report')
+        logit.debug('Created a weather report')
         return report
 
     def write_report(self, report, file_name=None):
@@ -422,7 +415,7 @@ class WeatherMan:
         self.update_report(json_report)
         with open(file_name, 'w') as new_report:
             json.dump(self.report, new_report, indent=2)
-        self.logit.debug(f'Wrote a weatehr report to a file {file_name}')
+        logit.debug(f'Wrote a weatehr report to a file {file_name}')
 
     def clear_search(self):
         self.clear_dump_list()
