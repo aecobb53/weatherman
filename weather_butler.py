@@ -1,4 +1,3 @@
-import json
 import requests
 import datetime
 import yaml
@@ -6,25 +5,24 @@ import yaml
 
 class WeatherButler:
     """
-    WeatherButler handles API calls of the weather website. 
+    WeatherButler handles API calls of the weather website.
     """
 
     def __init__(self, private_config_path, owma_url, key_path):
         """Load configs"""
         self.config = {}
         self.key = {}
-        
+
         with open(private_config_path) as private_config:
             private_conf = yaml.load(private_config, Loader=yaml.FullLoader)
 
         self.config.update(private_conf)
-        public_conf = {'url':owma_url}
+        public_conf = {'url': owma_url}
         self.config.update(public_conf)
 
         """Load key"""
         with open(key_path) as keyfile:
             self.key = yaml.load(keyfile, Loader=yaml.FullLoader)
-
 
     def get_response(self, url, args):
         """
@@ -38,22 +36,20 @@ class WeatherButler:
             return_list = []
         return request, return_list
 
-
     def format_request_city_id_list(self, url, city_id_list, key):
         """
-        Format the url in the git_response to look for the list of cities in the config. 
+        Format the url in the git_response to look for the list of cities in the config.
         """
         url += 'group?'
-        args = {'appid':key, 'id':','.join([str(i) for i in city_id_list]), 'units':'imperial'}
+        args = {'appid': key, 'id': ','.join([str(i) for i in city_id_list]), 'units': 'imperial'}
         return url, args
-
 
     def format_response(self, data):
         """
         Format data from weather call
         """
         report = []
-        
+
         for weather in data:
             for i in range(len(weather['weather'])):
                 entry = {}
@@ -122,17 +118,16 @@ class WeatherButler:
                 report.append(entry)
         return report
 
-
     def poll(self):
         """
-        An easy module to handle all parts of grabbing the data. Its run and successful weather 
+        An easy module to handle all parts of grabbing the data. Its run and successful weather
         comes out... or an error... an error can happen too.
         """
         url, args = self.format_request_city_id_list(
-            self.config['url'], 
-            self.config['locations'].values(), 
+            self.config['url'],
+            self.config['locations'].values(),
             self.key['Weather_Key']
         )
         self.request, data = self.get_response(url, args)
-        report  = self.format_response(data)
+        report = self.format_response(data)
         return report

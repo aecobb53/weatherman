@@ -1,5 +1,7 @@
 #! /bin/bash
 
+SUCCESSFUL_TEST=true
+
 grep_port () {
     echo "Activiating ports:"
     grep -A8 $1 docker-compose.yml | grep -A2 ports | grep "-"
@@ -76,22 +78,49 @@ clense () {
 }
 
 
+lint () {
+    # Run the functional tests. 
+    docker-compose run --rm lint
+
+    if [[ $? -eq 1 ]]; then 
+        SUCCESSFUL_TEST=false
+        echo 'Test failed'
+    fi
+}
+
 unit () {
     # Run the unit tests. 
-    # This includes flake and lenting
+    # This includes flake
     docker-compose run --rm unit
+
+    if [[ $? -eq 1 ]]; then 
+        SUCCESSFUL_TEST=false
+        echo 'Test failed'
+    fi
 }
 
 functional () {
     # Run the functional tests. 
     docker-compose run --rm functional
+
+    if [[ $? -eq 1 ]]; then 
+        SUCCESSFUL_TEST=false
+        echo 'Test failed'
+    fi
 }
 
 tests () {
     # Run each test. 
     # I have them seporated in case i want to grep for things in the test or save them to files. 
+    lint
     unit
     functional
+    if [[ $SUCCESSFUL_TEST == true ]]
+    then
+        echo 'The tests were successful'
+    else
+        echo 'The tests were unsuccessful'
+    fi
 }
 
 about () {
@@ -149,6 +178,9 @@ case "$1" in
         ;;
 
     # Testing
+    lint)
+        lint
+        ;;
     unit)
         unit
         ;;

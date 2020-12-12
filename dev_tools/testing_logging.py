@@ -3,7 +3,7 @@ import time
 # Logging
 import logger
 logger = logger.Logger(
-    'testing_logging', 
+    'testing_logging',
     f_level='DEBUG',
     c_level='DEBUG',
     log_rolling='size',
@@ -35,4 +35,3 @@ while True:
     if count < 0:
         break
     time.sleep(.2)
-    

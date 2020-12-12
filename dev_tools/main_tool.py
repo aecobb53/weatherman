@@ -11,7 +11,8 @@ aparse.add_argument('-state',   action='store_true', help='state of app')
 aparse.add_argument('-poll',    action='store_true', help='poll data now')
 aparse.add_argument('-dump',    action='store_true', help='database data dump')
 aparse.add_argument('-report',  action='store_true', help='database refined dump')
-aparse.add_argument('-setup',   action='store_true', help='set up the app. run -setup help for more info')
+aparse.add_argument('-setup',   action='store_true', help='set up the app. \
+    run -setup help for more info')
 aparse.add_argument('-bug',     action='store_true', help='create a bug report')
 aparse.add_argument('-port',    default='8010',      help='create a bug report')
 aparse.add_argument('args', nargs='*')
@@ -31,7 +32,7 @@ print('')
 def get(url, args=None):
     print(f"url: {url}")
     print(f"args: {args}")
-    if args == None:
+    if args is None:
         print('running no args')
         responses = requests.get(url)
     else:
@@ -45,10 +46,12 @@ def get(url, args=None):
 
     return responses, data
 
+
 def run_setup():
     # if response.status_code == 501 and response.content.decode('utf-8') == 'App not setup!':
     print('Run setup endpoint api/setup to finish setting up the app!')
     exit()
+
 
 if args.state:
     response, data = get(url + '/state')
@@ -56,7 +59,7 @@ if args.state:
     # if response.content.decode('utf-8') == app_no_setup:
     if data == app_no_setup:
         run_setup()
-    for k,v in data.items():
+    for k, v in data.items():
         if k == 'cities':
             print(f"{tab}Cities:")
             for k2, v2 in v.items():
@@ -168,10 +171,12 @@ if args.report:
             for line in storm:
                 print(tab*2 + str(line))
 
+
 def print_setup_help():
     print('Args for setup:')
     print('The action types define if it is retreiving data or setup data.')
-    print(tab + 'action - either refresh or setup (can also call those two directly) by default it will refresh')
+    print(tab + 'action - either refresh or setup (can also call those two directly) \
+        by default it will refresh')
     print(tab + 'Example: action=refresh or refresh')
 
     print('The key/value pairs use an "=" to designate them')
@@ -194,6 +199,7 @@ def print_setup_help():
 
     print('No arguments returns the current state of the setup')
 
+
 # setup
 if args.setup:
     if 'help' in args.args:
@@ -202,7 +208,7 @@ if args.setup:
     print_setup_help()
     arg_dct = {}
     for item in args.args:
-        
+
         key = ''
         value = ''
         if '=' in item:
@@ -219,7 +225,14 @@ if args.setup:
             if item == 'setup':
                 arg_dct['action'] = 'setup'
 
-        if any([True for i in ['key', 'citySearch', 'cityId', 'stateAbbr', 'countryAbbr', 'lat', 'lon'] if item.startswith(i)]):
+        if any([True for i in [
+            'key',
+            'citySearch',
+            'cityId',
+            'stateAbbr',
+            'countryAbbr',
+            'lat',
+            'lon'] if item.startswith(i)]):
             if key == 'key':
                 arg_dct['key'] = value
             if key == 'citySearch':
@@ -234,7 +247,7 @@ if args.setup:
                 arg_dct['lat'] = value
             if key == 'lon':
                 arg_dct['lon'] = value
-    
+
         if any([True for i in ['delete', 'newname', 'city'] if item.startswith(i)]):
             if key == 'delete':
                 if 'delete' not in arg_dct.keys():
@@ -249,7 +262,7 @@ if args.setup:
                 arg_dct['city'].append(value)
 
     response, data = get(url + '/setup', arg_dct)
-    
+
     for category, values in data.items():
         if category == 'key':
             print(f"{tab}key: {values}")
@@ -268,26 +281,17 @@ if args.setup:
                 print(f"{tab*2}{thing}")
 
     print('')
-    print('Here is the list of elements to replace to make copy/paste/replace easier if you need to')
+    print('Here is the list of elements to replace to make copy/paste/replace \
+        easier if you need to')
     newstr = "'" + "','".join([item for item in data['locations'].keys()]) + "'"
     print(f"newname=[{newstr}]")
-    
+
     print('')
     print("To rename a city from the locations list above add newname=<ID>")
     print("To remove a city from the locations list above add delete=<ID>")
     print("To add a city from the results list above add city=<name>=<ID>")
-        
-
 
 # # bug report
 # @app.get("/api/bug-report/entry", response_class=HTMLResponse)
 # @app.get("/bug-report", response_class=HTMLResponse)
 # @app.get("/bug-report/entry", response_class=HTMLResponse)
-
-
-
-
-
-
-
-
