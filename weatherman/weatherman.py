@@ -66,19 +66,29 @@ class WeatherMan:
         self.setup = False
 
         # Logging
-        if passed_logit == None:
-            self.logger = logger.Logger(appname, app_name_in_file=True, log_suffix='startup')
+        logging_dct = self.config['environments'][self.environment]['log_parameters']
+        if passed_logit is None:
+            self.logger = logger.Logger(
+                appname,
+                f_level=logging_dct['f_level'],
+                c_level=logging_dct['c_level'],
+                log_directory=logging_dct['log_directory'],
+                log_prefix=logging_dct['log_prefix'],
+                log_suffix=logging_dct['log_suffix'],
+                app_name_in_file=logging_dct['app_name_in_file'],
+                date_in_file=logging_dct['date_in_file'],
+                time_in_file=logging_dct['time_in_file'],
+                utc_in_file=logging_dct['utc_in_file'],
+                short_datetime=logging_dct['short_datetime'],
+                maxBytes=logging_dct['maxBytes'],
+                backupCount=logging_dct['backupCount'],
+                create_ch=logging_dct['create_ch'],
+                create_sh=logging_dct['create_sh'])
             self.logit = self.logger.return_logit()
-            default_log_file = self.logger.log_file
+            default_log_file = self.logger.file_name
         else:
             self.logger = passed_logger
             self.logit = passed_logit
-
-        # self.set_logging()
-        # self.logger.update_file_level(
-        #     self.config['environments'][self.environment]['log_parameters']['f_level'])
-        # self.logger.update_consol_level(
-        #     self.config['environments'][self.environment]['log_parameters']['c_level'])
 
         # Variables
         try:
@@ -107,7 +117,6 @@ class WeatherMan:
 
         # Wrapping up
         self.logit.info(f"Starting in {self.environment}")
-        # self.logit.info(f"logging levels set to fh:{self.state['f_level']} ch:{self.state['c_level']} testing:{self.testing}")
         self.logit.debug(f'State: {self.state}')
 
     # Getters/Setters
@@ -231,41 +240,41 @@ class WeatherMan:
             pass
         return self.config
 
-    def set_logging(self, logging_dct=None):
-        """
-        Set or reset the logging parameters.
-        """
-        if logging_dct is None:
-            logging_dct = self.config['environments'][self.environment]['log_parameters']
-        for k, v in logging_dct.items():
-            if v == 'None':
-                logging_dct[k] = None
-        self.logger.update_file(
-            appname,
-            f_level=logging_dct['f_level'],
-            c_level=logging_dct['c_level'],
-            log_rolling=logging_dct['log_rolling'],
-            maxBytes=logging_dct['maxBytes'],
-            backupCount=logging_dct['backupCount'],
-            log_directory=logging_dct['log_directory'],
-            log_prefix=logging_dct['log_prefix'],
-            log_suffix=logging_dct['log_suffix'],
-            app_name_in_file=logging_dct['app_name_in_file'],
-            date_in_file=logging_dct['date_in_file'],
-            time_in_file=logging_dct['time_in_file'],
-            utc_in_file=logging_dct['utc_in_file'],
-            short_datetime=logging_dct['short_datetime']
-        )
-        if self.logger.state['log_rolling'] is not None:
-            self.logger.add_rotation()
-        self.update_state({
-            'f_level': logging_dct['f_level'],
-            'c_level': logging_dct['c_level'],
-            'log_rolling': logging_dct['log_rolling'],
-            'maxBytes': logging_dct['maxBytes'],
-            'backupCount': logging_dct['backupCount'],
-            'log_file': self.logger.log_file,
-        })
+    # def set_logging(self, logging_dct=None):
+    #     """
+    #     Set or reset the logging parameters.
+    #     """
+    #     if logging_dct is None:
+    #         logging_dct = self.config['environments'][self.environment]['log_parameters']
+    #     for k, v in logging_dct.items():
+    #         if v == 'None':
+    #             logging_dct[k] = None
+    #     self.logger.update_file(
+    #         appname,
+    #         f_level=logging_dct['f_level'],
+    #         c_level=logging_dct['c_level'],
+    #         log_rolling=logging_dct['log_rolling'],
+    #         maxBytes=logging_dct['maxBytes'],
+    #         backupCount=logging_dct['backupCount'],
+    #         log_directory=logging_dct['log_directory'],
+    #         log_prefix=logging_dct['log_prefix'],
+    #         log_suffix=logging_dct['log_suffix'],
+    #         app_name_in_file=logging_dct['app_name_in_file'],
+    #         date_in_file=logging_dct['date_in_file'],
+    #         time_in_file=logging_dct['time_in_file'],
+    #         utc_in_file=logging_dct['utc_in_file'],
+    #         short_datetime=logging_dct['short_datetime']
+    #     )
+    #     if self.logger.state['log_rolling'] is not None:
+    #         self.logger.add_rotation()
+    #     self.update_state({
+    #         'f_level': logging_dct['f_level'],
+    #         'c_level': logging_dct['c_level'],
+    #         'log_rolling': logging_dct['log_rolling'],
+    #         'maxBytes': logging_dct['maxBytes'],
+    #         'backupCount': logging_dct['backupCount'],
+    #         'log_file': self.logger.log_file,
+    #     })
 
     def poll_weather(self):
         """

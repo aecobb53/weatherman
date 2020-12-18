@@ -16,7 +16,7 @@ from typing import Optional, List  # noqa
 # from weatherman import *
 from weatherman import weather_butler
 from weatherman import data_validator
-import setup_weatherman
+from bin import setup_weatherman
 from weatherman import sql_butler
 from bin import logger
 
@@ -31,6 +31,8 @@ Because i dont want it to log to the main log i use a startup log that should fo
 logger = logger.Logger(appname, app_name_in_file=True, log_suffix='startup')
 logit = logger.return_logit()
 default_log_file = logger.log_file
+
+logit.debug('logging the this thingy here')
 
 
 class WeatherMan:

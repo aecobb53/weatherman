@@ -31,7 +31,7 @@ Because i dont want it to log to the main log i use a startup log that should fo
 """
 logger = logger.Logger(appname, app_name_in_file=True, log_suffix='api')
 logit = logger.return_logit()
-default_log_file = logger.log_file
+default_log_file = logger.file_name
 
 logit.debug('logging after first creation')
 
@@ -41,17 +41,14 @@ with open(master_config_path) as ycf:
 environment = os.environ.get('ENVIRONMENT')
 
 logging_dct = config['environments'][environment]['log_parameters']
+# logging_dct = config['api_log_parameters']
 for k, v in logging_dct.items():
     if v == 'None':
         logging_dct[k] = None
-print(logging_dct)
 logger.update_file(
     appname,
     f_level=logging_dct['f_level'],
     c_level=logging_dct['c_level'],
-    log_rolling=logging_dct['log_rolling'],
-    maxBytes=logging_dct['maxBytes'],
-    backupCount=logging_dct['backupCount'],
     log_directory=logging_dct['log_directory'],
     log_prefix=logging_dct['log_prefix'],
     log_suffix=logging_dct['log_suffix'],
@@ -59,12 +56,12 @@ logger.update_file(
     date_in_file=logging_dct['date_in_file'],
     time_in_file=logging_dct['time_in_file'],
     utc_in_file=logging_dct['utc_in_file'],
-    short_datetime=logging_dct['short_datetime']
+    short_datetime=logging_dct['short_datetime'],
+    maxBytes=logging_dct['maxBytes'],
+    backupCount=logging_dct['backupCount'],
+    create_ch=logging_dct['create_ch'],
+    create_sh=logging_dct['create_sh'],
 )
-logger.update_file_level(
-    config['environments'][environment]['log_parameters']['f_level'])
-logger.update_consol_level(
-    config['environments'][environment]['log_parameters']['c_level'])
 
 app = FastAPI()  # noqa
 global WM

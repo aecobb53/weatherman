@@ -39,9 +39,6 @@ environments:
         log_parameters:
             f_level: DEBUG
             c_level: DEBUG
-            log_rolling: size
-            maxBytes: 10000000
-            backupCount: 5
             log_directory: logs
             log_prefix: None
             log_suffix: dev
@@ -50,6 +47,10 @@ environments:
             time_in_file: False
             utc_in_file: False
             short_datetime: False
+            maxBytes: 10000000
+            backupCount: 5
+            create_ch: True
+            create_sh: True
     testing:
         env: test
         testing_flag: True
@@ -72,9 +73,6 @@ environments:
 api_log_parameters:
     f_level: DEBUG
     c_level: DEBUG
-    log_rolling: size
-    maxBytes: 10000000
-    backupCount: 5
     log_directory: logs
     log_prefix: None
     log_suffix: api
@@ -83,6 +81,12 @@ api_log_parameters:
     time_in_file: False
     utc_in_file: False
     short_datetime: False
+    maxBytes: 10000000
+    backupCount: 5
+    create_ch: True
+    create_sh: True
+
+
 
 time_increment:
     replace_seconds: 0
