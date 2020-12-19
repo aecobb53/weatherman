@@ -224,8 +224,8 @@ class Logger(Borg):
         if self.create_fh is None and \
             self.create_ch is None and \
             self.create_sh is None and \
-            self.create_th is None
-        :
+            self.create_th is None:
+            
             self.create_fh = True
             self.create_ch = True
 

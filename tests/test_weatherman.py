@@ -23,7 +23,7 @@ def test_setup(setup_wm):
     # assert wm._setup == None
     # assert wm.setup == False
     # wm.setup = True
-    # assert wm.setup == True
+    assert wm.setup == True
 
 
 
