@@ -7,10 +7,10 @@ import time
 # import os
 # sys.path.append(os.path.abspath('../bin'))
 # from ..bin import logger
-import newlogger
+import logger
 import testing_logging_2
 
-logger = newlogger.Logger(
+logger1 = logger.Logger(
     'testing_logging',
     f_level='DEBUG',
     c_level='DEBUG',
@@ -29,22 +29,22 @@ logger = newlogger.Logger(
     time_in_file=False,
     utc_in_file=False,
     short_datetime=False,
-    # create_fh=True,
+    create_fh=True,
     create_ch=True,
-    create_sh=True,
+    # create_sh=True,
     # create_th=True,
 )
-# logger.print_values()
+# logger1.print_values()
 # exit()
-# logger.add_rotation()
-# logger.add_rotation()
-# logger.add_rotation()
-logit = logger.return_logit()
-# default_log_file = logger.log_file
+# logger1.add_rotation()
+# logger1.add_rotation()
+# logger1.add_rotation()
+logit = logger1.return_logit()
+# default_log_file = logger1.log_file
 
-print(logger.logger.handlers)
+print(logger1.logger.handlers)
 
-logger.update_file(
+logger1.update_file(
     'testing_logging',
     create_fh=True,
     create_sh=None
@@ -54,9 +54,9 @@ logger.update_file(
 
 count = 100
 transition = 10
-
 while True:
     logit.debug(f"itteration: {count}")
+    # testing_logging_2.seccondfunction()
     testing_logging_2.seccondfunction(logit)
     count -= 1
     if count < 0:

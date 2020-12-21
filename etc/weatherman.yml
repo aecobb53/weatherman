@@ -51,7 +51,7 @@ environments:
             backupCount: 5
             create_ch: True
             create_sh: True
-    testing:
+    test:
         env: test
         testing_flag: True
         db_addition: '_test'
@@ -59,17 +59,18 @@ environments:
         log_parameters:
             f_level: DEBUG
             c_level: DEBUG
-            log_rolling: size
-            maxBytes: 10000000
-            backupCount: 5
             log_directory: logs
             log_prefix: None
-            log_suffix: dev
+            log_suffix: test
             app_name_in_file: True
-            date_in_file: False
-            time_in_file: False
+            date_in_file: True
+            time_in_file: True
             utc_in_file: False
-            short_datetime: False
+            short_datetime: True
+            maxBytes: 10000000
+            backupCount: 5
+            create_ch: True
+            create_sh: True
 api_log_parameters:
     f_level: DEBUG
     c_level: DEBUG

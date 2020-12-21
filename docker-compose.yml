@@ -50,8 +50,8 @@ services:
     unit:
         build: .
         image: weather-unit:latest
-        # command: pytest --cov=. .
-        command: pytest --cov=. tests/test_weatherman.py
+        command: pytest --cov=. .
+        # command: pytest --cov=. tests/test_weatherman.py
         # command: pytest --cov=. tests/test_application.py
         volumes:
             - .:/usr/src

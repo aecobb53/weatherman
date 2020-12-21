@@ -1,9 +1,7 @@
 from weatherman import weatherman
 import pytest
-# import datetime
-# import sqlite3
+from datetime import datetime
 import yaml
-# import json
 import os
 import unittest
 mock = unittest.mock.Mock()
@@ -13,6 +11,8 @@ with open(master_copnfig) as ycf:
     config = yaml.load(ycf, Loader=yaml.FullLoader)
 environment = os.environ.get('ENVIRONMENT')
 
+
+
 @pytest.fixture(scope="function")
 def setup_wm():
     wm = weatherman.WeatherMan()
@@ -20,67 +20,53 @@ def setup_wm():
 
 def test_setup(setup_wm):
     wm = setup_wm
-    # assert wm._setup == None
-    # assert wm.setup == False
-    # wm.setup = True
+    assert wm.setup == False
+    wm.setup = True
     assert wm.setup == True
+    wm.setup = None
+
+def testing_auto_polling(setup_wm):
+    wm = setup_wm
+    assert wm.auto_polling == False
+    wm.auto_polling = True
+    assert wm.auto_polling == True
+    wm.auto_polling = None
+
+def testing_timing_intervul(setup_wm):
+    wm = setup_wm
+    assert wm.timing_intervul == 5
+    wm.timing_intervul = 10
+    assert wm.timing_intervul == 10
+    wm.timing_intervul = None
+
+def tesing_last_poll(setup_wm):
+    wm = setup_wm
+    assert isinstance(wm.last_poll, datetime)
+    wm.last_poll = 10
+    assert wm.last_poll == 10
+
+def tesing_db_name(setup_wm):
+    wm = setup_wm
+    assert wm.db_name == config['db_name']
+    wm.db_name = 'newname'
+    assert wm.db_name == 'newname'
 
 
+# def tesing_dump_list(setup_wm):
+# def tesing_append_dump_list(setup_wm):
+# def tesing_clear_dump_list(setup_wm):
+# def tesing_report(setup_wm):
+# def tesing_update_report(setup_wm):
+# def tesing_clear_report(setup_wm):
+# def tesing_state(setup_wm):
+# def tesing_update_state(setup_wm):
+# def tesing_load_config(setup_wm):
+# def tesing_poll_weather(setup_wm):
+# def tesing_manage_polling(setup_wm):
+# def tesing_weather_dump(setup_wm):
+# def tesing_weather_report(setup_wm):
+# def tesing_recursive_search(setup_wm):
+# def tesing_write_report(setup_wm):
+# def tesing_clear_search(setup_wm):
+# def tesing_set_timing_intervul(setup_wm):
 
-
-# def test_auto_polling():
-# def test_timing_intervul():
-# def test_last_poll():
-
-# def test_db_name():
-# def test_dump_list():
-# def test_append_dump_list():
-# def test_clear_dump_list():
-# def test_report():
-# def test_update_report():
-# def test_clear_report():
-# def test_state():
-# def test_update_state():
-
-# def test_load_config():
-# def test_set_logging():
-
-# def test_poll_weather():
-# def test_manage_polling():
-# def test_weather_dump():
-# def test_weather_report():
-# def test_write_report():
-# def test_clear_search():
-# def test_set_timing_intervul():
-
-
-
-
-
-
-# def setup(self, value):
-# def auto_polling(self, value):
-# def timing_intervul(self, value):
-# def last_poll(self, value):
-# def db_name(self, value):
-
-# def dump_list(self):
-# def append_dump_list(self, values):
-# def clear_dump_list(self):
-# def report(self):
-# def update_report(self, dct):
-# def clear_report(self):
-# def state(self):
-# def update_state(self, dct):
-
-# def load_config(self, path=master_config_path):
-# def set_logging(self, logging_dct=None):
-
-# def poll_weather(self):
-# def manage_polling(self):
-# def weather_dump(self, parameters):
-# def weather_report(self, data):
-#     def recursive_search(value, key, index, lst, itterations):
-# def write_report(self, report, file_name=None):
-# def clear_search(self):
-# def set_timing_intervul(self, intervul='auto'):
