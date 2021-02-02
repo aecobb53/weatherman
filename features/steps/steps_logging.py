@@ -1,4 +1,4 @@
-import logger
+from bin import logger
 
 logging_mod = logger
 
@@ -14,5 +14,5 @@ def setup():
         f_level='DEBUG', \
         c_level='WARNING')
     logit = logger.return_logit()
-    default_log_file = logger.log_file
+    default_log_file = logger.file_name
     return logit, logger

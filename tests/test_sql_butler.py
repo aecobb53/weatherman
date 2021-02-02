@@ -1,4 +1,4 @@
-from sql_butler import SQLButler
+from weatherman import sql_butler
 import pytest
 import datetime
 import sqlite3
@@ -15,7 +15,7 @@ environment = os.environ.get('ENVIRONMENT')
 
 @pytest.fixture(scope="function")
 def setup_sqlb():
-    sqlb = SQLButler('db/weatherman_unit')
+    sqlb = sql_butler.SQLButler('db/weatherman_unit')
     return sqlb
 
 @pytest.fixture(scope="function")

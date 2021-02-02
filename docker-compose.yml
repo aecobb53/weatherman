@@ -20,6 +20,7 @@ services:
     dev:
         build: .
         image: weather-dev:latest
+        # command: uvicorn orig_main:app --reload --workers 1 --host 0.0.0.0 --port 8000
         command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8000
         volumes:
             - .:/usr/src
@@ -50,7 +51,7 @@ services:
         build: .
         image: weather-unit:latest
         command: pytest --cov=. .
-        # command: pytest --cov=. tests/test_main.py
+        # command: pytest --cov=. tests/test_weatherman.py
         # command: pytest --cov=. tests/test_application.py
         volumes:
             - .:/usr/src
@@ -64,6 +65,7 @@ services:
     lint:
         build: .
         image: weather-lint:latest
+        # command: sh
         command: pycodestyle --show-source
         # command: pycodestyle dev_tools/main_tool.py --show-source
         # command: pycodestyle dev_tools/main_tool.py --show-source --show-pep8

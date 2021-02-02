@@ -1,4 +1,4 @@
-from data_validator import DataValidator
+from weatherman import data_validator
 import pytest
 from datetime import datetime
 import yaml
@@ -13,7 +13,7 @@ environment = os.environ.get('ENVIRONMENT')
 
 @pytest.fixture(scope="function")
 def setup_dv():
-    dv = DataValidator()
+    dv = data_validator.DataValidator()
     return dv
 
 testdata = [

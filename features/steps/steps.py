@@ -2,8 +2,9 @@ import datetime
 import json
 import yaml
 from behave import given, when, then
-import weather_butler
-import sql_butler
+
+from weatherman import weather_butler
+from weatherman import sql_butler
 
 # Logging
 import steps_logging
