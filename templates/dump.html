@@ -67,6 +67,72 @@
                     placeholder="YYYY-MM-DD[THH:MM:SSZ]">
                 </div>
 
+                <div class="exact-search">
+                    <div><label class="selector-indicator" for="code">City selector</label></div>
+                    <input 
+                    type="search" 
+                    id="city_selector" 
+                    name="city_selector" 
+                    placeholder="Comma seporated city search">
+                </div>
+                
+                <div class="ranges">
+                    <div><label class="selector-indicator" for="code">Range selector</label></div>
+                    <div>
+                        <label class="selector-indicator" for="url">Temp</label>
+                        <select name="first_temp_selector" id="first_temp_selector">
+                            <option value="gt">gt</option>
+                            <option value="gteq">gteq</option>
+                            <option value="eq">eq</option>
+                            <option value="lteq">lteq</option>
+                            <option value="lt">lt</option>
+                        </select>
+                        <input 
+                        type="search" 
+                        id="first_temp_bound" 
+                        name="first_temp_bound" 
+                        size="5">
+                        <select name="second_temp_selector" id="second_temp_selector">
+                            <option value="none">none</option>
+                            <option value="lt">lt</option>
+                            <option value="lteq">lteq</option>
+                            <option value="gteq">gteq</option>
+                            <option value="gt">gt</option>
+                        </select>
+                        <input 
+                        type="search" 
+                        id="second_temp_bound" 
+                        name="second_temp_bound" 
+                        size="5">
+
+                        <label class="selector-indicator" for="url">Wind</label>
+                        <select name="first_wind_selector" id="first_wind_selector">
+                            <option value="gt">gt</option>
+                            <option value="gteq">gteq</option>
+                            <option value="eq">eq</option>
+                            <option value="lteq">lteq</option>
+                            <option value="lt">lt</option>
+                        </select>
+                        <input 
+                        type="search" 
+                        id="first_wind_bound" 
+                        name="first_wind_bound" 
+                        size="5">
+                        <select name="second_wind_selector" id="second_wind_selector">
+                            <option value="none">none</option>
+                            <option value="lt">lt</option>
+                            <option value="lteq">lteq</option>
+                            <option value="gteq">gteq</option>
+                            <option value="gt">gt</option>
+                        </select>
+                        <input 
+                        type="search" 
+                        id="second_wind_bound" 
+                        name="second_wind_bound" 
+                        size="5">
+                    </div>
+                </div>
+
                 <div class="search">
                     <input type="submit" id="get_data" value="Get data" autofocus>
                 </div>

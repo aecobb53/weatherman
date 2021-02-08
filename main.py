@@ -111,8 +111,16 @@ def generage_parameters(
     clear=False,
     exact_list=None,
     start_time=None,
-    end_time=None
-):
+    end_time=None,
+    city_selector=None,
+    first_temp_selector=None,
+    first_temp_bound=None,
+    second_temp_selector=None,
+    second_temp_bound=None,
+    first_wind_selector=None,
+    first_wind_bound=None,
+    second_wind_selector=None,
+    second_wind_bound=None):
 
     if exact_list is None:
         exact_list = ''
@@ -167,10 +175,20 @@ def generage_parameters(
     except:
         end_time = None
 
+    if city_selector is not None:
+        city_select_list = []
+        for city_re in city_selector.split(','):
+            city_re = city_re.replace(' ', '')
+            # print(f"-{city_re}-")
+            city_select_list.append(city_re)
+    else:
+        city_select_list = None
+
     parameters = {
         'exact_list': exact_list,
         'start_time': start_time,
         'end_time': end_time,
+        'city_select_list': city_select_list,
     }
     return parameters
 
@@ -555,7 +573,17 @@ def read_items_search(
         clear=False,
         exact_list=None,
         start_time=None,
-        end_time=None):
+        end_time=None,
+        city_selector=None,
+        first_temp_selector = None,
+        first_temp_bound = None,
+        second_temp_selector = None,
+        second_temp_bound = None,
+        first_wind_selector = None,
+        first_wind_bound = None,
+        second_wind_selector = None,
+        second_wind_bound = None):
+
     """
     Takes a query and tells the app to grab data.
     """
@@ -571,6 +599,15 @@ def read_items_search(
     logit.debug(f"exact_list: {exact_list}")
     logit.debug(f"start_time: {start_time}")
     logit.debug(f"end_time: {end_time}")
+    logit.debug(f"city_selector: {city_selector}")
+    logit.debug(f"first_temp_selector: {first_temp_selector}")
+    logit.debug(f"first_temp_bound: {first_temp_bound}")
+    logit.debug(f"second_temp_selector: {second_temp_selector}")
+    logit.debug(f"second_temp_bound: {second_temp_bound}")
+    logit.debug(f"first_wind_selector: {first_wind_selector}")
+    logit.debug(f"first_wind_bound: {first_wind_bound}")
+    logit.debug(f"second_wind_selector: {second_wind_selector}")
+    logit.debug(f"second_wind_bound: {second_wind_bound}")
 
     resp = is_setup()
     if resp:
@@ -587,7 +624,17 @@ def read_items_search(
         exact_list,
         start_time,
         end_time,
+        city_selector,
+        first_temp_selector,
+        first_temp_bound,
+        second_temp_selector,
+        second_temp_bound,
+        first_wind_selector,
+        first_wind_bound,
+        second_wind_selector,
+        second_wind_bound,
     )
+
     WM.weather_dump(parameters)
     response = RedirectResponse(url='/dump')
     return response

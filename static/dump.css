@@ -50,6 +50,19 @@ label {
     display: inline-block;
 }
 
+.city-search {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+}
+.city-search label {
+    display: inline-block;
+}
+.city-search input {
+    margin-left: 0;
+    padding: 0;
+    display: inline-block;
+}
+
 .search {
     margin: 0;
     padding: 0;
