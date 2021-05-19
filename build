@@ -8,7 +8,16 @@ grep_port () {
 }
 
 setup () {
-    echo 'This is depreciated. use dev_tools/main_tool.py -setup help'
+    # echo 'This is depreciated. use dev_tools/main_tool.py -setup help'
+    echo 'This only does the first half of the setup. use dev_tools/main_tool.py -setup help to finish'
+    mkdir db
+    mkdir db/archive
+    mkdir logs
+    mkdir logs/archive
+    mkdir logs/behave
+    mkdir logs/behave/old
+    mkdir out
+    mkdir out/archive
 }
 
 clean () {

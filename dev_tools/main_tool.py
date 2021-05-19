@@ -14,7 +14,7 @@ aparse.add_argument('-report',  action='store_true', help='database refined dump
 aparse.add_argument('-setup',   action='store_true', help='set up the app. \
     run -setup help for more info')
 aparse.add_argument('-bug',     action='store_true', help='create a bug report')
-aparse.add_argument('-port',    default='8010',      help='create a bug report')
+aparse.add_argument('-port',    default='8000',      help='create a bug report')
 aparse.add_argument('args', nargs='*')
 args = aparse.parse_args()
 

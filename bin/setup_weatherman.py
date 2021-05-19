@@ -224,22 +224,24 @@ class SetupWeatherman:
         """
         Download the list of cities supported by OWMA
         """
-        # print('Grabbing gz file from OWM')
+        print('Grabbing gz file from OWM')
         r = requests.get(self.config['city_list_url'])
-        # print(r)
-        # print(r.json)
-        # open(self.config['city_list_gz_location'], 'wb').write(r.content)
+        print(r)
+        print(r.json)
+        open(self.config['city_list_gz_location'], 'wb').write(r.content)
         return r.content
 
     def gzip_city_list(self):
         """
         Unzip the gz file into the city list json
         """
-        # print('unziping gz')
-        # print(os.path.isfile(self.config['city_list_gz_location']))
+        print('unziping gz')
+        print(os.path.isfile(self.config['city_list_gz_location']))
         if not os.path.isfile(self.config['city_list_gz_location']):
+            f = self.download_city_list()
+        else:
             self.download_city_list()
-        f = gzip.open(self.config['city_list_gz_location'], 'rb')
+            f = gzip.open(self.config['city_list_gz_location'], 'rb')
         file_content = f.read()
         f.close()
         city_list_dict = json.loads(file_content)

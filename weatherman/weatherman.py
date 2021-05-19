@@ -110,7 +110,7 @@ class WeatherMan:
         self.update_state({'env': self.environment})
         self.update_state({'db_name': self.db_name})
         self.update_state({'setup_needed': self.setup})
-        self.update_state({'timing_intervul': self.setup})
+        self.update_state({'timing_intervul': self.timing_intervul})
         self.update_state({'testing': self.testing})
         self.update_state({'db_name': self.db_name})
         self.update_state({'working_directory': os.getcwd()})
@@ -148,7 +148,12 @@ class WeatherMan:
     @property
     def timing_intervul(self):
         if self._timing_intervul is None:
-            return self.set_timing_intervul()
+            return self.set_timing_intervul(self.config['minimum_poll_time'])
+            """
+            If you want to run this as often as possible for a free acount,
+            remove the set_timing_intervul arguments so it runs 'auto'
+            """
+            # return self.set_timing_intervul()
         return self._timing_intervul
 
     @timing_intervul.setter
@@ -444,17 +449,35 @@ class WeatherMan:
         between polls and take the largest value
         between that and the minimum poll timer in the config.
         """
-        try:
-            if intervul == 'auto':
-                calls_made = len(self.state['cities'].keys())
+
+        if intervul == 'auto' or not isinstance(intervul, int):
+            try:
+                calls_made = len(self.config['locations'])
+                # calls_made = len(self.state['cities'].keys())
                 month_minute_converion = 60 * 24 * self.config['estemated_days_per_month']
                 minimum_intervul = month_minute_converion / \
                     self.config['max_calls_per_month'] * calls_made
-                intervul = minimum_intervul
-            self.timing_intervul = max(intervul, self.config['minimum_poll_time'])
-            self.state['timing_intervul'] = self.timing_intervul
-        except:
-            self.timing_intervul = self.config['minimum_poll_time']
-            self.auto_polling = False
-        self.state['auto_polling'] = self.auto_polling
-        return self.timing_intervul
+                intervul = round(minimum_intervul * 10) / 10
+            except KeyError:
+                self.logit.debug('key error when trying to set timing intervul for auto or non int')
+                intervul = int(self.config['minimum_poll_time'])
+        self.timing_intervul = intervul
+        return intervul
+
+        # try:
+        #     pass
+        #     # if intervul == 'auto':
+        #     #     calls_made = len(self.state['cities'].keys())
+        #     #     month_minute_converion = 60 * 24 * self.config['estemated_days_per_month']
+        #     #     minimum_intervul = month_minute_converion / \
+        #     #         self.config['max_calls_per_month'] * calls_made
+        #     #     intervul = minimum_intervul
+        #     # self.timing_intervul = max(intervul, self.config['minimum_poll_time'])
+        #     # self.state['timing_intervul'] = self.timing_intervul
+        # except:
+        #     self.timing_intervul = self.config['minimum_poll_time']
+        #     self.auto_polling = False
+        # self.timing_intervul
+        # self.state['auto_polling'] = self.auto_polling # State should be updated when self.auto_polling is updated, if not this needs to be fixed!
+        # return self.timing_intervul
+        # return 10
