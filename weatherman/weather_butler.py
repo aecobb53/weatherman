@@ -118,14 +118,16 @@ class WeatherButler:
                 report.append(entry)
         return report
 
-    def poll(self):
+    def poll(self, city_id_list=None):
         """
         An easy module to handle all parts of grabbing the data. Its run and successful weather
         comes out... or an error... an error can happen too.
         """
+        if city_id_list is None:
+            city_id_list = self.config['locations'].values()
         url, args = self.format_request_city_id_list(
             self.config['url'],
-            self.config['locations'].values(),
+            city_id_list,
             self.key['Weather_Key']
         )
         self.request, data = self.get_response(url, args)

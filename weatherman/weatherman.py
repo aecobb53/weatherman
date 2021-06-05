@@ -281,23 +281,24 @@ class WeatherMan:
     #         'log_file': self.logger.log_file,
     #     })
 
-    def poll_weather(self):
+    def poll_weather(self, city_id_list=None):
         """
         Using the weather butler to grabb data from the weather website.
         """
-        data = self.weather_butler.poll()
+        data = self.weather_butler.poll(city_id_list)
+        self.logit.debug(f"City list: {city_id_list}")
         self.logit.debug(f"request: {self.weather_butler.request}")
         self.logit.debug(f"request: {self.weather_butler.request.json()}")
         self.last_poll = datetime.datetime.now(tz=datetime.timezone.utc)
         return data
 
-    def manage_polling(self):
+    def manage_polling(self, city_id_list=None):
         """
         I used to have a use case for needing two functions to do this...
         now i just have two functions...
         """
         self.logit.debug('managing polling?')
-        data = self.poll_weather()
+        data = self.poll_weather(city_id_list)
         self.db.multi_add(data)
         self.logit.debug('data added to db')
 
