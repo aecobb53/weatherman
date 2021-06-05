@@ -9,7 +9,7 @@ grep_port () {
 
 setup () {
     # echo 'This is depreciated. use dev_tools/main_tool.py -setup help'
-    echo 'This only does the first half of the setup. use dev_tools/main_tool.py -setup help to finish'
+    echo 'Creating directory structures'
     mkdir db
     mkdir db/archive
     mkdir logs
@@ -18,6 +18,33 @@ setup () {
     mkdir logs/behave/old
     mkdir out
     mkdir out/archive
+
+    echo ''
+    echo '########################################'
+    echo 'Creating container'
+    run
+
+    echo ''
+    echo '########################################'
+    echo 'starting setup'
+    python3 dev_tools/main_tool.py -setup help || python dev_tools/main_tool.py -setup help
+
+    echo ''
+    echo '########################################'
+    echo 'Use this basic command [python3/python] dev_tools/main_tool.py -setup'
+
+}
+
+setup_check() {
+    if [ ! -f 'etc/key.yml' ]; then
+        echo 'Weatherman is not set up yet'
+        setup
+    fi
+
+    if [ ! -f 'etc/weather_api_private.yml' ]; then
+        echo 'Weatherman is not set up yet'
+        setup
+    fi
 }
 
 clean () {
@@ -163,6 +190,7 @@ case "$1" in
 
     # Running
     run)
+        setup_check
         run
         ;;
     dev)
