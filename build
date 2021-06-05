@@ -84,7 +84,6 @@ clean () {
 
 run () {
     # Use docker-compose to spin up the app. 
-    setup_check
     grep_port "weather"
     docker-compose up -d weather
 }
@@ -191,6 +190,7 @@ case "$1" in
 
     # Running
     run)
+        setup_check
         run
         ;;
     dev)
