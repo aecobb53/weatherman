@@ -35,6 +35,18 @@ setup () {
 
 }
 
+setup_check() {
+    if [ ! -f 'etc/key.yml' ]; then
+        echo 'Weatherman is not set up yet'
+        setup()
+    fi
+
+    if [ ! -f 'etc/weather_api_private.yml' ]; then
+        echo 'Weatherman is not set up yet'
+        setup()
+    fi
+}
+
 clean () {
     # Move log files to the logs/archive directory to work with a clean log file. 
     # When the log file is moved a prefix of the date is added. 
@@ -72,6 +84,7 @@ clean () {
 
 run () {
     # Use docker-compose to spin up the app. 
+    setup_check
     grep_port "weather"
     docker-compose up -d weather
 }
