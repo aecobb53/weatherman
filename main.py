@@ -459,15 +459,22 @@ async def return_args(request: Request):
 
 # Poll
 @app.get('/api/poll')
-async def poll_api_data(request: Request):
+async def poll_api_data(
+    city_id_list=None,):
     """
     This fires off a poll to the app.
     """
+
+    if city_id_list is not None:
+        city_id_list = city_id_list.split(',')
+
+    logit.debug(f"polling city_id_list: {city_id_list}")
+
     logit.debug('api poll endpoint hit')
     resp = is_api_setup()
     if resp:
         return resp
-    WM.manage_polling()
+    WM.manage_polling(city_id_list)
 
 
 @app.get('/poll')

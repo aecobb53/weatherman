@@ -68,7 +68,17 @@ if args.state:
             print(f"{tab}{k}: {v}")
 
 if args.poll:
-    response, data = get(url + '/poll')
+    arg_dct = {}
+    if args.args:
+        arg_dct = {
+            'city_id_list': ','.join(args.args)
+        }
+    if arg_dct:
+        print(f"polling for this city id list: {arg_dct['city_id_list']}")
+        response, data = get(url + '/poll', arg_dct)
+    else:
+        print(f"polling with for all cities")
+        response, data = get(url + '/poll')
     print(f"Return code -- {response.status_code}")
     if data == app_no_setup:
         run_setup()
