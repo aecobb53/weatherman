@@ -38,12 +38,12 @@ setup () {
 setup_check() {
     if [ ! -f 'etc/key.yml' ]; then
         echo 'Weatherman is not set up yet'
-        setup()
+        setup
     fi
 
     if [ ! -f 'etc/weather_api_private.yml' ]; then
         echo 'Weatherman is not set up yet'
-        setup()
+        setup
     fi
 }
 
