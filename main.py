@@ -457,6 +457,23 @@ async def return_args(request: Request):
     return templates.TemplateResponse("state.html", {"request": request, 'list': state_list})
 
 
+@app.post('/api/state/update')
+async def return_api_update_state(
+    updated_dict={}):
+    """
+    The api endpoint for updating the state.
+    """
+    logit.debug('api update state endpoint hit')
+    logit.warning(f"Setup is {WM.setup}")
+    logit.debug(f"updated_dict: {updated_dict}")
+    resp = is_api_setup()
+    if resp:
+        return resp
+    WM.update_state(updated_dict)
+    state_response = return_state()
+    return state_response
+
+
 # Poll
 @app.get('/api/poll')
 async def poll_api_data(request: Request):
