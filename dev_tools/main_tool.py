@@ -7,15 +7,16 @@ import yaml
 
 # Argparse
 aparse = argparse.ArgumentParser(description='Task Warrior TMUX wrapper')
-aparse.add_argument('-state',   action='store_true', help='state of app')
-aparse.add_argument('-poll',    action='store_true', help='poll data now')
-aparse.add_argument('-dump',    action='store_true', help='database data dump')
-aparse.add_argument('-report',  action='store_true', help='database refined dump')
-aparse.add_argument('-setup',   action='store_true', help='set up the app. \
+aparse.add_argument('-state',           action='store_true', help='state of app')
+aparse.add_argument('-update_state',    action='append',     help='update the state')
+aparse.add_argument('-poll',            action='store_true', help='poll data now')
+aparse.add_argument('-dump',            action='store_true', help='database data dump')
+aparse.add_argument('-report',          action='store_true', help='database refined dump')
+aparse.add_argument('-setup',           action='store_true', help='set up the app. \
     run -setup help for more info')
-aparse.add_argument('-bug',     action='store_true', help='create a bug report')
-aparse.add_argument('-port',    default='8000',      help='create a bug report')
-aparse.add_argument('args', nargs='*')
+aparse.add_argument('-bug',             action='store_true', help='create a bug report')
+aparse.add_argument('-port',            default='8000',      help='create a bug report')
+aparse.add_argument('args',             nargs='*')
 args = aparse.parse_args()
 
 url = 'http://localhost:' + args.port + '/api'
@@ -46,6 +47,23 @@ def get(url, args=None):
 
     return responses, data
 
+def post(url, args=None):
+    print(f"url: {url}")
+    print(f"args: {args}")
+    if args is None:
+        print('running no args')
+        responses = requests.post(url)
+    else:
+        print('running args')
+        responses = requests.post(url, args)
+
+    try:
+        data = responses.json()
+    except:
+        data = {}
+
+    return responses, data
+
 
 def run_setup():
     # if response.status_code == 501 and response.content.decode('utf-8') == 'App not setup!':
@@ -66,6 +84,18 @@ if args.state:
                 print(f"{tab*2}-{k2}: {v2}")
         else:
             print(f"{tab}{k}: {v}")
+
+if args.update_state:
+    print('updating state')
+    new_states = {}
+    for arg in args.update_state:
+        updatable = arg.split('=')
+        if len(updatable) != 2:
+            raise ValueError('there needs to be an "=" to seporate key/values')
+        new_states[updatable[0]] = updatable[1]
+    print(new_states)
+    response, data = post(url + '/state/update', new_states)
+        
 
 if args.poll:
     arg_dct = {}
